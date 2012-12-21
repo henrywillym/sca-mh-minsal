@@ -1,0 +1,7 @@
+parameters:
+#    min_sal_sid_pla_dependencia.example.class: MinSal\SidPla\DependenciaBundle\Example
+
+services:
+#    min_sal_sid_pla_dependencia.example:
+#        class: %min_sal_sid_pla_dependencia.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

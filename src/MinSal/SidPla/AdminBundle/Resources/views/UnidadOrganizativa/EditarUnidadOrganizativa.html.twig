@@ -1,0 +1,180 @@
+{# ingresar nueva  #}
+{% extends 'MinSalSidPlaBundle:Default:index.html.twig' %}
+{% block body %}
+<script type="text/javascript">        
+      $(document).ready(function(){
+          
+          $('#limpiar').button();
+          $('#guardar').button();
+          $('#buscar').button();
+          $('#dialog').jqm();
+          $('#tabs').tabs(); 
+         
+          $("#formulario").validate();
+         $("#telefono").mask("9999-9999",{placeholder:" "});
+         $("#fax").mask("9999-9999",{placeholder:" "});
+         
+          
+          $('#departamento').change(function(){   
+              $('#municipio').children().remove();
+             
+            
+              $.getJSON('consultarMunicipiosJSON?departamento='+$('#departamento').val(), function(data) {
+                  var i=0;
+                  $.each(data, function(key, val) {
+                      if(key=='rows'){
+                        $.each(val, function(id, registro){
+                          
+                           $('#municipio').append('<option value="'+registro['cell'][0]+'">'+registro['cell'][1]+'</option>');
+                        });                    
+                      }
+                  });
+              });              
+          });
+      });
+      
+      
+                     
+            
+     
+      
+      
+    
+</script>
+
+<style type="text/css">
+
+
+
+form.cmxform label.error, label.error {
+	/* remove the next line when you have trouble in IE6 with labels in list */
+	color: red;
+	font-style: italic
+            
+}
+input.error { border: 1px dotted red; }
+textarea.error { border: 1px dotted red; }
+      </style>
+      
+<h2 class="demoHeaders">Edici&oacute;n  de Unidad Organizativa</h2>
+<div id="tabs">
+        <ul>
+                <li><a href="#tabs-1">Edici&oacute;n</a></li>
+                
+        </ul>
+        <div id="tabs-1" >
+            <form id="formulario" action="{{ path('MinSalSidPlaAdminBundle_editandoUnidadesOrg')}}" method="post" >
+                <table align="center" id="datosgeneralesTabla"  >
+                    <tr>
+                        <td colspan="4" align="center" >Datos Generales de la Unidad<br><br></td>
+                    </tr>
+                    <tr>
+                        <td >Nombre unidad:</td>
+                        <td colspan="3" ><input size="60%" class="required" name="nombreUnidad" id="nombreUnidad" value="{{nombreUnidad}}" ></input></td>
+                    </tr>
+                    <tr>
+                        <td >Descripcion:</td>
+                        <td colspan="3" ><textarea rows="4" cols="58" name="descripcion" size="60%" id="textoMensaje" >{{ descripcion}}</textarea></td>
+                    </tr>
+                    <tr>
+                        <td >Direcci&oacute;n:</td>
+                        <td colspan="3" ><input name="direccion" size="60%" id="direccion" value="{{ direccion}}" ></input></td>
+                    </tr>
+                    <tr>
+                        <td >Responsable: </td>
+                        <td colspan="3" ><input size="60%" name="responsable" id="responsable" value="{{ nombreempleado}} {{segundonombre}} {{apellidoempleado}} {{ segundoapellido}}"></input><input type="button" class="jqModal" value="..." id="buscar"></input></td>
+                    </tr>  
+                    <tr>
+                        <td >Tel&eacute;fono:</td>
+                        <td ><input id="telefono" name="telefono"value="{{telefono}}" ></input></td>
+                        <td>Fax:</td> 
+                        <td><input id="fax" name="fax"value="{{fax}}" ></input></td>
+                    </tr>
+                    <tr>
+                        <td  >Tipo Unidad:</td>
+                        <td colspan="3">
+                            <select id="tipoUnidad" class="required" name="tipoUnidad">
+                                 <option value="1" {% if "1"==tipounidad%} selected="selected" {% endif%}>Dependencia</option>    
+                                 <option value="2"{% if "2"==tipounidad%} selected="selected" {% endif%} >Unidad de Salud</option>    
+                                 <option value="3" {% if "3" ==tipounidad%} selected="selected" {% endif%}>Entidad de Control</option>    
+                                 <option value="4"{% if "4"==tipounidad%} selected="selected" {% endif%} >Ministerio</option>    
+                                 <option value="5"{% if "5"==tipounidad%} selected="selected" {% endif%} >Departamento</option>    
+                            </select>
+                        </td>
+                    </tr> 
+                    <tr>
+                        <td  >Unidad Padre:</td>
+                        <td colspan="3"  >
+                            <select id="unidadPadre" name="unidadPadre">
+                                 <option value="0" >--Seleccione Unidad Padre--</option>    
+                          
+                                        {% for uniorg in unidadPadre %} 
+                                        
+                                           <option value="{{ uniorg.idUnidadOrg}}" {% if uniorg.idUnidadOrg==unidadpadre.getIdUnidadOrg%} selected="selected" {% endif%} >{{ uniorg.descripcionUnidad }}</option>                                        
+                                
+                                   {% endfor %}
+                                        
+                           
+                            </select></td>                            
+                    </tr> 
+                    <tr>
+                        <td>Departamento:</td>
+                        <td><select id="departamento"class="required" name="departamento">
+                                <option value="0" >--Seleccione un Departamento--</option>    
+                                {% for dpto in deptos %} 
+                                        <option value="{{ dpto.idDepto}}" {% if dpto.idDepto==iddepartamento.getIdDepto%} selected="selected" {% endif%} >{{ dpto.nombreDepto }}</option>                                        
+                                {% endfor %}
+                            </select></td>
+                        <td>Municipio:</td>
+                        <td><select id="municipio"class="required" name="municipio">
+                                 <option value="0" >--Seleccione un Municipio--</option>    
+                            </select></td>
+                    </tr> 
+                    
+            <script type="text/javascript">   
+                var idmun={{idmunicipio}};
+      $.getJSON('consultarMunicipiosJSON?departamento={{iddepartamento.getIdDepto}}',function(data) {
+                  var i=0;
+                  $.each(data, function(key, val) {
+                      if(key=='rows'){
+                        $.each(val, function(id, registro){
+                          
+                          $('#municipio').append('<option value="'+registro['cell'][0]+'" >'+registro['cell'][1]+'</option>');
+                          
+                     });                    
+                      }
+                  });
+                  
+              });   
+           // $('#municipio').append('<option value="{{idmunicipio}}"Selected ></option>'); 
+            
+           $("#municipio").find("option[value='{{idmunicipio}}']").remove();
+            $('#municipio').append('<option value="{{idmunicipio}}"Selected >'+"{{nombremunicipio}}"+'</option>');                   
+           
+              </script>      
+                    
+                    
+                    
+                    
+                    <tr>
+                        <td colspan="4" align="center" ><button type="submmit" id="guardar"  >Guardar</button>
+                            <button type="reset" id='limpiar'  >Limpiar</button>
+                            <input type='hidden' name='idfila' id="idfila" value='{{idfila}}' />
+                            <input type='hidden' name='idinfogeneral' id="idfila" value='{{idinfogeneral}}' />
+                            <input type='hidden' name='idempleado' id="idempleado" value='{{responsable}}' />
+                        </td>                        
+                    </tr>                    
+                </table>
+            </form>            
+        </div>
+       
+        <div class="jqmWindow" id="dialog">
+            <a href="#" class="jqmClose">Cerrar</a>
+            <hr>
+            {% include 'MinSalSidPlaAdminBundle:Empleado:showAllEmpleadosforUnitOrg.html.twig'%}
+        </div>
+</div>
+<script type="text/javascript">
+
+</script>
+{% endblock %}

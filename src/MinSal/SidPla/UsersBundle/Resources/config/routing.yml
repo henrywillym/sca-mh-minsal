@@ -1,0 +1,15 @@
+MinSalSidPlaUsersBundle_mostrarUsuariosSinRol:
+    pattern:  /mostrarUsuariosSinRol
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:mostrarUsuariosSinRol}
+    
+MinSalSidPlaUsersBundle_consultarUsuarioSinRolJSON:
+    pattern:  /consultarUsuarioSinRolJSON
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:consultarUsuarioSinRolJSON }
+    
+MinSalSidPlaUsersBundle_editarUsuarioSinRol:
+    pattern:  /editarUsuarioSinRol
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:editarUsuarioSinRol }
+
+MinSalSidPlaUsersBundle_verificaCreacion:
+    pattern:  /verificaCreacion
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:verificaCreacion }

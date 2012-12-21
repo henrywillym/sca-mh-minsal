@@ -1,0 +1,4 @@
+#src/MinSal/SidPla/DependenciaBundle/Resources/config/rounting.yml
+MinSalSidPlaDependenciaBundle_homepage:
+    pattern:  /Dependencia
+    defaults: { _controller: MinSalSidPlaDependenciaBundle:Default:index }

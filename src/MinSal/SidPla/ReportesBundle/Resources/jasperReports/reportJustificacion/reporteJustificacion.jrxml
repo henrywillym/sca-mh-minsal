@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteJustificacion" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="idJustificacion" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ubicacionReport" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT just.justificacion_descripcion, pao.pao_anio, org.uniorg_nombre
+FROM sidpla_justificacion just, sidpla_pao pao, sidpla_unidadorganizativa org
+WHERE just.pao_codigo=pao.pao_codigo AND
+pao.uniorg_codigo = org.uniorg_codigo
+AND just.justificacion_codigo= $P{idJustificacion}]]>
+	</queryString>
+	<field name="justificacion_descripcion" class="java.lang.String"/>
+	<field name="pao_anio" class="java.math.BigDecimal"/>
+	<field name="uniorg_nombre" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="189" splitType="Stretch">
+			<staticText>
+				<reportElement x="55" y="81" width="396" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Formulario 3: Justificación del Plan Operativo ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="252" y="58" width="100" height="20"/>
+				<textElement>
+					<font size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pao_anio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="122" y="112" width="438" height="20" backcolor="#FFFFFF"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{uniorg_nombre}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="3" y="112" width="119" height="20" backcolor="#FFFFFF"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Unidad Organizativa:]]></text>
+			</staticText>
+			<image>
+				<reportElement x="453" y="10" width="79" height="47"/>
+				<imageExpression><![CDATA[$P{ubicacionReport}+"/../Resources/img-reportes/escudo.gif"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="23" y="10" width="80" height="45"/>
+				<imageExpression><![CDATA[$P{ubicacionReport}+"/../Resources/img-reportes/escudo.gif"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="105" y="57" width="233" height="24"/>
+				<textElement textAlignment="Center">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[AÑO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="10" width="346" height="24"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MINISTERIO DE SALUD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="34" width="346" height="24"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PLANIFICACIÓN ANUAL OPERATIVA]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="399" y="81" width="100" height="20"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pao_anio}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="11" y="140" width="547" height="47" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Justified"/>
+				<text><![CDATA[JUSTIFICACIÓN (Incluya un resumen del diagnóstico situacional actual del establecimiento de salud y su área geo-poblacional en término de indicadores de salud, etc. Debe incluir información relevante del entorno externo y del entorno interno.)]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="3" y="140" width="569" height="46"/>
+			</rectangle>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="3" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="47" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="4" width="572" height="26"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{justificacion_descripcion}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="28" splitType="Stretch">
+			<textField>
+				<reportElement x="452" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
