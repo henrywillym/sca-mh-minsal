@@ -52,11 +52,19 @@ class RolSistema
      */
     private $opcionesSistema;
     
+    /**
+     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\JoinTable(name="sca_usuario_rol",
+     *      joinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")}
+     *      )
+     */
+    private $rolUsuario;
     
-     public function __construct()
+    public function __construct()
     {
         $this->usuarios = new ArrayCollection();
         $this->opcionesSistema = new ArrayCollection();
+        $this->rolUsuarios = new ArrayCollection();
     }
 
     

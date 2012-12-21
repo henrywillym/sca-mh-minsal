@@ -1,0 +1,140 @@
+<?php
+
+/* MinSalSidPlaAdminBundle:Empleado:showAllEmpleados.html.twig */
+class __TwigTemplate_a6f68ff4d890779b8361d2cb256a7b3f extends Twig_Template
+{
+    public function __construct(Twig_Environment $env)
+    {
+        parent::__construct($env);
+
+        $this->blocks = array(
+            'body' => array($this, 'block_body'),
+        );
+    }
+
+    protected function doDisplay(array $context, array $blocks = array())
+    {
+        $context = array_merge($this->env->getGlobals(), $context);
+
+        // line 2
+        echo "
+";
+        // line 3
+        $this->displayBlock('body', $context, $blocks);
+    }
+
+    public function block_body($context, array $blocks = array())
+    {
+        // line 4
+        echo "    <script type=\"text/javascript\">
+      \$(document).ready(function(){
+        var myGrid = \$('#theGrid');        
+        myGrid.jqGrid({ 
+          url: 'consultarEmpleadosJSON',
+          datatype:'json',
+          altRows:true,
+          colNames:['Id','Primer Nombre', 'Segundo Nombre', 'Primer Apellido', 'Segundo Apellido', 'DUI','Email', 'Unidad Organizativa'],
+          colModel:[
+            { name:'id', index: 'id', width:20,editable:false,editoptions:{size:15}},
+            { name:'nombrePrimero', index: 'nombrePrimero', width:90,editable:true,editoptions:{size:25,maxlength: 35,dataInit:function(el){\$(el).keyfilter(/[a-z ]/i);}}, formoptions:{ rowpos:1, label: \"Primer Nombre\",elmprefix:\"(*)\"},editrules:{required:true}  },
+            { name:'nombreSegundo', index: 'nombreSegundo',width:90,editable:true,editoptions:{size:25,maxlength: 35,dataInit:function(el){\$(el).keyfilter(/[a-z ]/i);}}, formoptions:{ rowpos:2, label: \"Segundo Nombre\"} },
+            { name:'primerApellido', index: 'primerApellido', width:90,editable:true,editoptions:{size:25,maxlength: 35,dataInit:function(el){\$(el).keyfilter(/[a-z ]/i);}}, formoptions:{ rowpos:3, label: \"Primer Apellido\",elmprefix:\"(*)\"},editrules:{required:true} },
+            { name:'segundoApellido', index: 'segundoApellido',width:90,editable:true,editoptions:{size:25,maxlength: 35,dataInit:function(el){\$(el).keyfilter(/[a-z ]/i);}} , formoptions:{ rowpos:4, label: \"Segundo Apellido\"} },
+            { name:'dui', index: 'dui',width:90,editable:true,editoptions:{size:25,maxlength: 10,dataInit:function(el){\$(el).mask(\"99999999-9\",{placeholder:\" \"});}}, formoptions:{ rowpos:5, label: \"DUI\",elmprefix:\"(*)\"},editrules:{required:true}  },
+            { name:'email', index: 'email',width:150,editable:true,editoptions:{size:50,maxlength: 250,dataInit:function(el){\$(el).keyfilter(/[a-z0-9_\\.\\-@]/i);}}, formoptions:{ rowpos:6, label: \"Email\"},editrules:{email:true,required:false} },
+            { name:'unidad', index: 'unidad',width:300,editable:true,edittype:\"select\",
+                editoptions:{ size: 1,
+                   dataUrl: 'consultarUnidadesOrgJSONSelect',
+                   dataEvents: [
+                      {  type: 'change',
+                         fn: function(e) {
+                            \$('select#unidad').val(this.value);
+                         }
+                      }
+                   ]
+                }
+              }
+          ],            
+          rowNum:10,
+          rowList:[10,20,30],
+          multiselect: false,
+          loadonce:true,
+          pager: jQuery('#pager'),
+          viewrecords: true, 
+          caption: 'Empleados',
+          height: \"100%\",
+          editurl: 'manttEmpleadoEdicion',
+          editCaption: \"Editar Empleado\",
+          addCaption: \"Agregar Empleado\"
+        });
+        myGrid.jqGrid('navGrid','#pager',{edit:false,add:false,del:false,
+        beforeRefresh: function() {\$(\"#theGrid\").jqGrid('setGridParam',{datatype:'json',loadonce:true}).trigger('reloadGrid');}}
+        );
+       
+       function despuesAgregarEditar() {
+        \$(\"#theGrid\").jqGrid('setGridParam',{datatype:'json',loadonce:true}).trigger('reloadGrid');
+            return[true,'']; //no error
+        }
+        \$(\"#agregarEmpleado\").click(function(){
+        jQuery('#theGrid').jqGrid('editGridRow',\"new\",
+             {
+              addCaption: \"Agregar Empleado\",width:550,height:300,bottominfo:\"Campos marcados con (*) son obligatorios\",
+              afterSubmit:despuesAgregarEditar,closeAfterAdd:true,closeOnEscape: true,align:'center',
+              onclickSubmit: function(rp_ge, postdata){
+                                  alert(\"datos guardados con exito!\");                                  
+                                 }
+              });
+        });
+        
+    
+         //editar
+        \$(\"#editarEmpleado\").click(function(){
+          var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+          if( gr != null )
+             jQuery('#theGrid').jqGrid('editGridRow',gr,
+               { width:550,height:300,closeAfterAdd : true,editCaption: \"Editar Empleado\",bottominfo:\"Campos marcados con (*) son obligatorios\",closeAfterEdit:true,
+                 afterSubmit:despuesAgregarEditar,reloadAfterSubmit:true,closeOnEscape: true,align:'center',
+                 onclickSubmit: function(rp_ge, postdata) {
+                              alert(\"datos editados con exito!\");
+                   }   
+                       });
+          else alert(\"Por favor seleccione una fila para editar!\"); 
+          });
+     
+        //eliminar
+        \$(\"#eliminarEmpleado\").click(function(){
+         var grs = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+         if( grs != null ) 
+             jQuery('#theGrid').jqGrid('delGridRow',grs,
+                 {
+                msg: \"Desea Eliminar Este Empleado?\",caption:\"Eliminando Empleado\",
+                width:550,height:160,reloadAfterSubmit:true,align:'center',
+                onclickSubmit: function(rp_ge, postdata) {
+                           alert(\"Empleado eliminado con exito!\");
+                        }
+               
+             }); 
+             else alert(\"Por favor seleccione una fila para borrar!\"); 
+           }); 
+  //fin
+       
+      });
+    </script>
+        
+        <table id=\"theGrid\" class=\"scroll\"></table> 
+        <div id=\"pager\" class=\"scroll\" style=\"text-align:center;\"></div> 
+        
+
+";
+    }
+
+    public function getTemplateName()
+    {
+        return "MinSalSidPlaAdminBundle:Empleado:showAllEmpleados.html.twig";
+    }
+
+    public function isTraitable()
+    {
+        return true;
+    }
+}

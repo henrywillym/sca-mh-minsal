@@ -1,0 +1,122 @@
+<?php
+
+/* MinSalSidPlaAdminBundle:Roles:showAllRoles.html.twig */
+class __TwigTemplate_9869d91c76be2300c4dd102fff0050d5 extends Twig_Template
+{
+    public function __construct(Twig_Environment $env)
+    {
+        parent::__construct($env);
+
+        $this->blocks = array(
+            'body' => array($this, 'block_body'),
+        );
+    }
+
+    protected function doDisplay(array $context, array $blocks = array())
+    {
+        $context = array_merge($this->env->getGlobals(), $context);
+
+        // line 2
+        echo "
+";
+        // line 3
+        $this->displayBlock('body', $context, $blocks);
+    }
+
+    public function block_body($context, array $blocks = array())
+    {
+        // line 4
+        echo "    <script type=\"text/javascript\">
+      \$(document).ready(function(){
+
+        var myGrid = \$('#theGrid');        
+        myGrid.jqGrid({ 
+          url: 'consultarRoles',
+          datatype:'json',
+          altRows:true,
+          colNames:['Id','Nombre', 'Descripcion'],
+          colModel:[
+            { name:'id', index: 'id', width:20,editable:false,editoptions:{size:15}  },
+            { name:'nombre', index: 'nombre', width:150,editable:true,editoptions:{size:25,maxlength: 10}, editrules:{required:true},formoptions:{ rowpos:1, label: \"Nombre\", elmprefix:\"(*)\"} },
+            { name:'funciones', index: 'funciones',width:300,editable:true,editoptions:{size:50,maxlength: 300},editrules:{required:true},formoptions:{ rowpos:2, label: \"Descripcion\", elmprefix:\"(*)\"}  } ],            
+          rowNum:10,
+          rowList:[10,20,30],
+          loadonce:true,
+          multiselect: false,
+          pager: jQuery('#pager'),
+          viewrecords: true,          
+          caption: 'Roles del sistema',
+          height: \"100%\",
+          editurl: 'manttRolEdicion'
+        });
+        myGrid.jqGrid('navGrid','#pager',{edit:false,add:false,del:false,
+            beforeRefresh: function() {\$(\"#theGrid\").jqGrid('setGridParam',{datatype:'json',loadonce:true}).trigger('reloadGrid');}}).hideCol('id');
+        
+        function despuesAgregarEditar() {
+        \$(\"#theGrid\").jqGrid('setGridParam',{datatype:'json',loadonce:true}).trigger('reloadGrid');
+            return[true,'']; //no error
+        }
+        \$(\"#agregarRoles\").click(function(){
+        jQuery('#theGrid').jqGrid('editGridRow',\"new\",
+             {
+              width:550,height:160,bottominfo:\"Campos marcados con (*) son obligatorios\",
+              afterSubmit:despuesAgregarEditar,closeAfterAdd:true,closeOnEscape: true,align:'center',
+              onclickSubmit: function(rp_ge, postdata){
+                                  alert(\"datos guardados con exito!\");                                  
+                                 }
+              });
+        });
+        
+    
+         //editar
+        \$(\"#editarRoles\").click(function(){
+          var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+          if( gr != null )
+             jQuery('#theGrid').jqGrid('editGridRow',gr,
+               { width:550,height:160,bottominfo:\"Campos marcados con (*) son obligatorios\",closeAfterEdit:true,
+                 afterSubmit:despuesAgregarEditar,reloadAfterSubmit:true,closeOnEscape: true,align:'center',
+                 onclickSubmit: function(rp_ge, postdata) {
+                              alert(\"Roles Guardados con exito!\");
+                   }   
+                       });
+          else alert(\"Por favor seleccione una fila para editar!\"); 
+          });
+     
+        //eliminar
+        \$(\"#eliminarRoles\").click(function(){
+         var grs = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+         if( grs != null ) 
+             jQuery('#theGrid').jqGrid('delGridRow',grs,
+                 {
+                msg: \"Desea Eliminar Este Rol del sistema?\",caption:\"Eliminando rol del Sistema\",
+                width:550,height:160,reloadAfterSubmit:true,align:'center',
+                onclickSubmit: function(rp_ge, postdata) {
+                           alert(\"rol del sistema eliminadas con exito!\");
+                        }
+               
+             }); 
+             else alert(\"Por favor seleccione una fila para borrar!\"); 
+           }); 
+  //fin
+  
+        
+      });
+    </script>
+        
+        <table id=\"theGrid\" class=\"scroll\"></table> 
+        <div id=\"pager\" class=\"scroll\" style=\"text-align:center;\"></div> 
+        
+
+";
+    }
+
+    public function getTemplateName()
+    {
+        return "MinSalSidPlaAdminBundle:Roles:showAllRoles.html.twig";
+    }
+
+    public function isTraitable()
+    {
+        return true;
+    }
+}

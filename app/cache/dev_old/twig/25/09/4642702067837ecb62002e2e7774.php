@@ -1,0 +1,125 @@
+<?php
+
+/* MinSalSidPlaEstInfraBundle:UnidadMedida:showUnidadMedida.html.twig */
+class __TwigTemplate_25094642702067837ecb62002e2e7774 extends Twig_Template
+{
+    public function __construct(Twig_Environment $env)
+    {
+        parent::__construct($env);
+
+        $this->blocks = array(
+            'body' => array($this, 'block_body'),
+        );
+    }
+
+    protected function doDisplay(array $context, array $blocks = array())
+    {
+        $context = array_merge($this->env->getGlobals(), $context);
+
+        // line 1
+        $this->displayBlock('body', $context, $blocks);
+    }
+
+    public function block_body($context, array $blocks = array())
+    {
+        // line 2
+        echo "<script type=\"text/javascript\">
+\$(document).ready(function(){
+    \$('#agregarUnidadButton').button();
+    \$('#editarUnidadButton').button();
+    \$('#eliminarUnidadButton').button();
+       
+    \$('#tabUnidMed').jqGrid({ 
+          url: 'consultarUnidadMedidaJSON',
+          datatype:'json',
+          altRows:true,
+          colNames:['Codigo','Unidad de medida','Abreviatura','Tipo','Descripcion'],
+          colModel:[
+            { name:'codigo', index: 'codigo', width:40,align:'center',editable:false,editoptions:{size:15}},
+            { name:'unidmed', index: 'unimed', width:150,editable:true,editoptions:{size:30,maxlength: 50}, formoptions:{label: \"Unidad de medida\",elmprefix:\"(*)\"},editrules:{required:true}},
+            { name:'abreviatura', index: 'abreviatura',align:\"center\", width:70,editable:true,editoptions:{size:30,maxlength: 15}, formoptions:{label: \"Abreviatura\",elmprefix:\"(*)\"},editrules:{required:true}},
+            { name:'tipo', index: 'tipo', width:100,align:\"center\",editable:true,editoptions:{size:30},edittype:\"select\",editoptions:{value:\"entero:Entero;decimal:Decimal;porcentaje:Porcentaje\"},
+                formoptions:{label: \"Tipo\"}},
+            { name:'descripcion', index: 'descripcion', width:500,edittype:\"textarea\", editoptions:{rows:\"5\",cols:\"40\",maxlength: 250},editable:true,formoptions:{label: \"Descripcion\"}}
+          ],
+          rowNum:10,
+          rowList:[10,20,30],
+          multiselect: false,
+          pager: jQuery('#pager'),
+          loadonce:true,
+          viewrecords: true,          
+          caption: 'Gestion Unidades de Medida',
+          addCaption: \"Agregar Unidad de Medida\",
+          editCaption: \"Editar Unidad de Medida\",
+          height: \"100%\",
+          editurl:'manttUnidadMedida'
+                     
+        });
+   \$('#tabUnidMed').jqGrid('navGrid','#pager',{edit:false,add:false,del:false,view:true,
+     beforeRefresh: function() {\$('#tabUnidMed').jqGrid('setGridParam',{datatype:'json',loadonce:true}).trigger('reloadGrid');}}
+   ).hideCol('codigo');   
+ 
+    /* Funcion para regargar los JQGRID luego de agregar y editar*/
+   function despuesAgregarEditar() {
+      \$('#tabUnidMed').jqGrid('setGridParam',{datatype:'json',loadonce:true}).trigger('reloadGrid');
+      return[true,'']; //no error
+   }
+ 
+  //agregar
+  \$(\"#agregarUnidadButton\").click(function(){
+     jQuery('#tabUnidMed').jqGrid('editGridRow',\"new\",
+        {closeAfterAdd:true,addCaption: \"Agregar Unidad de Medida\",height:250,align:'center',reloadAfterSubmit:true,
+         width: 600,processData: \"Cargando...\",bottominfo:\"Campos marcados con (*) son obligatorios\",afterSubmit:despuesAgregarEditar, 
+         onclickSubmit: function(rp_ge, postdata) {
+            alert(\"datos guardados con exito!\");
+         }});
+  });
+    
+         //editar
+\$(\"#editarUnidadButton\").click(function(){
+  var gr = jQuery('#tabUnidMed').jqGrid('getGridParam','selrow');
+  if( gr != null )
+    jQuery(\"#tabUnidMed\").jqGrid('editGridRow',gr,
+        {closeAfterEdit:true,editCaption: \"Editando Unidad de Medida\",height:250,align:'center',reloadAfterSubmit:true,
+         width: 600,processData: \"Cargando...\",afterSubmit:despuesAgregarEditar, bottominfo:\"Campos marcados con (*) son obligatorios\", 
+         onclickSubmit: function(rp_ge, postdata) {
+                alert(\"Unidad de Medida editado con exito!\");
+          }});
+ else 
+     alert(\"Por favor seleccione una fila para editar!\"); 
+ });
+    
+        //eliminar
+\$(\"#eliminarUnidadButton\").click(function(){
+  var grs = jQuery('#tabUnidMed').jqGrid('getGridParam','selrow');
+  if( grs != null ) jQuery('#tabUnidMed').jqGrid('delGridRow',grs,
+    {msg: \"Desea Eliminar esta Unidad de Medida?\",caption:\"Eliminando Unidad de Medida\",height:100,
+     align:'center',reloadAfterSubmit:true,width: 300,processData: \"Cargando...\",
+     onclickSubmit: function(rp_ge, postdata) {
+        alert(\"Unidad de Medida eliminado con exito!\");
+  }}); 
+  else 
+     alert(\"Por favor seleccione una fila para borrar!\"); 
+  }); 
+});
+    </script>
+    <table id=\"tabUnidMed\" class=\"scroll\" alignalign=\"center\"></table>
+    <div id=\"pager\" class=\"scroll\"></div>  
+    <br></br>
+    <input type=\"button\" id=\"agregarUnidadButton\" value=\"  Agregar  \" />
+    <input type=\"button\" id=\"editarUnidadButton\" value=\"   Editar   \" />
+    <input type=\"button\" id=\"eliminarUnidadButton\" value=\"  Eliminar  \" />
+    
+";
+    }
+
+    public function getTemplateName()
+    {
+        return "MinSalSidPlaEstInfraBundle:UnidadMedida:showUnidadMedida.html.twig";
+    }
+
+    public function isTraitable()
+    {
+        return true;
+    }
+}
