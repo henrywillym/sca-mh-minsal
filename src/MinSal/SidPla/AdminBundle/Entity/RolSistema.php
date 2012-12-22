@@ -38,9 +38,9 @@ class RolSistema
     
     
      /**
-     * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="rol")
+     * ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="rol")
      */
-    protected $usuarios;
+    //protected $usuarios;
     
     /**
      * @ORM\ManyToMany(targetEntity="OpcionSistema")
@@ -53,18 +53,15 @@ class RolSistema
     private $opcionesSistema;
     
     /**
-     * @ORM\ManyToMany(targetEntity="User")
-     * @ORM\JoinTable(name="sca_usuario_rol",
-     *      joinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")}
-     *      )
-     */
-    private $rolUsuario;
+     * ORM\ManyToMany(targetEntity="MinSal\SidPla\UserBundle\Entity\User", mappedBy="rols")\
+     * ORM\JoinTable(name="sca_usuario_rol",joinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")})
+     *
+    private $usuarios;*/
     
     public function __construct()
     {
         $this->usuarios = new ArrayCollection();
         $this->opcionesSistema = new ArrayCollection();
-        $this->rolUsuarios = new ArrayCollection();
     }
 
     
@@ -130,10 +127,10 @@ class RolSistema
      *
      * @param MinSAl\SidPla\UsersBundle\Entity\User $usuarios
      */
-    public function addUsuarios(\MinSAl\SidPla\UsersBundle\Entity\User $usuarios)
+    /*public function addUsuarios(\MinSAl\SidPla\UsersBundle\Entity\User $usuarios)
     {
         $this->usuarios[] = $usuarios;
-    }
+    }*/
 
     /**
      * Get usuarios
@@ -177,10 +174,10 @@ class RolSistema
      *
      * @param MinSal\SidPla\UsersBundle\Entity\User $usuarios
      */
-    public function addUser(\MinSal\SidPla\UsersBundle\Entity\User $usuarios)
+    /*public function addUser(\MinSal\SidPla\UsersBundle\Entity\User $usuarios)
     {
         $this->usuarios[] = $usuarios;
-    }
+    }*/
 
     /**
      * Add opcionesSistema

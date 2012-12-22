@@ -12,6 +12,13 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class User extends BaseUser {
     
+    public function __construct() {
+        parent::__construct();
+        // your own logic
+        $this->entidad = new ArrayCollection();
+        $this->rols = new ArrayCollection();
+    }
+    
     /**
      * @ORM\Id
      * @ORM\Column(name="usuario_codigo", type="integer")
@@ -26,10 +33,18 @@ class User extends BaseUser {
     private $entidad;
 
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\RolSistema", inversedBy="usuarios")
-     * @ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")
+     * ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\RolSistema", inversedBy="usuarios")
+     * ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")
      */
-    protected $rol;
+    //protected $rol;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="MinSal\SidPla\AdminBundle\Entity\RolSistema")
+     * @ORM\JoinTable(name="sca_usuario_rol", 
+     *              joinColumns={@ORM\JoinColumn(name="usuario_codigo", referencedColumnName="usuario_codigo")},
+     *              inverseJoinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")})
+     */
+    protected $rols;
         
     /**
      * @var string $userDui
@@ -103,11 +118,7 @@ class User extends BaseUser {
      */
     //private $idEmpleado;
 
-    public function __construct() {
-        parent::__construct();
-        // your own logic
-        $this->entidad = new ArrayCollection();
-    }
+    
 
     /**
      * Get id
@@ -154,23 +165,6 @@ class User extends BaseUser {
         return $this->empleado;
     }*/
 
-    /**
-     * Set rol
-     *
-     * @param MinSal\SidPla\AdminBundle\Entity\RolSistema $rol
-     */
-    public function setRol(\MinSal\SidPla\AdminBundle\Entity\RolSistema $rol) {
-        $this->rol = $rol;
-    }
-
-    /**
-     * Get rol
-     *
-     * @return MinSal\SidPla\AdminBundle\Entity\RolSistema 
-     */
-    public function getRol() {
-        return $this->rol;
-    }
 
     /**
      * Get username
@@ -261,6 +255,14 @@ class User extends BaseUser {
 
     public function setUserApellidos($userApellidos) {
         $this->userApellidos = $userApellidos;
+    }
+
+    public function getRols() {
+        return $this->rols;
+    }
+
+    public function setRols($rols) {
+        $this->rols = $rols;
     }
 
 
