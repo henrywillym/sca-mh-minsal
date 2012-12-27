@@ -1,0 +1,132 @@
+{% extends 'MinSalSidPlaBundle:Default:index.html.twig' %}
+{% form_theme form 'MinSalSidPlaAdminBundle:Entidad/Form:fields.html.twig' %}
+
+{% block body %}
+
+    <script type="text/javascript">
+        /**
+        * Funcion utilizada para disparar todos los triggers y ajustar el formulario al contenido cargado.
+        */
+        function EventosIniciales(){
+            $('#Entidad_entTipoPersona').trigger('change');
+            $('#Entidad_entHabilitado').trigger('change');
+            HabProduccion();
+            HabVendedor();
+        }
+        
+        /**
+        * Funcion utilizada para Ocultar/Mostrar el campo de comentarios
+        */
+        function HabComentario(){
+            if( $('input[name="Entidad[entHabilitado]"]:checked').val() == 1){
+                $('#Entidad_entComentario').removeAttr('required');
+                $('#Entidad_entComentario').val(null);
+                $('#Entidad_entComentario').parent().parent().hide('slow');
+
+            }else if ( $('input[name="Entidad[entHabilitado]"]:checked').val() ==0){
+                $('#Entidad_entComentario').parent().parent().show('slow');
+                $('#Entidad_entComentario').attr('required','required');
+            }
+        }
+        
+        /**
+        * Funcion utilizada para Ocultar/Mostrar los campos relacionados al tipo de persona
+        */
+        function tipoPersona(accion){
+            if(accion=='show'){
+                $('#Entidad_entTipoDoc').parent().parent().show('slow');
+                $('#Entidad_entActua').parent().parent().show('slow');
+                $('#Entidad_entRepNit').parent().parent().show('slow');
+                $('#Entidad_entRepDoc').parent().parent().show('slow');
+                $('#Entidad_entRepNombre').parent().parent().show('slow');
+                
+                $('#Entidad_entTipoDoc').children('input').attr('required','required');
+                $('#Entidad_entActua').children('input').attr('required','required');
+                $('#Entidad_entRepNit').attr('required','required');
+                $('#Entidad_entRepDoc').attr('required','required');
+                $('#Entidad_entRepNombre').attr('required','required');
+                    
+            }else if(accion=='hide'){
+                $('#Entidad_entTipoDoc').parent().parent().hide('slow');
+                $('#Entidad_entActua').parent().parent().hide('slow');
+                $('#Entidad_entRepNit').parent().parent().hide('slow');
+                $('#Entidad_entRepDoc').parent().parent().hide('slow');
+                $('#Entidad_entRepNombre').parent().parent().hide('slow');
+                
+                $('input[name="Entidad[entTipoDoc]"]:checked').attr('checked',null);
+                $('input[name="Entidad[entActua]"]:checked').attr('checked',null);
+                $('#Entidad_entTipoDoc').children('input').removeAttr('required');
+                $('#Entidad_entActua').children('input').removeAttr('required');
+                
+                $('#Entidad_entRepNit').val(null);
+                $('#Entidad_entRepDoc').val(null);
+                $('#Entidad_entRepNombre').val(null);
+                
+                $('#Entidad_entRepNit').removeAttr('required');
+                $('#Entidad_entRepDoc').removeAttr('required');
+                $('#Entidad_entRepNombre').removeAttr('required');
+            }
+        }
+        
+        function HabProduccion(){
+            if( $('#Entidad_entProductor').is(':checked')){
+                $('#Entidad_entProdEstEtil').parent().parent().show('slow');
+                $('#Entidad_entProdEstEtil').attr('required','required');
+            }else{
+                $('#Entidad_entProdEstEtil').removeAttr('required');
+                $('#Entidad_entProdEstEtil').val(null);
+                $('#Entidad_entProdEstEtil').parent().parent().hide('slow');
+            }
+        }
+        
+        function HabVendedor(){
+            if( $('#Entidad_entComprador').is(':checked')){
+                $('#Entidad_entCompVend').parent().parent().show('slow');
+            }else{
+                $('#Entidad_entCompVend').removeAttr('checked');
+                $('#Entidad_entCompVend').parent().parent().hide('slow');
+            }
+        }
+        
+        $(document).ready(function(){
+            $('#btnGuardar').button();
+            $('#btnRegresar').button();
+            
+            $('#Entidad_entTipoPersona').change(function(){
+                if( $('input[name="Entidad[entTipoPersona]"]:checked').val() =='N'){
+                    tipoPersona('hide');
+                    
+                }else if ( $('input[name="Entidad[entTipoPersona]"]:checked').val() =='J'){
+                    tipoPersona('show');
+                }
+            });
+            
+            $('#Entidad_entHabilitado').change(function(){
+                HabComentario();
+            });
+            
+            $('#Entidad_entProductor').click(function(){
+                HabProduccion();
+            });
+            
+            $('#Entidad_entComprador').click(function(){
+                HabVendedor();
+            });
+            
+            $('form>table').show('fast',EventosIniciales);
+            
+       });
+    </script>
+    
+    
+    <form id="formulario" action="{{ path('MinSalSidPlaAdminBundle_mantEntidadEdicion') }}" method="post" {{ form_enctype(form) }}>
+        
+        <table align='center' style="display:none">
+            {{ form_widget(form) }}
+        </table>
+        <center>
+            <input id="btnGuardar" type="submit" value="Guardar"/> &nbsp;
+            <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSidPlaAdminBundle_mantEntidades')}}';"/>
+        </center>
+    </form>
+{% endblock %}

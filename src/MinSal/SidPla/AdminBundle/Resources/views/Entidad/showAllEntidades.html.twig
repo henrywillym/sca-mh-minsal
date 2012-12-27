@@ -1,0 +1,185 @@
+{# Muestra todos los Productores, Importadores y Compradores Locales Registrados#}
+
+{% block body %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var myGrid = $('#theGrid');
+            
+            myGrid.jqGrid({ 
+                url: 'consultarEntidadesJSON',
+                width: 1000,
+                datatype:'json',
+                altRows:true,            
+                rowNum:10,
+                rowList:[10,20,30],
+                multiselect: false,
+                loadonce:true,
+                jsonReader: {
+                    root:'rows',
+                    page:'page',
+                    total:'total',
+                    records:'records',
+                    repeatitems: false,     /**/
+                    id:"0"                 /**/
+                },
+                pager: jQuery('#pager'),
+                viewrecords: true, 
+                caption: 'Empresas Registradas',
+                height: "100%",
+                //editurl: 'mantEntidadEdicion',
+                editCaption: "Editar Empresa",
+                addCaption: "Agregar Empresa",
+                //colNames:['Id','Primer Nombre', 'Segundo Nombre', 'Primer Apellido', 'Segundo Apellido', 'DUI','Email', 'Unidad Organizativa'],
+                colModel:[{
+                        key:true,
+                        label:'ID',
+                        name:'entId', 
+                        index: 'entId', 
+                        width:20
+                    },{ 
+                        label:'NCR',
+                        name:'entNrc', 
+                        index: 'entNrc', 
+                        width:90
+                    },{ 
+                        label:'Giro o Actividad Económica',
+                        name:'entGiro', 
+                        index: 'entGiro',
+                        width:90
+                    },{ 
+                        label:'Tipo Persona',
+                        name:'entTipoPersona', 
+                        index: 'entTipoPersona',
+                        width:150 
+                    },{ 
+                        label:'E-mail',
+                        name:'entEmail', 
+                        index: 'entEmail',
+                        width:150
+                    },{
+                        label:'Nombre propietario, Denominación o Razón Social',
+                        name:'entNombre', 
+                        index: 'entNombre'
+                    },{
+                        label:'Nombre Comercial',
+                        name:'entNombComercial', 
+                        index: 'entNombComercial'
+                    },{
+                        label:'Nombre Rep. o Apoderado',
+                        name:'entRepNombre', 
+                        index: 'entRepNombre'
+                    },{
+                        label:'Vencimiento',
+                        name:'entVenc', 
+                        index: 'entVenc',
+                        sorttype:'date', 
+                        datefmt:'Y-m-d',
+                        editrules:{date:true}/*,
+                        formatter:'date',
+                        formatoptions:{
+                            srcformat:'Y-m-d H:i:s',
+                            newformat:'Y-m-d'
+                        }*/
+                    },{
+                        label:'¿Habilitado?',
+                        name:'entHabilitado', 
+                        index: 'entHabilitado'
+                    },{
+                        label:'¿Es Importador?',
+                        name:'entImportador', 
+                        index: 'entImportador'
+                    },{
+                        label:'¿Es Productor?',
+                        name:'entProductor', 
+                        index: 'entProductor'
+                    },{
+                        label:'¿Es Comp. Local?',
+                        name:'entComprador', 
+                        index: 'entComprador'
+                    },{
+                        label:'Comentario',
+                        name:'entComentario',
+                        index:'entComentario',
+                        hidden: true
+                    }
+                ]
+            });
+            
+            myGrid.jqGrid('navGrid','#pager',{
+                edit:false,
+                add:false,
+                del:false,
+                beforeRefresh: function() {
+                    $("#theGrid").jqGrid('setGridParam',{
+                            datatype:'json',
+                            loadonce:true
+                    }).trigger('reloadGrid');
+                }
+            }
+        );
+       
+        function despuesAgregarEditar() {
+            $("#theGrid").jqGrid('setGridParam',{
+                datatype:'json',
+                loadonce:true
+            }).trigger('reloadGrid');
+            
+            return[true,'']; //no error
+        }
+        
+        $("#agregarEntidad").click(function(){
+            location.href = '{{ url('MinSalSidPlaAdminBundle_mantCargarEntidad', {'entId':'entId'})}}'.replace(/entId/g, '-1');
+            
+            /*jQuery('#theGrid').jqGrid('editGridRow',"new",{
+                addCaption: "Agregar Empresa",
+                width:550,
+                height:300,
+                bottominfo:"Campos marcados con (*) son obligatorios",
+                afterSubmit:despuesAgregarEditar,
+                closeAfterAdd:true,
+                closeOnEscape: true,
+                align:'center',
+                onclickSubmit: function(rp_ge, postdata){
+                    alert("datos guardados con exito!");                                  
+                }
+             });*/
+        });
+        
+    
+         //editar
+        $("#editarEntidad").click(function(){
+            var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            
+            if( gr != null ){
+                location.href = '{{ url('MinSalSidPlaAdminBundle_mantCargarEntidad', {'entId':'entId'})}}'.replace(/entId/g, gr);
+                /*
+                jQuery('#theGrid').jqGrid('editGridRow',gr,{ 
+                    width:550, 
+                    height:300,
+                    closeAfterAdd : true,
+                    editCaption: "Editar Empresa",
+                    bottominfo:"Campos marcados con (*) son obligatorios",
+                    closeAfterEdit:true,
+                    afterSubmit:despuesAgregarEditar,
+                    reloadAfterSubmit:true,
+                    closeOnEscape: true,
+                    align:'center',
+                    onclickSubmit: function(rp_ge, postdata) {
+                        alert("datos editados con exito!");
+                    }
+                });/**/
+            }else{ 
+                alert("Por favor seleccione una fila para editar!"); 
+            }
+        });
+  //fin
+       
+      });
+    </script>
+        
+    <table id="theGrid" class="scroll">
+    </table> 
+        
+    <div id="pager" class="scroll" style="text-align:center;">
+    </div> 
+{% endblock %}

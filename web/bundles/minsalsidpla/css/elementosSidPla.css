@@ -44,3 +44,9 @@
   border-width: thin;
   border-collapse: collapse
 }
+
+.flash-notice{
+    font-size: 12px;
+    color: #FF0000;
+    font-weight: bolder; 
+}

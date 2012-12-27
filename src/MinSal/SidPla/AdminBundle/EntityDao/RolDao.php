@@ -135,7 +135,7 @@ class RolDao {
              $rsm->addFieldResult('o', 'opcionsistema_codigo', 'idOpcionSistema');
              $rsm->addFieldResult('o', 'opcionsistema_nombre', 'nombreOpcion');
              $query = $this->em->createNativeQuery('SELECT opc.opcionsistema_codigo, opc.opcionsistema_nombre 
-                                                    FROM sidpla_rol_opcion rolopc, sidpla_opcionsistema opc, sidpla_rol rol  
+                                                    FROM sca_rol_opcion rolopc, sca_opcionsistema opc, sca_rol rol  
                                                     WHERE rol.rol_codigo=rolopc.rol_codigo AND opc.opcionsistema_codigo=rolopc.opcionsistema_codigo
                                                     AND rol.rol_codigo = ?' , $rsm);   
              $query->setParameter(1, $id);
@@ -152,7 +152,7 @@ class RolDao {
          public function insertOpcSeleccRol($idRol, $idOpc){ 
              
              $query = $this->em->getConnection()
-                     ->executeUpdate('INSERT INTO sidpla_rol_opcion(
+                     ->executeUpdate('INSERT INTO sca_rol_opcion(
                                 opcionsistema_codigo, rol_codigo)
                                 VALUES ('.$idOpc.','.$idRol.' );');
          }
@@ -164,7 +164,7 @@ class RolDao {
          public function deleteOpcSeleccRol($idRol, $idOpc){ 
              
              $query = $this->em->getConnection()
-                     ->executeUpdate('DELETE FROM sidpla_rol_opcion
+                     ->executeUpdate('DELETE FROM sca_rol_opcion
                                       WHERE opcionsistema_codigo='.$idOpc.'  
                                       AND rol_codigo='.$idRol);  
          }
@@ -182,10 +182,10 @@ class RolDao {
              $rsm->addFieldResult('o', 'opcionsistema_nombre', 'nombreOpcion');
              $query = $this->em
                      ->createNativeQuery('SELECT opc.opcionsistema_codigo, opc.opcionsistema_nombre 
-                                          FROM sidpla_opcionsistema opc
+                                          FROM sca_opcionsistema opc
                                           WHERE opc.opcionsistema_codigo 
                                           NOT IN (SELECT opc.opcionsistema_codigo 
-                                            FROM sidpla_rol_opcion rolopc, sidpla_rol rol 
+                                            FROM sca_rol_opcion rolopc, sca_rol rol 
                                             WHERE rol.rol_codigo=rolopc.rol_codigo AND opc.opcionsistema_codigo=rolopc.opcionsistema_codigo
                                             AND rol.rol_codigo=?)' , $rsm);   
              $query->setParameter(1, $idRol);

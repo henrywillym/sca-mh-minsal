@@ -139,3 +139,19 @@ MinSalSidPlaAdminBundle_editandoUnidadesOrg:
     pattern:  /admin/editandoUnidadesOrg    
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:editandoUnidadesOrg }  
     
+#Empresas o Entidades
+MinSalSidPlaAdminBundle_mantEntidades:
+    pattern:  /admin/mantEntidades
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantEntidades } 
+    
+MinSalSidPlaAdminBundle_consultarEntidadesJSON:
+    pattern:  /admin/consultarEntidadesJSON
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:consultarEntidadesJSON } 
+
+MinSalSidPlaAdminBundle_mantEntidadEdicion:
+    pattern:  /admin/mantEntidadEdicion
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantEntidadEdicion }
+
+MinSalSidPlaAdminBundle_mantCargarEntidad:
+    pattern:  /admin/mantCargarEntidad/{entId}
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantCargarEntidad } 

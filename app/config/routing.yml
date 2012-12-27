@@ -15,9 +15,6 @@ MinSalSidPlaUsersBundle:
     resource: "@MinSalSidPlaUsersBundle/Resources/config/routing.yml"
     prefix:   /SidPla/users
 
-MinSalSidPlaReportesBundle:
-    resource: "@MinSalSidPlaReportesBundle/Resources/config/routing.yml"
-    prefix:   /SidPla/reportes
 
 #Para seguridad
 fos_user_security:

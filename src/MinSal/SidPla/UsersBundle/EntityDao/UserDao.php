@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use MinSal\SidPla\UsersBundle\Entity\User;
 use MinSal\SidPla\AdminBundle\EntityDao\RolDao;
 use MinSal\SidPla\AdminBundle\Entity\RolSistema;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class UserDao {
 
@@ -33,13 +34,13 @@ class UserDao {
     }
 
     public function editUserSinRol($codigoUser, $idRol) {
-
+        $user = new User();
         $user = $this->getUserEspecifico($codigoUser);
 
         $rolDao = new RolDao($this->doctrine);
-        $rol = $rolDao->getRolEspecifico($idRol);
-
-        $user->setRol($rol);
+        $rol[0] = $rolDao->getRolEspecifico($idRol);
+        
+        $user->setRols($rol);
         $this->em->persist($user);
         $this->em->flush();
         $matrizMensajes = $codigoUser;
@@ -51,8 +52,8 @@ class UserDao {
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('resp', 'resp');
         $query = $this->em->createNativeQuery('SELECT count (* )resp 
-                                               FROM sidpla_usuario
-                                               WHERE sidpla_usuario.empleado_codigo=?', $rsm);
+                                               FROM sca_usuario
+                                               WHERE sca_usuario.empleado_codigo=?', $rsm);
         $query->setParameter(1, $idEmpleado);
 
         $x = $query->getResult();
@@ -64,7 +65,7 @@ class UserDao {
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('resp', 'resp');
         $query = $this->em->createNativeQuery("SELECT count (*)resp 
-                                               FROM sidpla_usuario
+                                               FROM sca_usuario
                                                WHERE username =?", $rsm);
         $query->setParameter(1, $username);
 
@@ -77,8 +78,8 @@ class UserDao {
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('resp', 'resp');
         $query = $this->em->createNativeQuery("SELECT count (*) resp
-                                               FROM sidpla_usuario
-                                               WHERE sidpla_usuario.email = ?", $rsm);
+                                               FROM sca_usuario
+                                               WHERE sca_usuario.email = ?", $rsm);
         $query->setParameter(1, $email);
 
         $x = $query->getResult();

@@ -5,18 +5,40 @@ namespace MinSal\SidPla\AdminBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use MinSal\SidPla\UsersBundle\Entity\User;
+
+
 /**
- * (repositoryClass="MinSal\SidPla\AdminBundle\Entity\EntidadRepository")
  * @ORM\Entity
  * @ORM\Table(name="sca_entidades_ctg")
  */
 class Entidad {
     
+    public function __construct() {
+        $this->users = new ArrayCollection();
+        $this->entHabilitado = true;
+        $this->entTipoPersona = 'N';
+        
+        $datetime = strval(Date('d/m/Y'));
+        $datetime = explode("/", $datetime);
+        $datetime = $datetime[2] + 1;
+        
+        $this->entVenc = new \DateTime(); 
+        $this->entVenc->setDate($datetime, '01', '01'); 
+    }
+    
+    /**
+     * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad")
+     */
+    protected $users;
+    
+    
     /**
      * @var integer $entId
      *
-     * @ORM\Column(name="ent_id", type="integer")
      * @ORM\Id
+     * @ORM\Column(name="ent_id", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $entId;
@@ -156,11 +178,11 @@ class Entidad {
     private $entVenc;
     
     /**
-     * @var boolean $entDistribuidor
+     * @var boolean $entImportador
      *
-     * @ORM\Column(name="ent_distribuidor", type="boolean")
+     * @ORM\Column(name="ent_importador", type="boolean")
      */
-    private $entDistribuidor;
+    private $entImportador;
     
     /**
      * @var boolean $entProductor
@@ -234,13 +256,6 @@ class Entidad {
     private $auditUserUpd;
     
     
-    
-    
-    /**
-     * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad")
-     */
-    protected $users;
-    
 
 
     /**
@@ -248,7 +263,7 @@ class Entidad {
      *
      * @param MinSal\SidPla\AdminBundle\Entity\User $usuario
      */
-    public function setUsuario(\MinSal\SidPla\UsersBundle\Entity\User $usuario) {
+    public function setUsuario(User $usuario) {
         $this->usuario = $usuario;
     }
 
@@ -414,19 +429,19 @@ class Entidad {
     }
 
     public function getEntVenc() {
-        return $this->entVenc;
+        return $this->entVenc;//->format('Y-m-d');
     }
 
     public function setEntVenc($entVenc) {
         $this->entVenc = $entVenc;
     }
 
-    public function getEntDistribuidor() {
-        return $this->entDistribuidor;
+    public function getEntImportador() {
+        return $this->entImportador;
     }
 
-    public function setEntDistribuidor($entDistribuidor) {
-        $this->entDistribuidor = $entDistribuidor;
+    public function setEntImportador($entImportador) {
+        $this->entImportador = $entImportador;
     }
 
     public function getEntProductor() {

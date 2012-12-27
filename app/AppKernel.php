@@ -21,8 +21,6 @@ class AppKernel extends Kernel
             new MinSal\SidPlaBundle\MinSalSidPlaBundle(),
             new MinSal\SidPla\AdminBundle\MinSalSidPlaAdminBundle(),
 	    new MinSal\SidPla\UsersBundle\MinSalSidPlaUsersBundle(),
-            new MinSal\SidPla\ReportesBundle\MinSalSidPlaReportesBundle(),
-	    
             new MinSal\SidPla\DependenciaBundle\MinSalSidPlaDependenciaBundle(),
         );
 
