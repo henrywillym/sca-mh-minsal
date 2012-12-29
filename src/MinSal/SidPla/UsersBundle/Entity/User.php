@@ -30,7 +30,7 @@ class User extends BaseUser {
      * @ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\Entidad", inversedBy="users")
      * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
      */
-    private $entidad;
+    protected $entidad;
 
     /**
      * ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\RolSistema", inversedBy="usuarios")

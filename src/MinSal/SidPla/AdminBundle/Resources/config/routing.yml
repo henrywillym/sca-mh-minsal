@@ -155,3 +155,22 @@ MinSalSidPlaAdminBundle_mantEntidadEdicion:
 MinSalSidPlaAdminBundle_mantCargarEntidad:
     pattern:  /admin/mantCargarEntidad/{entId}
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantCargarEntidad } 
+
+#******************
+#****  Cuotas   ***
+#******************
+MinSalSidPlaAdminBundle_mantCargarCuotas:
+    pattern:  /admin/mantCargarCuotas/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:mantCuotas } 
+
+MinSalSidPlaAdminBundle_mantCuotaEdicion:
+    pattern:  /admin/mantCuotaEdicion/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:mantCuotaEdicion } 
+
+MinSalSidPlaAdminBundle_consultarCuotasJSON:
+    pattern:  /admin/consultarCuotasJSON/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:consultarCuotasJSON } 
+
+MinSalSidPlaAdminBundle_consultarAlcoholesJSONSelect:
+    pattern:  /admin/consultarAlcoholesOrgJSONSelect
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminAlcoholes:consultarAlcoholesJSONSelect }

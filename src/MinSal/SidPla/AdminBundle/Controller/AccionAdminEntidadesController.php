@@ -9,6 +9,7 @@
 namespace MinSal\SidPla\AdminBundle\Controller;
 
 use MinSal\SidPla\AdminBundle\Entity\Entidad;
+use MinSal\SidPla\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SidPla\AdminBundle\EntityDao\EntidadDao;
 use MinSal\SidPla\AdminBundle\Form\Type\EntidadType;
 use MinSal\SidPla\UsersBundle\Entity\User;
@@ -100,12 +101,33 @@ class AccionAdminEntidadesController extends Controller {
             //$operacion = $request->get('oper');
             //$entidad = $form->getData();
             $entidad->setEntYear($entidad->getEntVenc()->format("Y"));
+            
+            //Eliminar cuotas de importación
+            if(!$entidad->getEntImportador() || !$entidad->getEntComprador()){
+                
+                //$cuotaDao = new CuotaDao($this->getDoctrine());
+                foreach( $entidad->getCuotas() as $cuota){
+                    //$cuota = $cuotaDao->getCuota($cuota->getCuoId());
+                    if(($cuota->getCuoTipo()=='I' && !$entidad->getEntImportador() || 
+                       $cuota->getCuoTipo()=='L' && !$entidad->getEntComprador()) && $cuota->getAuditDeleted()==false
+                    ){
+                        $cuota->setAuditDeleted(true);
+                        $cuota->setAuditUserUpd($user->getUsername());
+                        $cuota->setAuditDateUpd(new \DateTime());
+                    }
+                    
+                }
+            }
             $entidadDao->editEntidad($entidad);
         }
         
         $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
         
-        return $this->mantEntidadesAction();
+        return $this->redirect(
+                $this->generateUrl('MinSalSidPlaAdminBundle_mantCargarEntidad', 
+                        array('entId'=>$entidad->getEntId()))
+                );
+        //return $this->mantCargarEntidadAction($entidadTmp->getEntId());
     }
     
     
@@ -113,6 +135,7 @@ class AccionAdminEntidadesController extends Controller {
      * Se encarga de cargar los datos de la entidad para que sean editados
      */
     public function mantCargarEntidadAction($entId) {
+        $opciones = $this->getRequest()->getSession()->get('opciones');
         //$entidad = new Entidad();
         //$form->bindRequest($this->getRequest());//Capturar datos de Request a Form
         
@@ -126,7 +149,7 @@ class AccionAdminEntidadesController extends Controller {
         $form = $this->createForm(new EntidadType(), $entidad);
 
         return $this->render('MinSalSidPlaAdminBundle:Entidad:showEntidad.html.twig', 
-                array('form' => $form->createView(),)
+                array('form' => $form->createView(),'opciones'=>$opciones, 'entId'=>$entId)
         );
     }
 }

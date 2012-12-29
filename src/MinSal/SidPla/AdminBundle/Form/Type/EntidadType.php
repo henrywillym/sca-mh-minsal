@@ -1,6 +1,7 @@
 <?php
 namespace MinSal\SidPla\AdminBundle\Form\Type;
 
+use MinSal\SidPla\AdminBundle\Form\Type\CuotaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -12,17 +13,29 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class EntidadType extends AbstractType {
    
+    /*
+     * Symfony 2.1
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
             'data_class' => 'MinSal\SidPla\AdminBundle\Entity\Entidad',
         ));
     }
-   public function buildForm(FormBuilder $builder, array $opciones)
-    {
+    
+    /*
+     * Symfony 2.0
+     */
+    public function getDefaultOptions(array $options){
+        return array(
+            'data_class' => 'MinSal\SidPla\AdminBundle\Entity\Entidad',
+        );
+    }
+    
+    public function buildForm(FormBuilder $builder, array $opciones){
         $builder->add('entId', 'hidden');
         $builder->add('entVenc', 'date', array(
             'label' => 'Vencimiento del Permiso', 
-            'widget'=>'choice',
+            'widget'=>'single_text',
             'input'=>'datetime',
             'format'=>'dd/MM/yyyy'
         ));
@@ -106,10 +119,11 @@ class EntidadType extends AbstractType {
         ));
         
         $builder->add('entComentario',  null, array('label' => 'Explique. ¿Por qué se deshabilitara la empresa?'));
+        
+        //$builder->add('cuotas', 'collection', array('type' => new CuotaType(), 'label'=> 'collection'));
     }
 
-    public function getName()
-    {
+    public function getName(){
         return 'Entidad';
     }
 }

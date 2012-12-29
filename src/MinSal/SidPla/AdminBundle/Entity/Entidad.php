@@ -4,10 +4,11 @@
 namespace MinSal\SidPla\AdminBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use MinSal\SidPla\UsersBundle\Entity\User;
-
+use MinSal\SidPla\AdminBundle\Entity\Cuota;
 
 /**
  * @ORM\Entity
@@ -17,6 +18,7 @@ class Entidad {
     
     public function __construct() {
         $this->users = new ArrayCollection();
+        $this->cuotas = new ArrayCollection();
         $this->entHabilitado = true;
         $this->entTipoPersona = 'N';
         
@@ -27,6 +29,11 @@ class Entidad {
         $this->entVenc = new \DateTime(); 
         $this->entVenc->setDate($datetime, '01', '01'); 
     }
+    
+    /**
+     * @ORM\OneToMany(targetEntity="MinSal\SidPla\AdminBundle\Entity\Cuota", mappedBy="entidad")
+     */
+    protected $cuotas;
     
     /**
      * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad")
@@ -524,8 +531,23 @@ class Entidad {
         $this->auditUserUpd = $auditUserUpd;
     }
 
-    
-    public function __toString() {
+    public function getCuotas() {
+        return $this->cuotas;
+    }
+
+    public function setCuotas($cuotas) {
+        $this->cuotas = $cuotas;
+    }
+
+    public function getUsers() {
+        return $this->users;
+    }
+
+    public function setUsers($users) {
+        $this->users = $users;
+    }
+
+        public function __toString() {
         return 'ID ' . $this->getIdEmpleado() . ' ' . $this->getPrimerNombre() . ' ' . $this->getPrimerApellido();
     }
 }

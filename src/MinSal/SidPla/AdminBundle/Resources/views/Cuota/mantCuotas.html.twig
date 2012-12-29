@@ -1,0 +1,30 @@
+{% extends 'MinSalSidPlaBundle:Default:index.html.twig' %}
+
+{% block body %}
+
+    <script type="text/javascript">
+       $(document).ready(function(){
+            $('input[type="button"]').button();
+       });
+    </script>
+    
+        <center>
+            <h1>
+                {% if(cuoTipo=='I') %}
+                    Listado de Cuotas de Importación Registradas
+                {%else%}
+                    Listado de Cuotas de Compras Locales Registradas
+                {%endif%}
+            </h1>
+            
+            {% include 'MinSalSidPlaAdminBundle:Cuota:showAllCuotas.html.twig'%}
+        
+            <br/>
+            <input type="button" value="Agregar" id="agregarCuota" /> &nbsp;
+            <input type="button" value="Editar" id="editarCuota" /> &nbsp;
+            <input type="button" value="Eliminar" id="eliminarCuota"/> &nbsp;
+            
+            <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSidPlaAdminBundle_mantCargarEntidad',{'entId':entId})}}';"/>
+        </center>
+    
+{% endblock %}
