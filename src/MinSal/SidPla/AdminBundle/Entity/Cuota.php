@@ -9,10 +9,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use MinSal\SidPla\AdminBundle\Entity\Alcohol;
 use MinSal\SidPla\AdminBundle\Entity\Entidad;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="sca_cuotas")
+ * @UniqueEntity(fields={"entidad","alcohol","cuoYear","cuoTipo", "cuoGrado","cuoNombreEsp"},message="Ya existe un registro similar")
  */
 class Cuota {
     
@@ -64,9 +66,7 @@ class Cuota {
      * @var string $cuoNombreEsp
      *
      * @ORM\Column(name="cuo_nombre_esp", type="string", length=255, nullable=false)
-     * @Assert\All({
-     *      @Assert\NotNull(message="Debe especificar el nombre especifico")
-     * })
+     * @Assert\NotNull(message="Debe especificar el nombre especifico")
      */
     private $cuoNombreEsp;
     
@@ -74,11 +74,9 @@ class Cuota {
      * @var string $cuoGrado
      *
      * @ORM\Column(name="cuo_grado", type="decimal", nullable=false)
-     * @Assert\All({
-     *      @Assert\Type(type="real", message="El grado ingresado ->{{value}} no es un número valido"),
-     *      @Assert\Min(limit="0", message="El grado ingresado {{value}}debe ser mayor a 0"),
-     *      @Assert\Max(limit="100", message="El grado ingresado {{value}} debe menor mayor a 100")
-     * })
+     * @Assert\Type(type="real", message="El grado ingresado ->{{value}} no es un número valido"),
+     * @Assert\Min(limit="0", message="El grado ingresado {{value}}debe ser mayor a 0"),
+     * @Assert\Max(limit="100", message="El grado ingresado {{value}} debe menor mayor a 100")
      */
     private $cuoGrado;
     
@@ -86,10 +84,8 @@ class Cuota {
      * @var string $cuoLitros
      *
      * @ORM\Column(name="cuo_litros", type="decimal", nullable=false)
-     * @Assert\All({
-     *      @Assert\Type(type="real", message="Los litros ingresados ->{{value}} no es un número valido"),
-     *      @Assert\Min(limit="0", message="Los Litros ingresados {{value}} debe ser mayor a 0")
-     * })
+     * @Assert\Type(type="real", message="Los litros ingresados ->{{value}} no es un número valido"),
+     * @Assert\Min(limit="0", message="Los Litros ingresados {{value}} debe ser mayor a 0")
      */
     private $cuoLitros;
     

@@ -83,7 +83,7 @@ class AccionAdminAlcoholesController extends Controller {
 
         $select = "<select>";
         foreach ($alcoholes as $alc) {
-            $select = $select . "<option value=" . $alc->getAlcId() . ">" . $alc->getAlcNombre() . " " . $alc->getAlcGrado() . "</option>";
+            $select = $select . "<option value=" . $alc->getAlcId() . " grado=" . $alc->getAlcGrado() . ">" . $alc->getAlcNombre() . "</option>";
         }
         $select = $select . "</select>";
 

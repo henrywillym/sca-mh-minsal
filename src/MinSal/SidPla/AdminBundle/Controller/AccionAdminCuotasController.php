@@ -90,21 +90,25 @@ class AccionAdminCuotasController extends Controller {
         
         if ($operacion == 'edit' || $operacion == 'del') {
             $cuota = $cuotaDao->getCuota($cuoId);
+        }else{
+            $cuoId = null;
         }
         
         if ($operacion != 'del') {
             //$cuoTipo= $request->get('cuoTipo');
-            $cuoNombreEsp= $request->get('cuoNombreEsp');
+            $cuoNombreEsp= trim($request->get('cuoNombreEsp'));
             $cuoGrado= $request->get('cuoGrado');
             $cuoLitros= $request->get('cuoLitros');
-
             $t = new \DateTime();
-            $cuota->setCuoYear($t->format('Y')+0);
+            $cuoYear = $t->format('Y')+0;
+            
+            $cuota->setCuoYear($cuoYear);
             $cuota->setCuoTipo($cuoTipo);
             $cuota->setCuoNombreEsp($cuoNombreEsp);
             $cuota->setCuoGrado($cuoGrado);
             $cuota->setCuoLitros($cuoLitros);
-
+            
+            
             //Asociamos el objeto seleccionado en el formulario
             //$cuota->setAlcohol($alcoholDao->getAlcohol($alcId));
 
@@ -117,7 +121,28 @@ class AccionAdminCuotasController extends Controller {
 
             $cuota->setEntidad($entidad);
             $cuota->setAlcohol($alcohol);
+            /*
+            $validator = $this->get('validator');
+            $errors = $validator->validate($cuota);
+            
+            if (count($errors) > 0) {
+                $msg = '';
+                foreach($errors as $error){
+                    //var_dump($error->message);
+                    $msg = $msg.$error->getMessage();
+                } 
+                return new Response("{sc:false,msg:'".$msg."' }");
+                //json_encode($errors)
+            }/**/
+            
+            $cantidad = $cuotaDao->existeCuota($cuoId, $entId, $alcId, $cuoYear, $cuoTipo, $cuoGrado, $cuoNombreEsp);
+            if( $cantidad>0 ){
+                $resp = new Response('{"status":false,"msg":"Registro duplicado, ya existe un registro con estos datos"}');
+                //$resp->setStatusCode(418, 'Errores duplicados');//json_encode($form->getErrors())
+                return $resp;
+            }
         }
+        
         if($cuota->getEntidad() && $cuota->getAlcohol()  ){
             if ($operacion == 'edit') {
                 //#### Auditoría 
@@ -138,14 +163,14 @@ class AccionAdminCuotasController extends Controller {
                 $cuotaDao->editCuota($cuota);
             }
             
-            return new Response("{sc:true,msg:'' }");
+            return new Response('{"status":true,"msg":""}');
         }else{
-            return new Response('');
+            return new Response('{"status":false,"msg":"No se encuentra la Entidad o Nombre Alcohol"}');
         };
     }
     
     /*
-    public function mantCuotaEdicionAction1(Request $request) {
+    public function mantCuotaEdicionAction(Request $request) {
         //$request = $this->getRequest();
         //$user = new User();
         //Request 

@@ -9,10 +9,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use MinSal\SidPla\UsersBundle\Entity\User;
 use MinSal\SidPla\AdminBundle\Entity\Cuota;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="sca_entidades_ctg")
+ * @UniqueEntity(fields="entNit",message="Ya existe otra empresa con este número de NIT")
  */
 class Entidad {
     
@@ -53,14 +57,14 @@ class Entidad {
     /**
      * @var string $entRegDgii
      *
-     * @ORM\Column(name="ent_reg_dgii", type="text", nullable=false)
+     * @ORM\Column(name="ent_reg_dgii", type="text")
      */
     private $entRegDgii;
 
     /**
      * @var string $entRegMinsal
      *
-     * @ORM\Column(name="ent_reg_minsal", type="text", nullable=false)
+     * @ORM\Column(name="ent_reg_minsal", type="text")
      */
     private $entRegMinsal;
 

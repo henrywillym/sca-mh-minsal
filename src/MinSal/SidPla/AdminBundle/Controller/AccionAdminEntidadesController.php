@@ -119,14 +119,18 @@ class AccionAdminEntidadesController extends Controller {
                 }
             }
             $entidadDao->editEntidad($entidad);
-        }
-        
-        $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
-        
-        return $this->redirect(
+            $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
+            return $this->redirect(
                 $this->generateUrl('MinSalSidPlaAdminBundle_mantCargarEntidad', 
                         array('entId'=>$entidad->getEntId()))
                 );
+        }else{
+            $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
+            
+            $opciones = $this->getRequest()->getSession()->get('opciones');
+            return $this->render('MinSalSidPlaAdminBundle:Entidad:showEntidad.html.twig', 
+                array('opciones' => $opciones, 'form' => $form->createView(), 'entId'=>$entidad->getEntId(), 'entHabilitado'=>$entidad->getEntHabilitado()));
+        }
         //return $this->mantCargarEntidadAction($entidadTmp->getEntId());
     }
     
@@ -149,7 +153,7 @@ class AccionAdminEntidadesController extends Controller {
         $form = $this->createForm(new EntidadType(), $entidad);
 
         return $this->render('MinSalSidPlaAdminBundle:Entidad:showEntidad.html.twig', 
-                array('form' => $form->createView(),'opciones'=>$opciones, 'entId'=>$entId)
+                array('form' => $form->createView(),'opciones'=>$opciones, 'entId'=>$entId, 'entHabilitado'=>$entidad->getEntHabilitado())
         );
     }
 }

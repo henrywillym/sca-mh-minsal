@@ -35,13 +35,13 @@ class EntidadType extends AbstractType {
         $builder->add('entId', 'hidden');
         $builder->add('entVenc', 'date', array(
             'label' => 'Vencimiento del Permiso', 
-            'widget'=>'single_text',
+            'widget'=>'choice',
             'input'=>'datetime',
             'format'=>'dd/MM/yyyy'
         ));
-        $builder->add('entRegDgii', null, array('label' => 'Registro de Usuario (MINSAL)'));
-        $builder->add('entRegMinsal',  null, array('label' => 'Número Resolución DGII'));
-        $builder->add('entNrc', null, array('label' => 'NCR'));
+        $builder->add('entRegDgii', 'text', array('label' => 'Registro de Usuario (MINSAL)'));
+        $builder->add('entRegMinsal',  'text', array('label' => 'Número Resolución DGII'));
+        $builder->add('entNrc', 'text', array('label' => 'NCR','required'=>false));
         $builder->add('entTel',  null, array('label' => 'Teléfono'));
         $builder->add('entGiro', null, array('label' => 'Giro o Actividad Económica'));
         $builder->add('entEmail',  'email', array('label' => 'E-mail', 'max_length'=>'50'));
@@ -114,7 +114,7 @@ class EntidadType extends AbstractType {
             'multiple'=>false,
             'choices'=> array(
                 true => 'Habilitada', 
-                false =>'Deshabilitada'
+                false =>'Bloqueada'
             )
         ));
         

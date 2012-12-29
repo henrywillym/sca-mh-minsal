@@ -182,6 +182,13 @@
                             {{ app.session.flash('notice') }}
                         </div><br/>
                     {% endif %}
+                    
+                        
+                    {% if entHabilitado == false %}
+                        <div class="flash-notice">
+                            ESTA EMPRESA SE ENCUENTRA BLOQUEADA
+                        </div><br/>
+                    {% endif %}
                 </td>
             </tr>
             {{ form_widget(form) }}

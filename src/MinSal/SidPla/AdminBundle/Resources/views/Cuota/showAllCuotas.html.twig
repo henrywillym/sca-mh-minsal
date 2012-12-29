@@ -45,17 +45,6 @@
                             rowpos:10,
                             label: ""
                         }
-                    },{
-                        label:'ID',
-                        name:'entidad.entId', 
-                        index: 'entidad.entId', 
-                        //width:20,
-                        hidden:true,
-                        editable:true,
-                        formoptions:{
-                            rowpos:9,
-                            label: ""
-                        }
                     },{ 
                         label:'Año',
                         name:'cuoYear', 
@@ -65,26 +54,6 @@
                         edittype:"hidden",
                         formoptions:{
                             rowpos:8,
-                            label: ""
-                        }
-                    },{
-                        label:'ID',
-                        name:'cuoTipo', 
-                        index: 'cuoTipo', 
-                        hidden:true,
-                        editable:true,
-                        formoptions:{
-                            rowpos:7,
-                            label: ""
-                        }
-                    },{
-                        label:'ID Alcohol',
-                        name:'alcohol.alcId', 
-                        index: 'alcohol.alcId', 
-                        hidden:true,
-                        editable:true,
-                        formoptions:{
-                            rowpos:6,
                             label: ""
                         }
                     },{ 
@@ -100,13 +69,19 @@
                             dataEvents: [{  
                                 type: 'change',
                                 fn: function(e) {
-                                    document.getElementById('alcohol.alcId').value = this.value;
+                                    if($('#cuoNombreEsp').val().trim() ==''){
+                                        $('#cuoNombreEsp').val($('[id="alcohol.alcNombre"]').children("option").filter(":selected").text());
+                                    }
+                                    if($('#cuoGrado').val().trim() ==''){
+                                        $('#cuoGrado').val($('[id="alcohol.alcNombre"]').children("option").filter(":selected").attr('grado'));
+                                    }
                                 }
                             }]
                         },
                         formoptions:{
                             rowpos:5,
-                            label: "Nombre Alcohol"
+                            label: "Nombre Alcohol",
+                            elmsuffix:" (*)"
                         },
                         editrules:{
                             //email:true,
@@ -125,7 +100,8 @@
                         }, 
                         formoptions:{
                             rowpos:1,
-                            label: "Nombre Específico"
+                            label: "Nombre Específico",
+                            elmsuffix:" (*)"
                         },
                         editrules:{
                             //email:true,
@@ -138,13 +114,17 @@
                         //width:90,
                         editable:true,
                         editoptions:{
-                            size:10//,
+                            size:10,
                             //maxlength: 255//,
+                            dataInit:function(el){
+                                $(el).keyfilter(/[0-9.}]/i);
+                            }
                             //dataInit:function(el){$(el).keyfilter(/[a-z0-9_\.\-@]/i);}
                         }, 
                         formoptions:{
                             rowpos:2,
-                            label: "Grado"
+                            label: "Grado",
+                            elmsuffix:" (*)"
                         },
                         editrules:{
                             //email:true,
@@ -157,13 +137,17 @@
                         //width:90,
                         editable:true,
                         editoptions:{
-                            size:10//,
+                            size:10,
+                            dataInit:function(el){
+                                $(el).keyfilter(/[0-9.}]/i);
+                            }
                             //maxlength: 255//,
                             //dataInit:function(el){$(el).keyfilter(/[a-z0-9_\.\-@]/i);}
                         }, 
                         formoptions:{
                             rowpos:3,
-                            label: "Cuota (Ltr.)"
+                            label: "Cuota (Ltr.)",
+                            elmsuffix:" (*)"
                         },
                         editrules:{
                             //email:true,
@@ -186,7 +170,7 @@
             }
         );
        
-        function despuesAgregarEditar() {
+        function despuesAgregarEditar(response, postdata) {
             //alert("datos guardados con exito!");
             
             $("#theGrid").jqGrid('setGridParam',{
@@ -194,14 +178,25 @@
                 loadonce:true
             }).trigger('reloadGrid');
             
-            return[true,'']; //no error
+            json   = response.responseText; // response text is returned from server.
+            
+            try{
+                var result = JSON.parse(json); // convert json object into javascript object
+                if(result.status){
+                    alert("Datos guardados con exito!");
+                }
+                return [result.status,result.msg,null];
+            }catch(e){
+                return [false,'Ocurrio un error interno en el servidor',null];
+            }
+            //return[response.responseText,response.statusText]; //no error
         }
         
         $("#agregarCuota").click(function(){
             jQuery('#theGrid').jqGrid('editGridRow',"new",{
                 addCaption: "Agregar Cuota",
                 width:550,
-                height:300,
+                height:220,
                 bottominfo:"Campos marcados con (*) son obligatorios",
                 afterSubmit:despuesAgregarEditar,
                 closeAfterAdd:true,
@@ -214,7 +209,8 @@
              
             setTimeout(function(){
                 $('[id="alcohol.alcNombre"]').attr('name','alcId');
-                $('[id="entidad.entId"]').attr('name','entId');
+                $('#cuoNombreEsp').val($('[id="alcohol.alcNombre"]').children("option").filter(":selected").text());
+                $('#cuoGrado').val($('[id="alcohol.alcNombre"]').children("option").filter(":selected").attr('grado'));
             },3000);
         });
         
@@ -226,7 +222,7 @@
             if( gr != null ){
                 jQuery('#theGrid').jqGrid('editGridRow',gr,{ 
                     width:550, 
-                    height:300,
+                    height:220,
                     closeAfterAdd : true,
                     editCaption: "Editar Cuota",
                     bottominfo:"Campos marcados con (*) son obligatorios",
@@ -242,7 +238,6 @@
                 
                 setTimeout(function(){
                     $('[id="alcohol.alcNombre"]').attr('name','alcId');
-                    $('[id="entidad.entId"]').attr('name','entId');
                     },3000);
             }else{ 
                 alert("Por favor seleccione una fila para editar!"); 
@@ -265,11 +260,6 @@
                         alert("Cuota eliminada con exito!");
                     }
                 });
-                
-                setTimeout(function(){
-                    $('[id="alcohol.alcNombre"]').attr('name','alcId');
-                    $('[id="entidad.entId"]').attr('name','entId');
-                    },3000);
             }else{
                 alert("Por favor seleccione una fila para borrar!");
             }

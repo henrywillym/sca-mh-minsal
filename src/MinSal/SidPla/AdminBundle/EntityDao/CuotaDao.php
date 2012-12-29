@@ -68,10 +68,33 @@ class CuotaDao {
         return $matrizMensajes;
     }
 
-    public function existeCuota($idCuota) {
-        $result = $this->em->createQuery("SELECT count(e) 
-                                          FROM MinSalSidPlaAdminBundle:Cuota e
-                                          WHERE e.cuoId = " . $idCuota);
+    public function existeCuota($cuoId, $entId, $alcId, $cuoYear, $cuoTipo, $cuoGrado, $cuoNombreEsp) {
+        $sql = "SELECT count(e) 
+                                          FROM MinSalSidPlaAdminBundle:Cuota e JOIN e.entidad A JOIN e.alcohol B
+                                          WHERE A.entId= :entId
+                                            AND B.alcId= :alcId
+                                            AND e.cuoYear= :cuoYear
+                                            AND e.cuoTipo= :cuoTipo
+                                            AND e.cuoGrado= :cuoGrado
+                                            AND e.cuoNombreEsp = :cuoNombreEsp
+                                            AND e.auditDeleted = false";
+        
+        if($cuoId){
+            $sql = $sql." AND e.cuoId <> :cuoId";
+        }
+        
+        $result = $this->em->createQuery($sql)
+                ->setParameter("entId",$entId)
+                ->setParameter("alcId",$alcId)
+                ->setParameter("cuoYear",$cuoYear)
+                ->setParameter("cuoTipo",$cuoTipo)
+                ->setParameter("cuoGrado",$cuoGrado)
+                ->setParameter("cuoNombreEsp",trim($cuoNombreEsp));
+        
+        if($cuoId){
+            $result->setParameter("cuoId",$cuoId);
+        }
+        
         return $result->getSingleScalarResult();
     }
 }
