@@ -23,7 +23,8 @@ class UserDao {
 
     public function getUserSinRol() {
         $User = $this->em->createQuery("SELECT U
-                                        FROM MinSalSidPlaUsersBundle:User U");//WHERE U.rol IS NULL
+                                        FROM MinSalSidPlaUsersBundle:User U
+                                        WHERE U.auditDeleted = false");//WHERE U.rol IS NULL
         return $User->getResult();
     }
 
@@ -47,26 +48,39 @@ class UserDao {
 
         return $matrizMensajes;
     }
-
-    public function tieneOtroUsuario($idEmpleado) {
+    
+    /**
+     * @deprecated
+     * @param type $idUsuario
+     * @return type
+     */
+    public function tieneOtroUsuario($idUsuario) {
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('resp', 'resp');
         $query = $this->em->createNativeQuery('SELECT count (* )resp 
                                                FROM sca_usuario
-                                               WHERE sca_usuario.empleado_codigo=?', $rsm);
-        $query->setParameter(1, $idEmpleado);
+                                               WHERE sca_usuario.username = ?
+                                               AND audit_deleted = false', $rsm);
+        $query->setParameter(1, $idUsuario);
 
         $x = $query->getResult();
 
         return $x[0]['resp'];
     }
 
-    public function usernameDisponible($username) {
+    public function usernameDisponible($username, $idUsuario='') {
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('resp', 'resp');
-        $query = $this->em->createNativeQuery("SELECT count (*)resp 
-                                               FROM sca_usuario
-                                               WHERE username =?", $rsm);
+        $sql = "SELECT count (*)resp 
+                FROM sca_usuario
+                WHERE username =?
+                AND audit_deleted = false";
+        
+        if($idUsuario !='' && $idUsuario != null){
+            $sql= $sql.' AND usuario_codigo <> '.$idUsuario;
+        }
+        
+        $query = $this->em->createNativeQuery($sql, $rsm);
         $query->setParameter(1, $username);
 
         $x = $query->getResult();
@@ -74,13 +88,20 @@ class UserDao {
         return $x[0]['resp'];
     }
     
-     public function emailDisponible($email) {
+     public function emailDisponible($email, $idUsuario='') {
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('resp', 'resp');
-        $query = $this->em->createNativeQuery("SELECT count (*) resp
-                                               FROM sca_usuario
-                                               WHERE sca_usuario.email = ?", $rsm);
-        $query->setParameter(1, $email);
+        $sql = "SELECT count (*) resp
+                FROM sca_usuario
+                WHERE sca_usuario.email = ?
+                AND audit_deleted = false";
+        
+        if($idUsuario!='' && $idUsuario!=null){
+            $sql= $sql.' AND usuario_codigo <> '.$idUsuario;
+        }
+        
+        $query = $this->em->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, trim($email));
 
         $x = $query->getResult();
 

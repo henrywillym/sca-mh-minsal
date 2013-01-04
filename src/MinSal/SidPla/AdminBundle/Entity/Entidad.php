@@ -40,7 +40,7 @@ class Entidad {
     protected $cuotas;
     
     /**
-     * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad")
+     * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad", cascade={"persist"})
      */
     protected $users;
     
@@ -548,10 +548,7 @@ class Entidad {
     }
 
     public function setUsers($users) {
+        $users->setEntidad($this);
         $this->users = $users;
-    }
-
-        public function __toString() {
-        return 'ID ' . $this->getIdEmpleado() . ' ' . $this->getPrimerNombre() . ' ' . $this->getPrimerApellido();
     }
 }

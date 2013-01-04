@@ -5,6 +5,7 @@ namespace MinSal\SidPla\UsersBundle\Entity;
 use FOS\UserBundle\Entity\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -15,8 +16,10 @@ class User extends BaseUser {
     public function __construct() {
         parent::__construct();
         // your own logic
-        $this->entidad = new ArrayCollection();
+        //$this->entidad = new ArrayCollection();
         $this->rols = new ArrayCollection();
+        $this->auditDeleted = false;
+        $this->userInternoTipo = null;
     }
     
     /**
@@ -27,17 +30,11 @@ class User extends BaseUser {
     protected $idUsuario;
 
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\Entidad", inversedBy="users")
-     * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
+     * @ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\Entidad", inversedBy="users", cascade={"persist"})
+     * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id", nullable=true)
      */
     protected $entidad;
 
-    /**
-     * ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\RolSistema", inversedBy="usuarios")
-     * ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")
-     */
-    //protected $rol;
-    
     /**
      * @ORM\ManyToMany(targetEntity="MinSal\SidPla\AdminBundle\Entity\RolSistema")
      * @ORM\JoinTable(name="sca_usuario_rol", 
@@ -50,6 +47,13 @@ class User extends BaseUser {
      * @var string $userDui
      *
      * @ORM\Column(name="user_primer_nombre", type="string", length=20)
+     * 
+     * @Assert\NotNull(message="Debe especificar el Primer Nombre", groups={"Registration", "Profile"})
+     * @Assert\MinLength(
+     *     limit=2,
+     *     message="Nombre no valido, es muy corto", 
+     *     groups={"Registration", "Profile"}
+     * )
      */
     private $userPrimerNombre;
     
@@ -57,6 +61,11 @@ class User extends BaseUser {
      * @var string $userNit
      *
      * @ORM\Column(name="user_segundo_nombre", type="string", length=30)
+     * @Assert\MaxLength(
+     *     limit=30,
+     *     message="Segundo Nombre no valido, es muy largo. Debe ser inferior a {{limit}} caracteres", 
+     *     groups={"Registration", "Profile"}
+     * )
      */
     private $userSegundoNombre;
     
@@ -64,6 +73,17 @@ class User extends BaseUser {
      * @var string $userNit
      *
      * @ORM\Column(name="user_apellidos", type="string", length=30)
+     * 
+     * @Assert\NotNull(message="Debe especificar los Apellidos", groups={"Registration", "Profile"})
+     * @Assert\MinLength(
+     *     limit=2,
+     *     message="Apellidos no validos, es muy corto", 
+     *     groups={"Registration", "Profile"}
+     * )
+     * @Assert\MaxLength(
+     *     limit=30,
+     *     message="Apellidos no validos, es muy largo. Debe ser inferior a {{limit}} caracteres"
+     * )
      */
     private $userApellidos;
     
@@ -71,6 +91,18 @@ class User extends BaseUser {
      * @var string $userDui
      *
      * @ORM\Column(name="user_dui", type="string", length=20)
+     * 
+     * @Assert\NotNull(message="Debe especificar el número de DUI", groups={"Registration", "Profile"})
+     * @Assert\MinLength(
+     *     limit=10,
+     *     message="DUI no valido , es muy corto", 
+     *      groups={"Registration", "Profile"}
+     * )
+     * @Assert\MaxLength(
+     *     limit=20,
+     *     message="DUI es muy largo. Debe ser inferior a {{limit}} caracteres", 
+     *      groups={"Registration", "Profile"}
+     * )
      */
     private $userDui;
     
@@ -78,6 +110,18 @@ class User extends BaseUser {
      * @var string $userNit
      *
      * @ORM\Column(name="user_nit", type="string", length=30)
+     * 
+     * @Assert\NotNull(message="Debe especificar el número de NIT", groups={"Registration", "Profile"})
+     * @Assert\MinLength(
+     *     limit=17,
+     *     message="NIT no valido , es muy corto", 
+     *      groups={"Registration", "Profile"}
+     * )
+     * @Assert\MaxLength(
+     *     limit=30,
+     *     message="NIT es muy largo. Debe ser inferior a {{limit}} caracteres", 
+     *      groups={"Registration", "Profile"}
+     * )
      */
     private $userNit;
     
@@ -85,6 +129,18 @@ class User extends BaseUser {
      * @var string $userCargo
      *
      * @ORM\Column(name="user_cargo", type="string", length=255, nullable=true)
+     * 
+     * @Assert\NotNull(message="Debe especificar el cargo", groups={"Registration", "Profile"})
+     * @Assert\MaxLength(
+     *     limit=255,
+     *     message="El nombre del Cargo es muy largo. Debe ser inferior a {{limit}} caracteres", 
+     *      groups={"Registration", "Profile"}
+     * )
+     * @Assert\MinLength(
+     *     limit=5,
+     *     message="Cargo no valido, es muy corto. Debe ser mayor a 5 caracteres", 
+     *      groups={"Registration", "Profile"}
+     * )
      */
     private $userCargo;
     
@@ -92,6 +148,12 @@ class User extends BaseUser {
      * @var string $userTelefono
      *
      * @ORM\Column(name="user_telefono", type="text")
+     * @Assert\NotNull(message="Debe especificar el número de teléfono", groups={"Registration", "Profile"})
+     * @Assert\MinLength(
+     *     limit=8,
+     *     message="Número telefónico no valido, es muy corto", 
+     *      groups={"Registration", "Profile"}
+     * )
      */
     private $userTelefono;
     
@@ -99,6 +161,7 @@ class User extends BaseUser {
      * @var string $userInterno
      *
      * @ORM\Column(name="user_interno", type="boolean")
+     * @Assert\NotNull(message="Debe especificar si es usuario interno")
      */
     private $userInterno;
     
@@ -109,19 +172,53 @@ class User extends BaseUser {
      */
     private $userInternoTipo;
     
-    
-
     /**
-     * @var integer $idEmpleado
+     * @var string $userTipo
      *
-     * ORM\Column(name="empleado_codigo", type="integer")
+     * @ORM\Column(name="user_tipo", type="string", length=20, nullable=true)
      */
-    //private $idEmpleado;
-
+    private $userTipo;
     
+    /**
+     * @var DateTime $auditDateIns
+     *
+     * @ORM\Column(name="audit_date_ins", type="datetime", nullable=true)
+     */
+    private $auditDateIns;
+    
+    
+    /**
+     * @var string $auditUserIns
+     *
+     * @ORM\Column(name="audit_user_ins", type="string", length=50)
+     */
+    private $auditUserIns;
+    
+    /**
+     * @var DateTime $auditDateUpd
+     *
+     * @ORM\Column(name="audit_date_upd", type="datetime", nullable=true)
+     */
+    private $auditDateUpd;
+    
+    /**
+     * @var string $auditUserUpd
+     *
+     * @ORM\Column(name="audit_user_upd", type="string", length=50, nullable=true)
+     */
+    private $auditUserUpd;
+    
+    /**
+     * @var string $auditDeleted
+     *
+     * @ORM\Column(name="audit_deleted", type="boolean", nullable=false)
+     */
+    private $auditDeleted;
+    
+   
 
     /**
-     * Get id
+     * Get idUsuario
      *
      * @return integer 
      */
@@ -130,41 +227,13 @@ class User extends BaseUser {
     }
 
     /**
-     * Set idEmpleado
+     * Set idUsuario
      *
-     * @param integer $idEmpleado
+     * @param integer $idUsuario
      */
-    /*public function setIdEmpleado($idEmpleado) {
-        $this->idEmpleado = $idEmpleado;
-    }*/
-
-    /**
-     * Get idEmpleado
-     *
-     * @return integer
-     */
-    /*public function getidEmpleado() {
-        return $this->idEmpleado;
-    }*/
-
-    /**
-     * Set empleado
-     *
-     * @param MinSal\SidPla\UsersBundle\Entity\Empleado $empleado
-     */
-    /*public function setEmpleado(\MinSal\SidPla\AdminBundle\Entity\Empleado $empleado) {
-        $this->empleado = $empleado;
-    }/**/
-
-    /**
-     * Get empleado
-     *
-     * @return MinSal\SidPla\UsersBundle\Entity\Empleado 
-     */
-    /*public function getEmpleado() {
-        return $this->empleado;
-    }*/
-
+    public function setIdUsuario($idUsuario) {
+        $this->idUsuario= $idUsuario;
+    }
 
     /**
      * Get username
@@ -175,7 +244,6 @@ class User extends BaseUser {
         return $this->username;
     }
 
-    
     
     public function getEntidad() {
         return $this->entidad;
@@ -230,6 +298,11 @@ class User extends BaseUser {
     }
 
     public function setUserInternoTipo($userInternoTipo) {
+        if($userInternoTipo ==''){
+            $userInternoTipo = null;
+        }else{
+            $userInternoTipo = trim($userInternoTipo);
+        }
         $this->userInternoTipo = $userInternoTipo;
     }
 
@@ -265,5 +338,51 @@ class User extends BaseUser {
         $this->rols = $rols;
     }
 
+    public function getUserTipo() {
+        return $this->userTipo;
+    }
 
+    public function setUserTipo($userTipo) {
+        $this->userTipo = $userTipo;
+    }
+    
+    public function getAuditDateIns() {
+        return $this->auditDateIns;
+    }
+
+    public function setAuditDateIns($auditDateIns) {
+        $this->auditDateIns = $auditDateIns;
+    }
+
+    public function getAuditUserIns() {
+        return $this->auditUserIns;
+    }
+
+    public function setAuditUserIns($auditUserIns) {
+        $this->auditUserIns = $auditUserIns;
+    }
+
+    public function getAuditDateUpd() {
+        return $this->auditDateUpd;
+    }
+
+    public function setAuditDateUpd($auditDateUpd) {
+        $this->auditDateUpd = $auditDateUpd;
+    }
+
+    public function getAuditUserUpd() {
+        return $this->auditUserUpd;
+    }
+
+    public function setAuditUserUpd($auditUserUpd) {
+        $this->auditUserUpd = $auditUserUpd;
+    }
+
+    public function getAuditDeleted() {
+        return $this->auditDeleted;
+    }
+
+    public function setAuditDeleted($auditDeleted) {
+        $this->auditDeleted = $auditDeleted;
+    }
 }

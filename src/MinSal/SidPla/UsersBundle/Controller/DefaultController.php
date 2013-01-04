@@ -2,18 +2,82 @@
 
 namespace MinSal\SidPla\UsersBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections\ArrayCollection;
+use FOS\UserBundle\Controller\RegistrationController as BaseController;
+use MinSal\SidPla\AdminBundle\Entity\Empleado;
+use MinSal\SidPla\AdminBundle\Entity\RolSistema;
+use MinSal\SidPla\AdminBundle\EntityDao\EmpleadoDao;
+use MinSal\SidPla\AdminBundle\EntityDao\EntidadDao;
+use MinSal\SidPla\AdminBundle\EntityDao\RolDao;
 use MinSal\SidPla\UsersBundle\Entity\User;
 use MinSal\SidPla\UsersBundle\EntityDao\UserDao;
-use MinSal\SidPla\AdminBundle\Entity\Empleado;
-use MinSal\SidPla\AdminBundle\EntityDao\EmpleadoDao;
-use MinSal\SidPla\AdminBundle\EntityDao\RolDao;
-use MinSal\SidPla\AdminBundle\Entity\RolSistema;
+use MinSal\SidPla\UsersBundle\Form\Type\RegistrationFormType;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class DefaultController extends Controller {
+class DefaultController extends BaseController {
+
+    public function registerAction(){
+        $request = $this->container->get("request");
+        $userInterno = $this->container->get("request")->get("userInterno");
+        $entId = '';
+        $entNombre = '';
+        
+        if($userInterno == 'false'){
+            $entId = $this->container->get("request")->get("entId");
+            $entidadDao = new EntidadDao($this->container->get("doctrine"));//fos_user.user_manager
+            $entNombre = $entidadDao->getEntidad($entId)->getEntNombre();
+        }
+        
+        $form = $this->container->get('fos_user.registration.form');
+        $formHandler = $this->container->get('fos_user.registration.form.handler');
+        
+        $auditUser = $this->container->get('security.context')->getToken()->getUser();
+        $this->container->get('session')->set('auditUserIns', $auditUser->getUsername());
+        
+        $confirmationEnabled = $this->container->getParameter('fos_user.registration.confirmation.enabled');
+        
+        $process = $formHandler->processIns($confirmationEnabled, $auditUser);
+        
+        if ($process) {die;
+            $user = $form->getData();
+            
+            /*****************************************************
+             * Add new functionality (e.g. log the registration) *
+             *****************************************************/
+            
+            /* 
+            $this->get('logger')->info(
+                sprintf('New user registration: %s', $user)
+            ); 
+            /**/
+            
+            if ($confirmationEnabled) {
+                $this->container->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
+                $route = 'fos_user_registration_check_email';
+                
+                $this->setFlash('fos_user_success', 'registration.flash.user_created');
+                $url = $this->container->get('router')->generate($route);
+
+                return new RedirectResponse($url);
+            } else {
+                //$this->authenticateUser($user);
+                $route = 'fos_user_registration_confirmed';
+            }
+
+            
+        }
+
+        return $this->container->get('templating')->renderResponse('FOSUserBundle:Registration:register.html.'.$this->getEngine(), array(
+            'form' => $form->createView(),
+            'theme' => $this->container->getParameter('fos_user.template.theme'),
+            'userInterno' => $userInterno,
+            'entId' => $entId,
+            'entNombre' => $entNombre,
+        ));
+    }
 
     public function mostrarUsuariosSinRolAction() {
         $opciones = $this->getRequest()->getSession()->get('opciones');
@@ -88,19 +152,22 @@ class DefaultController extends Controller {
     }
 
     public function verificaCreacionAction() {
-        $request = $this->getRequest();
-        $idEmpleado = $request->get('idEmpleado');
+        $request = $this->container->get("request");
+        $idUsuario = $request->get('idUsuario');
         $username = $request->get('username');
         $email = $request->get('email');
 
-        $empleadoDao = new EmpleadoDao($this->getDoctrine());
-        $be = $empleadoDao->existeEmpleado($idEmpleado);
+        //$empleadoDao = new EmpleadoDao($this->getDoctrine());
+        
+        //$be = $empleadoDao->existeEmpleado($idEmpleado);
 
-        $userDao = new UserDao($this->getDoctrine());
-        $bu = $userDao->tieneOtroUsuario($idEmpleado);
-        $bud = $userDao->usernameDisponible($username);
-        $bemail = $userDao->emailDisponible($email);
-
+        $userDao = new UserDao($this->container->get("doctrine"));
+        
+        //Se verifica si se encuentra registrado el usuario registrado 
+        //$bu = $userDao->tieneOtroUsuario($idEmpleado);
+        $bud = $userDao->usernameDisponible($username, $idUsuario);
+        $bemail = $userDao->emailDisponible($email, $idUsuario);
+        /*
         if ($be == 0) {
             $msj[0][0] = 'NO EXISTE EL EMPLEADO';
             $msj[0][1] = FALSE;
@@ -108,21 +175,21 @@ class DefaultController extends Controller {
             if ($bu != 0) {
                 $msj[0][0] = 'NO SE PUEDE CREAR UN USUARIO PARA ESTE EMPLEADO PORQUE YA TIENE ASIGNADO UNO';
                 $msj[0][1] = FALSE;
-            } else {
+            } else {/**/
                 if ($bud != 0) {
-                    $msj[0][0] = 'ESTE USUARIO YA ESTA EN USO, ESCRIBA UNO NUEVA EN NOMBRE DE USUARIO';
+                    $msj[0][0] = 'ESTE USUARIO YA ESTA EN USO, ESCRIBA UN NUEVO NOMBRE DE USUARIO';
                     $msj[0][1] = FALSE;
                 } else {
                     if ($bemail != 0) {
-                        $msj[0][0] = 'ESTE EMAIL NO PUEDE UTILIZARSE, PORQUE YA TIENE USUARIO ASIGNADO';
+                        $msj[0][0] = 'ESTE EMAIL NO PUEDE UTILIZARSE PORQUE YA TIENE USUARIO ASIGNADO';
                         $msj[0][1] = FALSE;
                     } else {
                         $msj[0][0] = 'SE HA CREADO EXITOSAMENTE';
                         $msj[0][1] = TRUE;
                     }
                 }
-            }
-        }
+            /*}
+        }/**/
         $datos = json_encode($msj);
         $numfilas = 1;
         $pages = floor($numfilas / 10) + 1;

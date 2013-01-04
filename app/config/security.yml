@@ -23,7 +23,8 @@ security:
 
     access_control:
         - { path: ^/SidPla/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/SidPla/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/SidPla/users, role: ROLE_USER }
+        - { path: ^/SidPla/empresa, role: ROLE_USER }        
         - { path: ^/SidPla/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/SidPla/admin/, role: ROLE_ADMIN }
