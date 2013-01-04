@@ -25,13 +25,13 @@
 /**
  * Description of RolDao
  *
- * @author Bruno González
+ * @author Daniel E. Diaz
  */
 
 namespace MinSal\SidPla\AdminBundle\EntityDao;
 
 use MinSal\SidPla\AdminBundle\Entity\Empleado;
-use MinSal\SidPla\AdminBundle\EntityDao\UnidadOrganizativaDao;
+
 
 class EmpleadoDao {
 
@@ -69,11 +69,6 @@ class EmpleadoDao {
         $empleado->setSegundoApellido($segundoApellido);
         $empleado->setEmail($email);
 
-
-        $unidadDao = new UnidadOrganizativaDao($this->doctrine);
-        $unidad = $unidadDao->getUnidadOrg($unidadAsignada);
-
-        $empleado->setUnidadOrganizativa($unidad);
 
         $this->em->persist($empleado);
         $this->em->flush();
@@ -114,10 +109,6 @@ class EmpleadoDao {
         $empleado->setSegundoApellido($segundoApellido);
         $empleado->setEmail($email);
 
-        $unidadDao = new UnidadOrganizativaDao($this->doctrine);
-        $unidad = $unidadDao->getUnidadOrg($unidadAsignada);
-
-        $empleado->setUnidadOrganizativa($unidad);
 
         $this->em->persist($empleado);
         $this->em->flush();
@@ -127,9 +118,9 @@ class EmpleadoDao {
     }
 
     public function existeEmpleado($idEmpleado) {
-        $result = $this->em->createQuery("SELECT count(e) 
-                                          FROM MinSalSidPlaAdminBundle:Empleado e
-                                          WHERE e.idEmpleado = " . $idEmpleado);
+        $result = $this->em->createQuery("SELECT count(*) 
+                                          FROM sca_usuario
+                                          WHERE username = " . $idEmpleado);
         return $result->getSingleScalarResult();
     }
 

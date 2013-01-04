@@ -8,7 +8,7 @@
           $('#reporte').button();
           
           $('#reporte').click(function() {
-            this.form.action='{{ path('MinSalSidPlaReportesBundle_reporteEmpleadosOrg') }}'
+            //this.form.action='{//{ path('MinSalSidPlaReportesBundle_reporteEmpleadosOrg') }}'
         });
       });
     </script>
@@ -16,12 +16,14 @@
     <form action="" method="post">
         <table align="center">
             <tr><td align="center">
-                    <h1>Mantenimiento de Empleados</h1>
+                    <h1>Mantenimiento de Usuarios Internos</h1>
                 </td>
             </tr>
             <tr>
                 <td align="center">
-                     {% include 'MinSalSidPlaAdminBundle:Empleado:showAllEmpleados.html.twig'%}
+                     {% 
+                     include 'MinSalSidPlaAdminBundle:Empleado:showAllEmpleados.html.twig'
+                     %}
                 </td>
             </tr>
             <tr>
