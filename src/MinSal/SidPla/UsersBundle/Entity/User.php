@@ -174,8 +174,13 @@ class User extends BaseUser {
     
     /**
      * @var string $userTipo
-     *
+     * 
+     * es nullable=true porque los super-usuarios no tendran ningun tipo de accion a realizar dentro del proceso
+     * por eso se utiliza la condicion assert\notnull para que el formulario se valide que no venga vacio, pues desde ahi se crearan usuarios
+     * que pertenezcan al proceso
+     * 
      * @ORM\Column(name="user_tipo", type="string", length=20, nullable=true)
+     * @Assert\NotNull(message="Debe especificar que acciones realizara")
      */
     private $userTipo;
     

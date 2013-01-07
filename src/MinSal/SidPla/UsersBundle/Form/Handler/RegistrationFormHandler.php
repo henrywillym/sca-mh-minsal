@@ -15,12 +15,12 @@ class RegistrationFormHandler extends BaseHandler{
     
     public function processIns($confirmation = false, $auditUserIns){
         $this->auditUserIns = $auditUserIns;
-        $this->process($confirmation);
+        return $this->process($confirmation);
     }
     
     public function processUpd($confirmation = false, $auditUserUpd){
         $this->auditUserUpd = $auditUserUpd;
-        $this->process($confirmation);
+        return $this->process($confirmation);
     }
     
     public function process($confirmation = false){

@@ -35,13 +35,13 @@ class DefaultController extends BaseController {
         $formHandler = $this->container->get('fos_user.registration.form.handler');
         
         $auditUser = $this->container->get('security.context')->getToken()->getUser();
-        $this->container->get('session')->set('auditUserIns', $auditUser->getUsername());
+        //$this->container->get('session')->set('auditUserIns', $auditUser->getUsername());
         
         $confirmationEnabled = $this->container->getParameter('fos_user.registration.confirmation.enabled');
         
         $process = $formHandler->processIns($confirmationEnabled, $auditUser);
         
-        if ($process) {die;
+        if ($process) {
             $user = $form->getData();
             
             /*****************************************************
@@ -63,19 +63,22 @@ class DefaultController extends BaseController {
 
                 return new RedirectResponse($url);
             } else {
-                //$this->authenticateUser($user);
+                $this->authenticateUser($user);
                 $route = 'fos_user_registration_confirmed';
             }
 
             
         }
-
-        return $this->container->get('templating')->renderResponse('FOSUserBundle:Registration:register.html.'.$this->getEngine(), array(
+        
+        $opciones = $this->container->get("request")->getSession()->get('opciones');
+        //FOSUserBundle:Registration:register.html
+        return $this->container->get('templating')->renderResponse('MinSalSidPlaUsersBundle:Registration:register.html.'.$this->getEngine(), array(
             'form' => $form->createView(),
             'theme' => $this->container->getParameter('fos_user.template.theme'),
             'userInterno' => $userInterno,
             'entId' => $entId,
             'entNombre' => $entNombre,
+            'opciones' => $opciones,
         ));
     }
 

@@ -70,7 +70,7 @@ class RegistrationFormType  extends BaseType{
         $builder->add('userTipo',  'choice', array(
             'label'=>'Acciones que Realizará',
             'empty_value' => 'Seleccione una Acción',
-            'required'=>false,
+            'required'=>true,
             'expanded'=>false,
             'multiple'=>false,
             'choices'=> array(

@@ -2,7 +2,7 @@
 <HTML>
     <head>
         <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-        <title>{% block titulo %}Sistema para la Planificaci&oacute;n Anual Operativa{% endblock %}</title>
+        <title>{% block titulo %}Sistema para el Control de Alcoholes{% endblock %}</title>
 
         {% block stylesheets %}
         <link href="{{ asset('bundles/minsalsidpla/css/redmond/jquery-ui-1.8.16.custom.css') }}" type="text/css" rel="stylesheet" />
@@ -92,9 +92,9 @@
                              {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}              
                                 {% block body %}                                    
                                     {% if opciones is not defined %}
-                        <h2>Contacte al Administrador del Sistema para que le asigne un rol y asi podra ingresar al sistema correctamente</h2>
+                                        <h2>Contacte al Administrador del Sistema para que le asigne un rol y asi podra ingresar al sistema correctamente</h2>
                                     {% endif %}
-                        <table>
+                        <!--<table>
                             <tr>
                                 <td align="center">                                                
                                     <br>                                               
@@ -115,7 +115,7 @@
                                     <h4>Adaptado de la Guía metodológica aplicada para la formulación de indicadores y el seguimiento a metas de gobierno en el municipio de Tocancipá, Cundinamarca, Colombia.</h4>
                                 </td>
                             </tr>
-                        </table>
+                        </table>-->
 
                                 {% endblock %} 
                              {% else %}
