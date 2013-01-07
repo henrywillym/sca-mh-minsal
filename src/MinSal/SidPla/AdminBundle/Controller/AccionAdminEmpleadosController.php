@@ -25,7 +25,7 @@
 /**
  * Description of AccionAdminEmpleadosController
  *
- * @author Bruno González
+ * @author Daniel E. Diaz
  */
 
 namespace MinSal\SidPla\AdminBundle\Controller;
@@ -45,13 +45,11 @@ class AccionAdminEmpleadosController extends Controller {
 
     public function mattEmpleadosAction() {
         $opciones = $this->getRequest()->getSession()->get('opciones');
-
-
         return $this->render('MinSalSidPlaAdminBundle:Empleado:manttEmpleados.html.twig', array('opciones' => $opciones));
     }
 
     public function consultarEmpleadosJSONAction() {
-        $request = $this->getRequest();
+       $request = $this->getRequest();
         $empleadoDao = new EmpleadoDao($this->getDoctrine());
         $empleados = $empleadoDao->getEmpleados();
 
@@ -62,20 +60,19 @@ class AccionAdminEmpleadosController extends Controller {
 
         foreach ($empleados as $emple) {
 
-            $unidad = $emple->getUnidadOrganizativa();
-            if ($unidad == null)
-                $unidad = new UnidadOrganizativa();
-
-
-            $rows[$i]['id'] = $emple->getIdEmpleado();
-            $rows[$i]['cell'] = array($emple->getIdEmpleado(),
-                $emple->getPrimerNombre(),
-                $emple->getSegundoNombre(),
-                $emple->getPrimerApellido(),
-                $emple->getSegundoApellido(),
-                $emple->getDui(),
+            $rows[$i]['id'] = $emple->getIdUsuario();
+            $rows[$i]['cell'] = array($emple->getIdUsuario(),
+            	$emple->getUserName(),
+                $emple->getUserPrimerNombre(),
+                $emple->getUserSegundoNombre(),
+                $emple->getUserApellidos(),
+                $emple->getUserDui(),
+                $emple->getUserNit(),
+                $emple->getUserInternoTipo(),
+                $emple->getUserCargo(),
                 $emple->getEmail(),
-                $unidad->getNombreUnidad());
+                $emple->getUserTelefono(),
+				$emple->getPassword());
             $i++;
         }
 
@@ -116,7 +113,7 @@ class AccionAdminEmpleadosController extends Controller {
         $primerApellido = $request->get('primerApellido');
         $segundoApellido = $request->get('segundoApellido');
         $email=$request->get('email');
-        $unidadAsignada = $request->get('unidad');
+       
 
         $id = $request->get('id');
         $operacion = $request->get('oper');

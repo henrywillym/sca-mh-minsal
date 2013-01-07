@@ -2,247 +2,302 @@
 
 namespace MinSal\SidPla\AdminBundle\Entity;
 
+use FOS\UserBundle\Entity\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * MinSal\SidPla\AdminBundle\Entity\Empleado
  *
- * @ORM\Table(name="sidpla_empleado")
+ * @ORM\Table(name="sca_usuario")
  * @ORM\Entity
  */
-class Empleado {
+class Empleado  {
+ /**
+     * @ORM\Id
+     * @ORM\Column(name="usuario_codigo", type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $idUsuario;
+	
+/**
+     * 
+     * @ORM\Column(name="username", type="string")
+    
+     */
+    protected $username;
+	
+    /**
+     * @ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\Entidad", inversedBy="users")
+     * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
+     */
+    protected $entidad;
+
+    /**
+     * ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\RolSistema", inversedBy="usuarios")
+     * ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")
+     */
+    //protected $rol;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="MinSal\SidPla\AdminBundle\Entity\RolSistema")
+     * @ORM\JoinTable(name="sca_usuario_rol", 
+     *              joinColumns={@ORM\JoinColumn(name="usuario_codigo", referencedColumnName="usuario_codigo")},
+     *              inverseJoinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")})
+     */
+    protected $rols;
+        
+    /**
+     * @var string $userDui
+     *
+     * @ORM\Column(name="user_primer_nombre", type="string", length=20)
+     */
+    private $userPrimerNombre;
+    
+    /**
+     * @var string $userNit
+     *
+     * @ORM\Column(name="user_segundo_nombre", type="string", length=30)
+     */
+    private $userSegundoNombre;
+    
+    /**
+     * @var string $userNit
+     *
+     * @ORM\Column(name="user_apellidos", type="string", length=30)
+     */
+    private $userApellidos;
+    
+    /**
+     * @var string $userDui
+     *
+     * @ORM\Column(name="user_dui", type="string", length=20)
+     */
+    private $userDui;
+    
+    /**
+     * @var string $userNit
+     *
+     * @ORM\Column(name="user_nit", type="string", length=30)
+     */
+    private $userNit;
+    
+    /**
+     * @var string $userCargo
+     *
+     * @ORM\Column(name="user_cargo", type="string", length=255, nullable=true)
+     */
+    private $userCargo;
+    
+    /**
+     * @var string $userTelefono
+     *
+     * @ORM\Column(name="user_telefono", type="text")
+     */
+    private $userTelefono;
+    
+	 /**
+     * @var string $email
+     *
+     * @ORM\Column(name="email", type="text")
+     */
+    private $email;
+    
+	 /**
+     * @var string $password
+     *
+     * @ORM\Column(name="password", type="text")
+     */
+    private $password;
+	
+    /**
+     * @var string $userInterno
+     *
+     * @ORM\Column(name="user_interno", type="boolean")
+     */
+    private $userInterno;
+    
+    /**
+     * @var string $userInternoTipo
+     *
+     * @ORM\Column(name="user_interno_tipo", type="string", length=20, nullable=true)
+     */
+    private $userInternoTipo;
+    
+    
 
     /**
      * @var integer $idEmpleado
      *
-     * @ORM\Column(name="empleado_codigo", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * ORM\Column(name="empleado_codigo", type="integer")
      */
-    private $idEmpleado;
+    //private $idEmpleado;
+
+    
 
     /**
-     * @var string $primerNombre
+     * Get id
      *
-     * @ORM\Column(name="empleado_primernombre", type="string", length=32)
+     * @return integer 
      */
-    private $primerNombre;
+    public function getIdUsuario() {
+        return $this->idUsuario;
+    }
+	public function setIdUsuario($idUsuario) {
+        $this->idUsuario=$idUsuario;
+    }
+	   public function getEntidad() {
+        return $this->entidad;
+    }
 
-    /**
-     * @var string $segundoNombre
-     *
-     * @ORM\Column(name="empleado_segundonombre", type="string", length=35)
-     */
-    private $segundoNombre;
-
-    /**
-     * @var string $primerApellido
-     *
-     * @ORM\Column(name="empleado_primerapellido", type="string", length=35)
-     */
-    private $primerApellido;
-
-    /**
-     * @var string $segundoApellido
-     *
-     * @ORM\Column(name="empleado_segundoapellido", type="string", length=35)
-     */
-    private $segundoApellido;
-
-    /**
-     * @var string $dui
-     *
-     * @ORM\Column(name="empleado_dui", type="string", length=10)
-     */
-    private $dui;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="UnidadOrganizativa", inversedBy="empleados")
-     * @ORM\JoinColumn(name="uniorg_codigo", referencedColumnName="uniorg_codigo")
-     */
-    protected $unidadOrganizativa;
-
-    /**
-     * @ORM\OneToOne(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", inversedBy="empleado",orphanRemoval=true)
-     * @ORM\JoinColumn(name="usuario_codigo", referencedColumnName="usuario_codigo")
-     */
-    private $usuario;
-
-    /**
-     * @var string $email
-     *
-     * @ORM\Column(name="empleado_email", type="string", length=250)
-     */
-    private $email;
-
+    public function setEntidad($entidad) {
+        $this->entidad = $entidad;
+    }
+	
     /**
      * Set idEmpleado
      *
      * @param integer $idEmpleado
      */
-    public function setIdEmpleado($idEmpleado)
-    {
+    /*public function setIdEmpleado($idEmpleado) {
         $this->idEmpleado = $idEmpleado;
-    }
+    }*/
 
     /**
      * Get idEmpleado
      *
-     * @return integer 
+     * @return integer
      */
-    public function getIdEmpleado()
-    {
+    /*public function getidEmpleado() {
         return $this->idEmpleado;
-    }
+    }*/
 
     /**
-     * Set primerNombre
+     * Set empleado
      *
-     * @param string $primerNombre
+     * @param MinSal\SidPla\UsersBundle\Entity\Empleado $empleado
      */
-    public function setPrimerNombre($primerNombre)
-    {
-        $this->primerNombre = $primerNombre;
-    }
+    /*public function setEmpleado(\MinSal\SidPla\AdminBundle\Entity\Empleado $empleado) {
+        $this->empleado = $empleado;
+    }/**/
 
     /**
-     * Get primerNombre
+     * Get empleado
      *
-     * @return string 
+     * @return MinSal\SidPla\UsersBundle\Entity\Empleado 
      */
-    public function getPrimerNombre()
-    {
-        return $this->primerNombre;
-    }
+    /*public function getEmpleado() {
+        return $this->empleado;
+    }*/
+
 
     /**
-     * Set segundoNombre
-     *
-     * @param string $segundoNombre
-     */
-    public function setSegundoNombre($segundoNombre) {
-        $this->segundoNombre = $segundoNombre;
-    }
-
-    /**
-     * Get segundoNombre
+     * Get username
      *
      * @return string 
      */
-    public function getSegundoNombre() {
-        return $this->segundoNombre;
+    public function getUsername() {
+        return $this->username;
+    }
+	public function setUsername($username) {
+       $this->username=$username;
+    }
+	
+ 
+    public function getUserDui() {
+        return $this->userDui;
     }
 
-    /**
-     * Set primerApellido
-     *
-     * @param string $primerApellido(35)
-     */
-    public function setPrimerApellido($primerApellido) {
-        $this->primerApellido = $primerApellido;
+    public function setUserDui($userDui) {
+        $this->userDui = $userDui;
     }
 
-    /**
-     * Get primerApellido(35)
-     *
-     * @return string 
-     */
-    public function getPrimerApellido() {
-        return $this->primerApellido;
+    public function getUserNit() {
+        return $this->userNit;
     }
 
-    /**
-     * Set segundoApellido
-     *
-     * @param string $segundoApellido
-     */
-    public function setSegundoApellido($segundoApellido) {
-        $this->segundoApellido = $segundoApellido;
+    public function setUserNit($userNit) {
+        $this->userNit = $userNit;
     }
 
-    /**
-     * Get segundoApellido
-     *
-     * @return string 
-     */
-    public function getSegundoApellido() {
-        return $this->segundoApellido;
+    public function getUserCargo() {
+        return $this->userCargo;
     }
 
-    /**
-     * Set dui
-     *
-     * @param string $dui
-     */
-    public function setDui($dui) {
-        $this->dui = $dui;
+    public function setUserCargo($userCargo) {
+        $this->userCargo = $userCargo;
     }
 
-    /**
-     * Get dui
-     *
-     * @return string 
-     */
-    public function getDui() {
-        return $this->dui;
+    public function getUserTelefono() {
+        return $this->userTelefono;
     }
 
-    /**
-     * Set unidadOrganizativa
-     *
-     * @param MinSal\SidPla\AdminBundle\Entity\UnidadOrganizativa $unidadOrganizativa
-     */
-    public function setUnidadOrganizativa(\MinSal\SidPla\AdminBundle\Entity\UnidadOrganizativa $unidadOrganizativa) {
-        $this->unidadOrganizativa = $unidadOrganizativa;
+    public function setUserTelefono($userTelefono) {
+        $this->userTelefono = $userTelefono;
     }
 
-    /**
-     * Get unidadOrganizativa
-     *
-     * @return MinSal\SidPla\AdminBundle\Entity\UnidadOrganizativa 
-     */
-    public function getUnidadOrganizativa() {
-        return $this->unidadOrganizativa;
+    public function getUserInterno() {
+        return $this->userInterno;
     }
 
-    /**
-     * Set usuario
-     *
-     * @param MinSal\SidPla\AdminBundle\Entity\User $usuario
-     */
-    public function setUsuario(\MinSal\SidPla\UsersBundle\Entity\User $usuario) {
-        $this->usuario = $usuario;
+    public function setUserInterno($userInterno) {
+        $this->userInterno = $userInterno;
     }
 
-    /**
-     * Get usuario
-     *
-     * @return MinSal\SidPla\AdminBundle\Entity\User 
-     */
-    public function getUsuario() {
-        return $this->usuario;
+    public function getUserInternoTipo() {
+    	//ACA SE FILTRA CUAL ES EL TIPO DE MINISTERIO AL QUE PERTENECE
+    if($this->userInternoTipo=="MINSAL"){return "Ministerio de Salud";}
+	if($this->userInternoTipo=="DGII"){return "Dirección General de Impuestos Internos";}
+	if($this->userInternoTipo=="DGA"){return "Dirección General de Aduanas";}
+	if($this->userInternoTipo=="MH"){return "Ministerio de Hacienda";}
+	if($this->userInternoTipo=="DNM"){return "Dirección Nacional de Medicamentos";}
     }
 
-    public function __toString() {
-        return 'ID ' . $this->getIdEmpleado() . ' ' . $this->getPrimerNombre() . ' ' . $this->getPrimerApellido();
+    public function setUserInternoTipo($userInternoTipo) {
+        $this->userInternoTipo = $userInternoTipo;
     }
 
-    /**
-     * Set email
-     *
-     * @param string $email
-     */
-    public function setEmail($email) {
-        $this->email = $email;
+    public function getUserPrimerNombre() {
+        return $this->userPrimerNombre;
     }
 
-    /**
-     * Get email
-     *
-     * @return string 
-     */
-    public function getEmail() {
+    public function setUserPrimerNombre($userPrimerNombre) {
+        $this->userPrimerNombre = $userPrimerNombre;
+    }
+
+    public function getUserSegundoNombre() {
+        return $this->userSegundoNombre;
+    }
+
+    public function setUserSegundoNombre($userSegundoNombre) {
+        $this->userSegundoNombre = $userSegundoNombre;
+    }
+
+    public function getUserApellidos() {
+        return $this->userApellidos;
+    }
+
+    public function setUserApellidos($userApellidos) {
+        $this->userApellidos = $userApellidos;
+    }
+	 public function getEmail() {
         return $this->email;
+    }
+	public function setEmail($email) {
+       $this->email=$email;
+    }
+	 public function getPassword() {
+        return $this->password;
+    }
+	public function setPassword($password) {
+       $this->password=$password;
+    }
+
+    public function getRols() {
+        return $this->rols;
+    }
+
+    public function setRols($rols) {
+        $this->rols = $rols;
     }
 
 }
