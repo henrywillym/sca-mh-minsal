@@ -20,7 +20,25 @@ class UserDao {
         $this->em = $this->doctrine->getEntityManager();
         $this->repositorio = $this->doctrine->getRepository('MinSalSidPlaUsersBundle:User');
     }
-
+    
+    public function getUsersInternos() {
+        $User = $this->em->createQuery("SELECT U
+                                        FROM MinSalSidPlaUsersBundle:User U
+                                        WHERE U.userInterno = true
+                                        AND U.auditDeleted = false");
+        return $User->getResult();
+    }
+    
+    public function getUsersExternos($entId) {
+        $User = $this->em->createQuery("SELECT U
+                                        FROM MinSalSidPlaUsersBundle:User U JOIN U.entidad B
+                                        WHERE U.userInterno = false
+                                        AND B.entId = :entId
+                                        AND U.auditDeleted = false")
+                ->setParameter('entId',$entId); 
+        return $User->getResult();
+    }
+    
     public function getUserSinRol() {
         $User = $this->em->createQuery("SELECT U
                                         FROM MinSalSidPlaUsersBundle:User U

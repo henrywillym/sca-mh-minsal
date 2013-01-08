@@ -63,7 +63,8 @@ class EntidadDao {
     public function existeEntidad($idEntidad) {
         $result = $this->em->createQuery("SELECT count(e) 
                                           FROM MinSalSidPlaAdminBundle:Entidad e
-                                          WHERE e.entId = " . $idEntidad);
+                                          WHERE e.entId = :entId")
+                 ->setParameter('entId',$idEntidad);
         return $result->getSingleScalarResult();
     }
 }

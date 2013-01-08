@@ -45,7 +45,7 @@ class AccionAdminEntidadesController extends Controller {
 
         $numfilas = count($entidades);
         
-        $emple = new Entidad();
+        //$emple = new Entidad();
 
         if ($numfilas != 0) {
             //array_multisort($entidades, SORT_ASC);

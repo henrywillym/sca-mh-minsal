@@ -5,36 +5,58 @@ namespace  MinSal\SidPla\UsersBundle\Form\Handler;
 use FOS\UserBundle\Form\Handler\RegistrationFormHandler as BaseHandler;
 use FOS\UserBundle\Model\UserInterface;
 use MinSal\SidPla\UsersBundle\Entity\User;
+use MinSal\SidPla\AdminBundle\EntityDao\EntidadDao;
 
 /**
  * @author Henry Willy Melara
  */
 class RegistrationFormHandler extends BaseHandler{
-    private $auditUserIns;
-    private $auditUserUpd;
+    private $auditUser;
+    private $entId;
     
-    public function processIns($confirmation = false, $auditUserIns){
-        $this->auditUserIns = $auditUserIns;
+    private $container;
+
+    public function __construct($form, $request, $userManager, $mailer, $container){
+        parent::__construct($form, $request, $userManager, $mailer);
+        $this->container = $container;
+    }
+    
+    public function processIns($entId, $auditUserIns, $confirmation = false){
+        $this->auditUser = $auditUserIns;
+        $this->entId = $entId;
+        
         return $this->process($confirmation);
     }
     
-    public function processUpd($confirmation = false, $auditUserUpd){
+    /*public function processUpd($confirmation = false, $auditUserUpd){
         $this->auditUserUpd = $auditUserUpd;
         return $this->process($confirmation);
-    }
+    }*/
     
     public function process($confirmation = false){
         $user = $this->userManager->createUser();
-        //$user->setUserInterno(true);
         $this->form->setData($user);
 
         if ('POST' == $this->request->getMethod()) {
             $this->form->bindRequest($this->request);
             
             if ($this->form->isValid()) {
-                $user->setAuditUserIns($this->auditUserIns);
-                $user->setAuditDateIns(new \DateTime());
-                //var_dump($user);die;
+                $tmp = $this->entId;
+                if( !empty($tmp)){
+                    $entidadDao = new EntidadDao($this->container->get("doctrine"));
+                    $entidad = $entidadDao->getEntidad($this->entId);
+                    $user->setEntidad($entidad);
+                }
+                
+                $tmp = $user->getIdUsuario();
+                if(empty($tmp) ){
+                    $user->setAuditUserIns($this->auditUser);
+                    $user->setAuditDateIns(new \DateTime());
+                }else{
+                    $user->setAuditUserUpd($this->auditUser);
+                    $user->setAuditDateUpd(new \DateTime());
+                }
+                
                 $this->onSuccess($user, $confirmation);
                 // do your custom logic here
                 return true;

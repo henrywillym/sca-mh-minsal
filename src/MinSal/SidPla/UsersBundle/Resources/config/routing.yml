@@ -25,3 +25,11 @@ MinSalSidPlaUsersBundle_registerUsuarioInterno:
 MinSalSidPlaUsersBundle_registerUsuarioExterno:
     pattern:  /register/{userInterno}/{entId}
     defaults: { _controller: MinSalSidPlaUsersBundle:Default:register }
+    
+MinSalSidPlaUsersBundle_mantCargarUsuarios:
+    pattern:  /mantCargarUsuarios/{userInterno}/{entId}
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:mantUsers } 
+
+MinSalSidPlaUsersBundle_consultarUsuariosJSON:
+    pattern:  /consultarUsuariosJSON/{userInterno}/{entId}
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:consultarUsuariosJSON } 

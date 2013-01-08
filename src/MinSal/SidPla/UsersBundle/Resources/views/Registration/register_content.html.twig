@@ -110,6 +110,11 @@
     }
 </script>
     
+    {% for key, message in app.session.getFlashes() %}
+        <div class="{{ key }}">
+            {{ message|trans({}, 'FOSUserBundle') }}
+        </div>
+    {% endfor %}
     <form id="formUsuario" action="{{ path('MinSalSidPlaUsersBundle_registerUsuarioExterno', {'userInterno':userInterno, 'entId':entId}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_registration_register">
         <input type="hidden" id="valido" value=false/>
         

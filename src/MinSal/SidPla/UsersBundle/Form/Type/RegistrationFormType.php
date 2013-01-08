@@ -4,7 +4,7 @@ namespace  MinSal\SidPla\UsersBundle\Form\Type;
 use Symfony\Component\Form\FormBuilder;
 use FOS\UserBundle\Form\Type\RegistrationFormType as BaseType;
 use Doctrine\ORM\EntityRepository;
-
+use MinSal\SidPla\UsersBundle\Entity\User;
 
 /**
  * Description of RegistrationFormType
@@ -59,11 +59,11 @@ class RegistrationFormType  extends BaseType{
             'expanded'=>false,
             'multiple'=>false,
             'choices'=> array(
-                'MINSAL' => 'MINSAL - Ministerio de Salud', 
-                'DGII'=>'DGII - Dirección General de Impuestos Internos',
-                'DGA' => 'DGA - Dirección General de Aduanas', 
-                'MH'=>'MH - Ministerio de Hacienda',
-                'DNM' => 'DNM - Dirección Nacional de Medicamentos', 
+                User::$MINSAL => User::$MINSAL_TEXT, 
+                User::$DGII => User::$DGII_TEXT,
+                User::$DGA => User::$DGA_TEXT, 
+                User::$MH => User::$MH_TEXT,
+                User::$DNM => User::$DNM_TEXT, 
             )
         ));
         
@@ -74,10 +74,10 @@ class RegistrationFormType  extends BaseType{
             'expanded'=>false,
             'multiple'=>false,
             'choices'=> array(
-                'VENDEDOR' => 'Vendedor', 
-                'COMPRADOR'=>'Comprador',
-                'DIGITADOR' => 'Digitador de Empresas y Cuotas', 
-                'APROBADOR'=>'Autorizador en Proceso Solicitud de Import.'
+                User::$VENDEDOR => User::$VENDEDOR_TEXT, 
+                User::$COMPRADOR => User::$COMPRADOR_TEXT,
+                User::$DIGITADOR => User::$DIGITADOR_TEXT, 
+                User::$APROBADOR => User::$APROBADOR_TEXT
             )
         ));
         

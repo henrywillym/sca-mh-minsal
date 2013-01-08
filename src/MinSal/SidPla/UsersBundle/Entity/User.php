@@ -7,11 +7,35 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
+//define ('FILTER_VALIDATE_EMAIL', 274);
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="sca_usuario")
  */
 class User extends BaseUser {
+    
+    public static $MINSAL = 'MINSAL';
+    public static $DGII = 'DGII';
+    public static $DGA= 'DGA';
+    public static $MH = 'MH';
+    public static $DNM = 'DNM';
+    
+    public static $MINSAL_TEXT = 'Ministerio de Salud';
+    public static $DGII_TEXT = 'Dirección General de Impuestos Internos';
+    public static $DGA_TEXT= 'Dirección General de Aduanas';
+    public static $MH_TEXT = 'Ministerio de Hacienda';
+    public static $DNM_TEXT = 'Dirección Nacional de Medicamentos';
+    
+    public static $COMPRADOR = 'COMPRADOR';
+    public static $VENDEDOR = 'VENDEDOR';
+    public static $DIGITADOR= 'DIGITADOR';
+    public static $APROBADOR = 'APROBADOR';
+    
+    public static $COMPRADOR_TEXT = 'Comprador';
+    public static $VENDEDOR_TEXT = 'Vendedor';
+    public static $DIGITADOR_TEXT = 'Digitador de Empresas y Cuotas';
+    public static $APROBADOR_TEXT = 'Autorizador en Proceso Solicitud de Import.';
     
     public function __construct() {
         parent::__construct();
@@ -389,5 +413,33 @@ class User extends BaseUser {
 
     public function setAuditDeleted($auditDeleted) {
         $this->auditDeleted = $auditDeleted;
+    }
+    
+    public function getUserInternoTipoText() {
+    	//ACA SE FILTRA CUAL ES EL TIPO DE MINISTERIO AL QUE PERTENECE
+        if($this->userInternoTipo == User::$MINSAL){
+            return User::$MINSAL_TEXT;
+        }else if($this->userInternoTipo == User::$DGII){
+            return User::$DGII_TEXT;
+        }else if($this->userInternoTipo == User::$DGA){
+            return User::$DGA_TEXT;
+        }else if($this->userInternoTipo == User::$MH){
+            return User::$MH_TEXT;
+        }else if($this->userInternoTipo == User::$DNM){
+            return User::$DNM_TEXT;
+        }
+    }
+    
+    public function getUserTipoText() {
+        //Aca se determina el texto de que tipo de usuario es y las acciones que puede realizar.
+        if($this->userTipo == User::$VENDEDOR){
+            return User::$VENDEDOR_TEXT;
+        }else if($this->userTipo == User::$COMPRADOR){
+            return User::$COMPRADOR_TEXT;
+        }else if($this->userTipo == User::$APROBADOR){
+            return User::$APROBADOR_TEXT;
+        }else if($this->userTipo == User::$DIGITADOR){
+            return User::$DIGITADOR_TEXT;
+        }
     }
 }

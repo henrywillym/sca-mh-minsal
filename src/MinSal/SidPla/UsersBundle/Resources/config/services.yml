@@ -10,6 +10,6 @@ services:
             
     sidpla_user.form.handler.registration:
         class: MinSal\SidPla\UsersBundle\Form\Handler\RegistrationFormHandler
-        arguments: ["@fos_user.registration.form", "@request", "@fos_user.user_manager", "@fos_user.mailer"]
+        arguments: ["@fos_user.registration.form", "@request", "@fos_user.user_manager", "@fos_user.mailer", "@service_container"]
         scope: request
         public: false

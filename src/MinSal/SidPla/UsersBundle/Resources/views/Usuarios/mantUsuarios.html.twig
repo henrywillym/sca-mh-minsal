@@ -1,0 +1,180 @@
+{% extends 'MinSalSidPlaBundle:Default:index.html.twig' %}
+
+{% block body %}
+
+    <script type="text/javascript">
+       $(document).ready(function(){
+            $('input[type="button"]').button();
+       });
+    </script>
+    
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var myGrid = $('#theGrid');
+            
+            myGrid.jqGrid({ 
+                url: '{{ url('MinSalSidPlaUsersBundle_consultarUsuariosJSON',{'entId': entId, 'userInterno':userInterno})}}',
+                //width: 1000,
+                height: 200,
+                datatype:'json',
+                altRows:true,            
+                rowNum:10,
+                rowList:[10,20,30],
+                multiselect: false,
+                loadonce:true,
+                jsonReader: {
+                    root:'rows',
+                    page:'page',
+                    total:'total',
+                    records:'records',
+                    repeatitems: false,     /**/
+                    id:"0"                 /**/
+                },
+                pager: jQuery('#pager'),
+                viewrecords: true, 
+                {% if(userInterno=='true') %}
+                    caption: 'Usuarios de Ministerios',
+                {%else%}
+                    caption: 'Usuarios de {{entNombre}}',
+                {%endif%}
+                editurl: '{{ url('MinSalSidPlaUsersBundle_mantCargarUsuarios',{'entId':entId, 'userInterno':userInterno})}}',
+                editCaption: "Editar Usuario",
+                addCaption: "Agregar Usuario",
+                colModel:[{
+                        key:true,
+                        label:'ID',
+                        name:'idUsuario', 
+                        index: 'idUsuario',
+                        hidden:true
+                        //width:20
+                    },{ 
+                        label:'Usuario',
+                        name:'username', 
+                        index: 'username',
+                        hidden:false,
+                        editable:true
+                    },{ 
+                        label:'Primer Nombre',
+                        name:'userPrimerNombre', 
+                        index: 'userPrimerNombre'
+                        //width:300,
+                    },{ 
+                        label:'Segundo Nombre',
+                        name:'userSegundoNombre', 
+                        index: 'userSegundoNombre'
+                        //width:90
+                    },{ 
+                        label:'Apellidos',
+                        name:'userApellidos', 
+                        index: 'userApellidos'
+                        //width:90
+                    },{ 
+                        label:'DUI',
+                        name:'userDui', 
+                        index: 'userDui'
+                        //width:90
+                    },{ 
+                        label:'Acciones que Realizará',
+                        name:'userTipoText', 
+                        index: 'userTipoText'
+                        //width:90
+                    }
+                    
+                    {% if(userInterno=='true') %}
+                        ,{ 
+                            label:'Ministerio',
+                            name:'userInternoTipoText', 
+                            index: 'userInternoTipoText'
+                            //width:90
+                        }
+                    {%endif%}
+                ]
+            });
+            
+            myGrid.jqGrid('navGrid','#pager',{
+                edit:false,
+                add:false,
+                del:false,
+                beforeRefresh: function() {
+                    $("#theGrid").jqGrid('setGridParam',{
+                            datatype:'json',
+                            loadonce:true
+                    }).trigger('reloadGrid');
+                }
+            }
+        );
+       
+        $("#agregarUsuario").click(function(){
+            {% if(userInterno=='true') %}
+                location.href = '{{ url('MinSalSidPlaUsersBundle_registerUsuarioInterno', {'userInterno':userInterno}) }}';
+            {%else%}
+                location.href = '{{ url('MinSalSidPlaUsersBundle_registerUsuarioExterno', {'userInterno':userInterno, 'entId':entId}) }}';
+            {%endif%}
+        });
+        
+    
+         //editar
+        $("#editarUsuario").click(function(){
+            var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            
+            if( gr != null ){
+                prueba=gr;
+            }else{ 
+                alert("Por favor seleccione una fila para editar!"); 
+            }
+        });
+        
+        //eliminar
+        $("#eliminarUsuario").click(function(){
+            var grs = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            
+            if( grs != null ){
+                
+            }else{
+                alert("Por favor seleccione una fila para borrar!");
+            }
+        }); 
+  //fin
+       
+      });
+      
+      var prueba;
+    </script>
+    
+        <center>
+            <h1>
+                {% if(userInterno=='true') %}
+                    Listado de Usuarios de Ministerios
+                {%else%}
+                    Listado de Usuarios de {{entNombre}}
+                {%endif%}
+            </h1>
+            
+                {% if app.session.hasFlash('notice') %}
+                    <div class="flash-notice">
+                        {{ app.session.flash('notice') }}
+                    </div><br/>
+                {% endif %}
+                    
+                {% for key, message in app.session.getFlashes() %}
+                    <div class="flash-notice" id="{{ key }}">
+                        {{ message|trans({}, 'FOSUserBundle') }}
+                    </div>
+                {% endfor %}
+            <table id="theGrid" class="scroll">
+            </table> 
+            
+            
+                
+            <div id="pager" class="scroll" style="text-align:center;">
+            </div> 
+        
+            <br/>
+            <input type="button" value="Agregar" id="agregarUsuario" /> &nbsp;
+            <input type="button" value="Editar" id="editarUsuario" /> &nbsp;
+            <input type="button" value="Eliminar" id="eliminarUsuario"/> &nbsp;
+            
+            <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSidPlaAdminBundle_mantCargarEntidad',{'entId':entId})}}';"/>
+        </center>
+    
+{% endblock %}

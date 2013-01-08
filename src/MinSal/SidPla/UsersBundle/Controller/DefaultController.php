@@ -19,14 +19,72 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends BaseController {
 
+    /**
+     * Retorna la página principal donde se muestra el listado de usuarios Internos u Externos
+     * @return type HTML.twig
+     */
+    public function mantUsersAction($entId, $userInterno) {
+        $opciones = $this->container->get("request")->getSession()->get('opciones');
+        $entNombre = null;
+        
+        if($userInterno == 'false'){
+            $entidadDao = new EntidadDao($this->container->get("doctrine"));
+            $entNombre = $entidadDao->getEntidad($entId)->getEntNombre();
+        }
+        
+        return $this->container->get('templating')->renderResponse('MinSalSidPlaUsersBundle:Usuarios:mantUsuarios.html.twig', array(
+            'opciones' => $opciones, 
+            'userInterno'=>$userInterno, 
+            'entId'=>$entId,
+            'entNombre'=>$entNombre,
+        ));
+    }
+
+    /**
+     * Devuelve el listado principal de registros del mantenimiento
+     * @return Response
+     */
+    public function consultarUsuariosJSONAction($entId, $userInterno) {
+        $userDao = new UserDao($this->container->get("doctrine"));
+        $usuarios =null;
+        
+        if($userInterno == 'true'){
+            $usuarios = $userDao->getUsersInternos();
+        }else{
+            $usuarios = $userDao->getUsersExternos($entId);
+        }
+
+        $numfilas = count($usuarios);
+        
+        if ($numfilas != 0) {
+            //array_multisort($cuotas, SORT_ASC);
+        } else {
+            //$rows[0]['id'] = 0;
+            //$rows[0]['cell'] = array(' ', ' ',' ', ' ', ' ', ' ', ' ', ' ');
+        }
+
+        $datos = json_encode($usuarios);
+        $pages = floor($numfilas / 10) + 1;
+
+        $jsonresponse = '{
+               "page":"1",
+               "total":"' . $pages . '",
+               "records":"' . $numfilas . '", 
+               "rows":' . $datos . '}';
+
+        return new Response($jsonresponse);
+    }
+    
     public function registerAction(){
         $request = $this->container->get("request");
-        $userInterno = $this->container->get("request")->get("userInterno");
+        $opciones = $request->getSession()->get('opciones');
+        
+        $userInterno = $request->get("userInterno");
         $entId = '';
         $entNombre = '';
         
         if($userInterno == 'false'){
-            $entId = $this->container->get("request")->get("entId");
+            $entId = $request->get("entId");
             $entidadDao = new EntidadDao($this->container->get("doctrine"));//fos_user.user_manager
             $entNombre = $entidadDao->getEntidad($entId)->getEntNombre();
         }
@@ -39,7 +97,7 @@ class DefaultController extends BaseController {
         
         $confirmationEnabled = $this->container->getParameter('fos_user.registration.confirmation.enabled');
         
-        $process = $formHandler->processIns($confirmationEnabled, $auditUser);
+        $process = $formHandler->processIns($entId, $auditUser, $confirmationEnabled);
         
         if ($process) {
             $user = $form->getData();
@@ -48,12 +106,7 @@ class DefaultController extends BaseController {
              * Add new functionality (e.g. log the registration) *
              *****************************************************/
             
-            /* 
-            $this->get('logger')->info(
-                sprintf('New user registration: %s', $user)
-            ); 
-            /**/
-            
+            $url= null;
             if ($confirmationEnabled) {
                 $this->container->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
                 $route = 'fos_user_registration_check_email';
@@ -61,16 +114,23 @@ class DefaultController extends BaseController {
                 $this->setFlash('fos_user_success', 'registration.flash.user_created');
                 $url = $this->container->get('router')->generate($route);
 
-                return new RedirectResponse($url);
             } else {
-                $this->authenticateUser($user);
-                $route = 'fos_user_registration_confirmed';
+                //$this->authenticateUser($user);
+                //$route = 'fos_user_registration_confirmed';
+                $this->setFlash('fos_user_success', 'El usuario ha sido guardado exitosamente');
+                
+                $route = 'MinSalSidPlaUsersBundle_mantCargarUsuarios';
+                $url = $this->container->get('router')->generate($route, array(
+                    'userInterno' => $userInterno,
+                    'entId' => $entId,
+                    'entNombre' => $entNombre,
+                    'opciones' => $opciones,
+                ));
             }
-
-            
+            return new RedirectResponse($url);
         }
         
-        $opciones = $this->container->get("request")->getSession()->get('opciones');
+        
         //FOSUserBundle:Registration:register.html
         return $this->container->get('templating')->renderResponse('MinSalSidPlaUsersBundle:Registration:register.html.'.$this->getEngine(), array(
             'form' => $form->createView(),
