@@ -125,10 +125,11 @@ class AccionAdminEntidadesController extends Controller {
             foreach( $entidad->getUsers() as $usuario){
                 $rolDao = new RolDao($this->getDoctrine());
                 
-                $user->setRols($rolDao->getRolesEspecificos(
+                $usuario->setRols($rolDao->getRolesEspecificos(
                         $entidad->getEntImportador(),
                         $entidad->getEntProductor(),
                         $entidad->getEntComprador(),
+                        $entidad->getEntCompVend(),
                         $usuario->getUserTipo(),
                         $usuario->getUserInterno(),
                         $usuario->getUserInternoTipo()

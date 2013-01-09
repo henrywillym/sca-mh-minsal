@@ -71,6 +71,7 @@ class RegistrationFormHandler extends BaseHandler{
                         $user->getEntidad()->getEntImportador(),
                         $user->getEntidad()->getEntProductor(),
                         $user->getEntidad()->getEntComprador(),
+                        $user->getEntidad()->getEntCompVend(),
                         $user->getUserTipo(),
                         $user->getUserInterno(),
                         $user->getUserInternoTipo()

@@ -201,19 +201,19 @@ class RolDao {
      * @param bool $entImportador 
      * @param bool $entProductor
      * @param bool $entComprador
+     * @param bool $entVendedorLocal
      * @param string $userTipo VENDEDOR, COMPRADOR, APROBADOR, DIGITADOR
      * @param bool $userInterno true=Usuario interno (Ministerio); false=Usuario externo (Empresas)
      * @param sting $userInternoTipo MH, MINSAL, DGII, DGA, DNM
      * @return array Array Doctrine Object
      */
-    public function getRolesEspecificos($entImportador, $entProductor, $entComprador, $userTipo, $userInterno, $userInternoTipo) {
+    public function getRolesEspecificos($entImportador, $entProductor, $entComprador, $entVendedorLocal, $userTipo, $userInterno, $userInternoTipo) {
         $query = $this->repositorio->createQueryBuilder('R');
         
         $where = '(';
         
         if($entImportador){
             $where = $where.' R.rolImportador = :rolImportador ';
-            
             $query = $query->setParameter('rolImportador',$entImportador === true?1:0 );
         }
         
@@ -231,8 +231,9 @@ class RolDao {
                 $where = $where.' OR ';
             }
             
-            $where = $where.'    R.rolComprador = :rolComprador';
+            $where = $where.'    (R.rolComprador = :rolComprador AND R.rolCompVend = :rolCompVend )';
             $query = $query->setParameter('rolComprador',$entComprador === true?1:0 );
+            $query = $query->setParameter('rolCompVend',$entVendedorLocal === true?1:0 );
         }
         
         $where = $where.'     ) AND R.rolTipo = :rolTipo

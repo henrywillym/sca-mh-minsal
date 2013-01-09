@@ -74,6 +74,13 @@ class RolSistema{
     private $rolComprador;
     
     /**
+     * @var boolean $rolCompVend
+     *
+     * @ORM\Column(name="rol_venta_local", type="boolean")
+     */
+    private $rolCompVend;
+    
+    /**
      * @var string $rolTipo
      *
      * @ORM\Column(name="rol_tipo", type="string", length=20)
@@ -254,6 +261,14 @@ class RolSistema{
 
     public function setRolComprador($rolComprador) {
         $this->rolComprador = $rolComprador;
+    }
+    
+    public function getRolCompVend() {
+        return $this->rolCompVend;
+    }
+
+    public function setRolCompVend($rolCompVend) {
+        $this->rolCompVend = $rolCompVend;
     }
 
     public function getRolTipo() {

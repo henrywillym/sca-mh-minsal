@@ -12,10 +12,10 @@ security:
                use_forward:    true
                check_path:     fos_user_security_check
                failure_path:   null
-               always_use_default_target_path: false
+               always_use_default_target_path: true
                default_target_path:            /SidPla
                target_path_parameter:          _target_path
-               use_referer:                    false               
+               use_referer:                    true
             logout:
                path: fos_user_security_logout
                target: /SidPla
@@ -24,7 +24,7 @@ security:
     access_control:
         - { path: ^/SidPla/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/SidPla/users*, role: ROLE_USER }
-        - { path: ^/SidPla/empresa, role: ROLE_USER }
+        - { path: ^/SidPla/empresa*, role: ROLE_USER }
         - { path: ^/SidPla/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/SidPla/admin/, role: ROLE_ADMIN }
