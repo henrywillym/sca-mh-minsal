@@ -56,8 +56,19 @@ class DefaultController extends BaseController {
 
         $numfilas = count($usuarios);
         
+        
         if ($numfilas != 0) {
-            //array_multisort($cuotas, SORT_ASC);
+            //array_multisort($usuarios, SORT_ASC);
+            $usuario = new User();
+            $i=0;
+            foreach ($usuarios as $usu) {
+                $usuario->setUserInternoTipo($usu['userInternoTipo']);
+                $usuario->setUserTipo($usu['userTipo']);
+                
+                $usuarios[$i]['userInternoTipoText']= $usuario->getUserInternoTipoText();
+                $usuarios[$i]['userTipoText']= $usuario->getUserTipoText();
+                $i=$i+1;
+            }
         } else {
             //$rows[0]['id'] = 0;
             //$rows[0]['cell'] = array(' ', ' ',' ', ' ', ' ', ' ', ' ', ' ');
@@ -75,14 +86,48 @@ class DefaultController extends BaseController {
         return new Response($jsonresponse);
     }
     
+    public function mantCargarUsuarioAction($userInterno, $idUsuario, $entId){
+        $opciones = $this->container->get("request")->getSession()->get('opciones');
+        $entNombre = null;
+        
+        if($userInterno == 'false'){
+            $entidadDao = new EntidadDao($this->container->get("doctrine"));
+            $entNombre = $entidadDao->getEntidad($entId)->getEntNombre();
+        }
+        
+        $userDao = new UserDao($this->container->get("doctrine"));
+        $usuario = $userDao->getUserEspecifico($idUsuario);
+        
+        if( !$usuario ){
+            $usuario = new User();
+        }
+        
+        $form = $this->container->get('fos_user.registration.form');//$form = $this->createForm(new RegistrationFormType(), $usuario);
+        $form->setData($usuario);
+
+        return $this->container->get('templating')->renderResponse('MinSalSidPlaUsersBundle:Registration:register.html.twig', array(
+            'form' => $form->createView(),
+            'theme' => $this->container->getParameter('fos_user.template.theme'),
+            'userInterno' => $userInterno,
+            'entId' => $entId,
+            'entNombre' => $entNombre,
+            'opciones' => $opciones,
+        ));
+    }
+    
     public function registerAction(){
         $request = $this->container->get("request");
         $opciones = $request->getSession()->get('opciones');
         
         $userInterno = $request->get("userInterno");
+        $eliminar = $request->get("eliminar");
+        
+        if($eliminar === 'true'){
+            return $this->eliminarAction($request);
+        }
+        
         $entId = '';
         $entNombre = '';
-        
         if($userInterno == 'false'){
             $entId = $request->get("entId");
             $entidadDao = new EntidadDao($this->container->get("doctrine"));//fos_user.user_manager
@@ -119,7 +164,7 @@ class DefaultController extends BaseController {
                 //$route = 'fos_user_registration_confirmed';
                 $this->setFlash('fos_user_success', 'El usuario ha sido guardado exitosamente');
                 
-                $route = 'MinSalSidPlaUsersBundle_mantCargarUsuarios';
+                $route = 'MinSalSidPlaUsersBundle_mantMostrarUsuarios';
                 $url = $this->container->get('router')->generate($route, array(
                     'userInterno' => $userInterno,
                     'entId' => $entId,
@@ -141,7 +186,8 @@ class DefaultController extends BaseController {
             'opciones' => $opciones,
         ));
     }
-
+    
+    /*
     public function mostrarUsuariosSinRolAction() {
         $opciones = $this->getRequest()->getSession()->get('opciones');
 
@@ -212,7 +258,7 @@ class DefaultController extends BaseController {
         $userDao->editUserSinRol($codigoUsuario, $numRol);
 
         return new Response("{sc:true,msg:''}");
-    }
+    }/**/
 
     public function verificaCreacionAction() {
         $request = $this->container->get("request");
@@ -267,6 +313,40 @@ class DefaultController extends BaseController {
         $response = new Response($jsonresponse);
         return $response;
     }
+    
+    private function eliminarAction($request){
+        $opciones = $request->getSession()->get('opciones');
+        $userInterno = $request->get("userInterno");
+        $auditUser = $this->container->get('security.context')->getToken()->getUser();
+        
+        $entId = '';
+        $entNombre = '';
+        
+        if($userInterno == 'false'){
+            $entId = $request->get("entId");
+            $entidadDao = new EntidadDao($this->container->get("doctrine"));//fos_user.user_manager
+            $entNombre = $entidadDao->getEntidad($entId)->getEntNombre();
+        }
+        
+        $user = new User();
+        
+        $form = $this->container->get('fos_user.registration.form');//$form = $this->createForm(new RegistrationFormType(), $usuario);
+        $form->setData($user);
+        $form->bindRequest($request);
+        
+        $userDao= new UserDao($this->container->get("doctrine"));
+        $user = $userDao->eliminarUsuario($user->getIdUsuario(), $auditUser);
+                
+        $this->setFlash('fos_user_success', '#### El usuario "'.$user->getUsername().'" ha sido eliminado ####');
+                
+        $route = 'MinSalSidPlaUsersBundle_mantMostrarUsuarios';
+        $url = $this->container->get('router')->generate($route, array(
+            'userInterno' => $userInterno,
+            'entId' => $entId,
+            'entNombre' => $entNombre,
+            'opciones' => $opciones,
+        ));
+        return new RedirectResponse($url);
+    }
 
 }
-

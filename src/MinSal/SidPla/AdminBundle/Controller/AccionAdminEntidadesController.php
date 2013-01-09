@@ -16,6 +16,7 @@ use MinSal\SidPla\UsersBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use MinSal\SidPla\AdminBundle\EntityDao\RolDao;
 
 /**
 * Mantenimineto de Productores, Importadores y Compradores Locales...
@@ -98,16 +99,14 @@ class AccionAdminEntidadesController extends Controller {
         
         $form->bindRequest($request);
         if($form->isValid()){
-            //$operacion = $request->get('oper');
-            //$entidad = $form->getData();
             $entidad->setEntYear($entidad->getEntVenc()->format("Y"));
             
-            //Eliminar cuotas de importación
+            //Eliminar cuotas de importación y compras locales
             if(!$entidad->getEntImportador() || !$entidad->getEntComprador()){
                 
-                //$cuotaDao = new CuotaDao($this->getDoctrine());
+                //Se realiza una busqueda de todas las cuotas que no cumplen con el nuevo perfil (Importador, Productor, Comprador Local)
+                //Luego se dejan eliminadas logicamente en la BD
                 foreach( $entidad->getCuotas() as $cuota){
-                    //$cuota = $cuotaDao->getCuota($cuota->getCuoId());
                     if(($cuota->getCuoTipo()=='I' && !$entidad->getEntImportador() || 
                        $cuota->getCuoTipo()=='L' && !$entidad->getEntComprador()) && $cuota->getAuditDeleted()==false
                     ){
@@ -118,6 +117,28 @@ class AccionAdminEntidadesController extends Controller {
                     
                 }
             }
+            
+            //Se verifican todos los usuarios asociados a la Entidad/Empresa para que se actualicen los roles 
+            //de acuerdo a las actividades de la empresa y la de cada uno de los usuarios
+            $i=0;
+            $usuarios = array();
+            foreach( $entidad->getUsers() as $usuario){
+                $rolDao = new RolDao($this->getDoctrine());
+                
+                $user->setRols($rolDao->getRolesEspecificos(
+                        $entidad->getEntImportador(),
+                        $entidad->getEntProductor(),
+                        $entidad->getEntComprador(),
+                        $usuario->getUserTipo(),
+                        $usuario->getUserInterno(),
+                        $usuario->getUserInternoTipo()
+                ));
+                
+                $usuarios[$i] = $usuario;
+                $i+=1;
+            }
+            $entidad->setUsers($usuarios);
+            
             $entidadDao->editEntidad($entidad);
             $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
             return $this->redirect(

@@ -37,9 +37,6 @@
                 {%else%}
                     caption: 'Usuarios de {{entNombre}}',
                 {%endif%}
-                editurl: '{{ url('MinSalSidPlaUsersBundle_mantCargarUsuarios',{'entId':entId, 'userInterno':userInterno})}}',
-                editCaption: "Editar Usuario",
-                addCaption: "Agregar Usuario",
                 colModel:[{
                         key:true,
                         label:'ID',
@@ -118,7 +115,7 @@
             var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
             
             if( gr != null ){
-                prueba=gr;
+                location.href = '{{ url('MinSalSidPlaUsersBundle_mantCargarUsuario', {'userInterno':userInterno, 'entId':entId, 'idUsuario':'idUsuario'}) }}'.replace(/idUsuario/g, gr);
             }else{ 
                 alert("Por favor seleccione una fila para editar!"); 
             }
@@ -126,10 +123,10 @@
         
         //eliminar
         $("#eliminarUsuario").click(function(){
-            var grs = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
             
-            if( grs != null ){
-                
+            if( gr != null ){
+                location.href = '{{ url('MinSalSidPlaUsersBundle_mantCargarUsuario', {'userInterno':userInterno, 'entId':entId, 'idUsuario':'idUsuario'}) }}'.replace(/idUsuario/g, gr);
             }else{
                 alert("Por favor seleccione una fila para borrar!");
             }

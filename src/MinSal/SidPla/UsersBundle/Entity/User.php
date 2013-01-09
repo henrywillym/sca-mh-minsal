@@ -315,7 +315,7 @@ class User extends BaseUser {
     }
 
     public function getUserInterno() {
-        return $this->userInterno;
+        return $this->userInterno === 'true' || $this->userInterno === true;
     }
 
     public function setUserInterno($userInterno) {

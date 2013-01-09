@@ -6,7 +6,8 @@ use FOS\UserBundle\Form\Handler\RegistrationFormHandler as BaseHandler;
 use FOS\UserBundle\Model\UserInterface;
 use MinSal\SidPla\UsersBundle\Entity\User;
 use MinSal\SidPla\AdminBundle\EntityDao\EntidadDao;
-
+use MinSal\SidPla\AdminBundle\EntityDao\RolDao;
+use MinSal\SidPla\UsersBundle\EntityDao\UserDao;
 /**
  * @author Henry Willy Melara
  */
@@ -41,22 +42,41 @@ class RegistrationFormHandler extends BaseHandler{
             $this->form->bindRequest($this->request);
             
             if ($this->form->isValid()) {
-                $tmp = $this->entId;
-                if( !empty($tmp)){
-                    $entidadDao = new EntidadDao($this->container->get("doctrine"));
-                    $entidad = $entidadDao->getEntidad($this->entId);
-                    $user->setEntidad($entidad);
-                }
                 
                 $tmp = $user->getIdUsuario();
+                
                 if(empty($tmp) ){
                     $user->setAuditUserIns($this->auditUser);
                     $user->setAuditDateIns(new \DateTime());
+                    
+                    $tmp = $this->entId;
+                    if( !empty($tmp)){
+                        $entidadDao = new EntidadDao($this->container->get("doctrine"));
+                        $entidad = $entidadDao->getEntidad($this->entId);
+                        $user->setEntidad($entidad);
+                    }
                 }else{
-                    $user->setAuditUserUpd($this->auditUser);
-                    $user->setAuditDateUpd(new \DateTime());
+                    $userDao = new UserDao($this->container->get("doctrine"));
+                    $tmp = $userDao->getUserEspecifico($user->getIdUsuario());
+                    
+                    $this->form->setData($tmp);
+                    $this->form->bindRequest($this->request);
+                    $user = $tmp;
+                    $tmp->setAuditUserUpd($this->auditUser);
+                    $tmp->setAuditDateUpd(new \DateTime());
                 }
                 
+                $rolDao= new RolDao($this->container->get("doctrine"));
+                $user->setRols($rolDao->getRolesEspecificos(
+                        $user->getEntidad()->getEntImportador(),
+                        $user->getEntidad()->getEntProductor(),
+                        $user->getEntidad()->getEntComprador(),
+                        $user->getUserTipo(),
+                        $user->getUserInterno(),
+                        $user->getUserInternoTipo()
+                ));
+                
+                //Hacer busqueda de los roles segun los campos de tipos y obtener el listado de objetos.
                 $this->onSuccess($user, $confirmation);
                 // do your custom logic here
                 return true;

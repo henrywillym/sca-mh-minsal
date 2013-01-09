@@ -28,10 +28,11 @@
 
 
 namespace MinSal\SidPla\AdminBundle\EntityDao;
-use MinSal\SidPla\AdminBundle\Entity\RolSistema;
-use MinSal\SidPla\AdminBundle\Entity\OpcionSistema;
-use Doctrine\ORM\Query\ResultSetMapping;
 
+use Doctrine\ORM\Query\ResultSetMapping;
+use MinSal\SidPla\AdminBundle\Entity\OpcionSistema;
+use MinSal\SidPla\AdminBundle\Entity\RolSistema;
+use Symfony\Bundle\DoctrineBundle\Registry;
 
 class RolDao {
     
@@ -193,6 +194,91 @@ class RolDao {
              
              return $opciones;
          }
+    
+    /**
+     * Retorna todos los roles que cumplan con las condiciones acorde a los valores de los parametros
+     * 
+     * @param bool $entImportador 
+     * @param bool $entProductor
+     * @param bool $entComprador
+     * @param string $userTipo VENDEDOR, COMPRADOR, APROBADOR, DIGITADOR
+     * @param bool $userInterno true=Usuario interno (Ministerio); false=Usuario externo (Empresas)
+     * @param sting $userInternoTipo MH, MINSAL, DGII, DGA, DNM
+     * @return array Array Doctrine Object
+     */
+    public function getRolesEspecificos($entImportador, $entProductor, $entComprador, $userTipo, $userInterno, $userInternoTipo) {
+        $query = $this->repositorio->createQueryBuilder('R');
+        
+        $where = '(';
+        
+        if($entImportador){
+            $where = $where.' R.rolImportador = :rolImportador ';
+            
+            $query = $query->setParameter('rolImportador',$entImportador === true?1:0 );
+        }
+        
+        if($entProductor){
+            if($entImportador){
+                $where = $where.' OR ';
+            }
+            
+            $where = $where.'    R.rolProductor = :rolProductor ';
+            $query = $query->setParameter('rolProductor',$entProductor === true?1:0 );
+        }
+        
+        if($entComprador ){
+            if($entImportador || $entProductor){
+                $where = $where.' OR ';
+            }
+            
+            $where = $where.'    R.rolComprador = :rolComprador';
+            $query = $query->setParameter('rolComprador',$entComprador === true?1:0 );
+        }
+        
+        $where = $where.'     ) AND R.rolTipo = :rolTipo
+                         AND R.rolInterno = :rolInterno';
+        
+        if($userInterno==true){
+            $where = $where.' AND R.rolInternoTipo = :rolInternoTipo';
+        }
+        
+        /*
+            'rolImportador' => $entImportador === true?1:0,
+            'rolProductor' => $entProductor === true?1:0,
+            'rolComprador' => $entComprador === true?1:0,
+        */
+        
+        $query = $query->where($where);
+        
+        $query = $query->setParameters(array(
+            'rolTipo' => $userTipo,
+            'rolInterno' => $userInterno === true?1:0
+        ));
+        
+        if($userInterno==true){
+            $query = $query->setParameter('rolInternoTipo',$userInternoTipo);
+        }
+        
+        return $query->getQuery()->getResult();
+        
+        /*$roles = $this->em->createQuery("SELECT R
+                                        FROM MinSalSidPlaAdminBundle:RolSistema R 
+                                        WHERE R.rolImportador = :rolImportador
+                                        AND R.rolProductor = :rolProductor
+                                        AND R.rolComprador = :rolComprador
+                                        AND R.rolTipo = :rolTipo
+                                        AND R.rolInterno = :rolInterno
+                                        AND R.rolInternoTipo = :rolInternoTipo")
+                ->setParameters(array(
+                    'rolImportador' => $entImportador,
+                    'rolProductor' => $entProductor,
+                    'rolComprador' => $entComprador,
+                    'rolTipo' => $userTipo,
+                    'rolInterno' => $userInterno,
+                    'rolInternoTipo' => $userInternoTipo
+                )); 
+        return $roles->getResult();*/
+    }
  
 }
 

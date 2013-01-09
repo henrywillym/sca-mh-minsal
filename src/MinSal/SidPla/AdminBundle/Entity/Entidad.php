@@ -448,7 +448,7 @@ class Entidad {
     }
 
     public function getEntImportador() {
-        return $this->entImportador;
+        return $this->entImportador === 'true' || $this->entImportador === true;
     }
 
     public function setEntImportador($entImportador) {
@@ -456,7 +456,7 @@ class Entidad {
     }
 
     public function getEntProductor() {
-        return $this->entProductor;
+        return $this->entProductor === 'true' || $this->entProductor === true;
     }
 
     public function setEntProductor($entProductor) {
@@ -464,7 +464,7 @@ class Entidad {
     }
 
     public function getEntComprador() {
-        return $this->entComprador;
+        return $this->entComprador === 'true' || $this->entComprador === true;
     }
 
     public function setEntComprador($entComprador) {
@@ -472,7 +472,7 @@ class Entidad {
     }
 
     public function getEntCompVend() {
-        return $this->entCompVend;
+        return $this->entCompVend === 'true' || $this->entCompVend === true;
     }
 
     public function setEntCompVend($entCompVend) {
@@ -548,7 +548,9 @@ class Entidad {
     }
 
     public function setUsers($users) {
-        $users->setEntidad($this);
+        foreach($users as $tmp){
+            $tmp->setEntidad($this);
+        }
         $this->users = $users;
     }
 }

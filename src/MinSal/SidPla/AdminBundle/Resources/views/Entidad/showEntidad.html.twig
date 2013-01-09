@@ -198,8 +198,8 @@
         <center>
             <!--El boton tiene que ser submit, sino causa problemas con el envio-->
             <input id="btnGuardar" type="submit" value="Guardar" onclick="return ValidarCuotas();"/> &nbsp;
+            <input id="btnUsuarios" type="button" value="Ver Usuarios" onclick="location.href = '{{ url('MinSalSidPlaUsersBundle_mantMostrarUsuarios', {'userInterno': 'false', 'entId': entId})}}';"/>
             <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSidPlaAdminBundle_mantEntidades')}}';"/>
-            <input id="btnUsuarios" type="button" value="Ver Usuarios" onclick="location.href = '{{ url('MinSalSidPlaUsersBundle_mantCargarUsuarios', {'userInterno': 'false', 'entId': entId})}}';"/>
             
             <span id="cuotaImport">
                 &nbsp;&nbsp;

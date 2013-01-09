@@ -12,7 +12,7 @@ security:
                use_forward:    true
                check_path:     fos_user_security_check
                failure_path:   null
-               always_use_default_target_path: true
+               always_use_default_target_path: false
                default_target_path:            /SidPla
                target_path_parameter:          _target_path
                use_referer:                    false               

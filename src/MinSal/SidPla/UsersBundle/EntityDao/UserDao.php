@@ -22,11 +22,22 @@ class UserDao {
     }
     
     public function getUsersInternos() {
-        $User = $this->em->createQuery("SELECT U
+        $User = $this->em->createQuery("SELECT U.idUsuario, 
+                                        U.username,
+                                        U.userPrimerNombre, 
+                                        U.userSegundoNombre, 
+                                        U.userApellidos, 
+                                        U.userDui, 
+                                        U.userNit, 
+                                        U.userCargo, 
+                                        U.userTelefono, 
+                                        U.userInterno, 
+                                        U.userInternoTipoText, 
+                                        U.userTipoText
                                         FROM MinSalSidPlaUsersBundle:User U
                                         WHERE U.userInterno = true
                                         AND U.auditDeleted = false");
-        return $User->getResult();
+        return $User->getArrayResult();
     }
     
     public function getUsersExternos($entId) {
@@ -36,7 +47,7 @@ class UserDao {
                                         AND B.entId = :entId
                                         AND U.auditDeleted = false")
                 ->setParameter('entId',$entId); 
-        return $User->getResult();
+        return $User->getArrayResult();
     }
     
     public function getUserSinRol() {
@@ -48,7 +59,6 @@ class UserDao {
 
     public function getUserEspecifico($codigo) {
         $usuario = $this->repositorio->find($codigo);
-        ;
         return $usuario;
     }
 
@@ -125,7 +135,18 @@ class UserDao {
 
         return $x[0]['resp'];
     }
-
+    
+    public function eliminarUsuario($idUsuario, $auditUser){
+        $user = new User();
+        $user = $this->getUserEspecifico($idUsuario);
+        
+        $user->setAuditUserUpd($auditUser);
+        $user->setAuditDateUpd(new \DateTime());
+        $user->setAuditDeleted(true);
+        
+        $this->em->persist($user);
+        $this->em->flush();
+        return $user;
+    }
 }
-
 ?>

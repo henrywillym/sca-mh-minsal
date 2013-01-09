@@ -3,6 +3,9 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $('#verificarUsuario').button();
+        $('#eliminarUsuario').button();
+        $('#btnRegresar').button();
+        
         $('#fos_user_registration_form_userDui').mask('99999999-9');
         $('#fos_user_registration_form_userNit').mask('9999-999999-999-9');
         
@@ -46,6 +49,12 @@
     });
     
     function AcomodarFormulario(){
+        if($('#fos_user_registration_form_idUsuario').val() ==''){
+            $('#eliminarUsuario').hide();
+        }else{
+            $('#eliminarUsuario').show();
+        }
+        
         var userInterno = getUserInterno();
         
         if(userInterno){
@@ -97,16 +106,20 @@
         }
     }
     
-    function validarFormulario(){
-        if(getUserInterno()){
-                        
-        }else{
-            
-        }
-    }
-    
     function getUserInterno(){
         return {{userInterno}};
+    }
+    
+    function enviarEliminarUsuario(){
+        if(confirm('!Desea eliminar el usuario "'+$('#fos_user_registration_form_username').val()+'"?')){
+            if(!confirm('!Desea abortar la eliminacion??')){
+                $('#valido').val(true);
+                $('#eliminar').val(true);
+                $('#formUsuario').submit();
+                return true;
+            }
+        }
+        return false;
     }
 </script>
     
@@ -115,8 +128,13 @@
             {{ message|trans({}, 'FOSUserBundle') }}
         </div>
     {% endfor %}
+
+    {# ************************************************** #}
+    {# LA URL DICE QUE ES PARA USUARIOS EXTERNOS, PERO LA VERDAD ES QUE POR LA ESTRUCTURA DE LOS PARAMETROS, FUNCIONA PARA USUARIOS INTERNOS #}
+    {# ************************************************** #}
     <form id="formUsuario" action="{{ path('MinSalSidPlaUsersBundle_registerUsuarioExterno', {'userInterno':userInterno, 'entId':entId}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_registration_register">
         <input type="hidden" id="valido" value=false/>
+        <input type="hidden" id="eliminar" name="eliminar" value=false/>
         
             <table align='center' style="border: 1px solid;" >
                 <tr>
@@ -247,6 +265,10 @@
                         <br>
                         
                         <input id="verificarUsuario" type="submit" value="{{ 'Guardar Usuario'|trans({}, 'FOSUserBundle') }}" />
+                        
+                        <input id="eliminarUsuario" type="button" value=" ** Eliminar Usuario ** " onclick="return enviarEliminarUsuario();"/>
+
+                        <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSidPlaUsersBundle_mantMostrarUsuarios', {'userInterno': userInterno, 'entId': entId})}}';"/>
                     </td>
                 </tr>
             </table>    
