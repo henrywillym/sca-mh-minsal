@@ -145,6 +145,20 @@ MinSalSidPlaAdminBundle_mantEntidades:
     pattern:  /empresa/mantEntidades
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantEntidades } 
     
+#listado autorizado
+MinSalSidPlaAdminBundle_listadoDNM:
+    pattern:  /admin/listadoDNM
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:LoadListadoDNM } 
+#consulta listado
+MinSalSidPlaAdminBundle_ConsultarListadoDNM:
+    pattern:  /admin/ConsultarListadoDNM
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:ConsultarListadoDNM, _format: json }
+    requirements: { _format: (xml|json), _method: GET }  
+#manttlistado
+MinSalSidPlaAdminBundle_manttListadoDNMEdicion:
+    pattern:  /admin/manttListadoDNMEdicion
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:manttListadoDNMedicion }
+    
 MinSalSidPlaAdminBundle_consultarEntidadesJSON:
     pattern:  /empresa/consultarEntidadesJSON
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:consultarEntidadesJSON } 
