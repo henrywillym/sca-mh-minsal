@@ -1,9 +1,46 @@
+{% block _Entidad_cuotas_widget %}
+    <div id="divCuotaImport">
+        <br/><hr/>     
+        <h3>Cuotas Importación</h3>
+        <table align="center">
+            {# iterate over each existing tag and render its only field: name #}
+                <tr>
+                    <td>Nombre Alcohol</td>
+                    <td>Nombre Específico</td>
+                    <td>Grado</td>
+                    <td>Cuota (Lts)</td>
+                </tr>
+            {% for cuota in form%}
+                <tr>
+                    <td>{{ form_widget(cuota.alcNombre) }}</td>
+                    <td>{{ form_widget(cuota.cuoNombreEsp) }}</td>
+                    <td>{{ form_widget(cuota.cuoGrado) }}</td>
+                    <td>{{ form_widget(cuota.cuoLitros) }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
 
 {% block field_row  %}
     {% spaceless %}
-    <tr>
-        <td align="right">{{ form_label(form) }}: </td>
-        <td>{{ form_errors(form) }} {{ form_widget(form) }}</td>
-    </tr>
+
+    {%if label !='collection'%}
+
+        <tr>
+            <td align="right">{{ form_label(form) }}: </td>
+            <td>{{ form_errors(form) }} {{ form_widget(form) }}</td>
+        </tr>
+        
+    {% else %}
+        
+        </table>
+        
+        <h3>{{ form_errors(form) }}</h3>
+        {{ form_widget(form) }}
+        
+        <table> <tr><td></td></tr>
+            
+    {% endif %}
     {% endspaceless %}
 {% endblock field_row  %}

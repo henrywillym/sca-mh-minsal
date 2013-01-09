@@ -1,6 +1,7 @@
 <?php
 namespace MinSal\SidPla\AdminBundle\Form\Type;
 
+use MinSal\SidPla\AdminBundle\Form\Type\CuotaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -12,13 +13,25 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class EntidadType extends AbstractType {
    
+    /*
+     * Symfony 2.1
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
             'data_class' => 'MinSal\SidPla\AdminBundle\Entity\Entidad',
         ));
     }
-   public function buildForm(FormBuilder $builder, array $opciones)
-    {
+    
+    /*
+     * Symfony 2.0
+     */
+    public function getDefaultOptions(array $options){
+        return array(
+            'data_class' => 'MinSal\SidPla\AdminBundle\Entity\Entidad',
+        );
+    }
+    
+    public function buildForm(FormBuilder $builder, array $opciones){
         $builder->add('entId', 'hidden');
         $builder->add('entVenc', 'date', array(
             'label' => 'Vencimiento del Permiso', 
@@ -26,9 +39,9 @@ class EntidadType extends AbstractType {
             'input'=>'datetime',
             'format'=>'dd/MM/yyyy'
         ));
-        $builder->add('entRegDgii', null, array('label' => 'Registro de Usuario (MINSAL)'));
-        $builder->add('entRegMinsal',  null, array('label' => 'Número Resolución DGII'));
-        $builder->add('entNrc', null, array('label' => 'NCR'));
+        $builder->add('entRegDgii', 'text', array('label' => 'Registro de Usuario (MINSAL)'));
+        $builder->add('entRegMinsal',  'text', array('label' => 'Número Resolución DGII'));
+        $builder->add('entNrc', 'text', array('label' => 'NCR','required'=>false));
         $builder->add('entTel',  null, array('label' => 'Teléfono'));
         $builder->add('entGiro', null, array('label' => 'Giro o Actividad Económica'));
         $builder->add('entEmail',  'email', array('label' => 'E-mail', 'max_length'=>'50'));
@@ -101,15 +114,16 @@ class EntidadType extends AbstractType {
             'multiple'=>false,
             'choices'=> array(
                 true => 'Habilitada', 
-                false =>'Deshabilitada'
+                false =>'Bloqueada'
             )
         ));
         
         $builder->add('entComentario',  null, array('label' => 'Explique. ¿Por qué se deshabilitara la empresa?'));
+        
+        //$builder->add('cuotas', 'collection', array('type' => new CuotaType(), 'label'=> 'collection'));
     }
 
-    public function getName()
-    {
+    public function getName(){
         return 'Entidad';
     }
 }

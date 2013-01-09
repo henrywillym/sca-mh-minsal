@@ -9,12 +9,14 @@
 namespace MinSal\SidPla\AdminBundle\Controller;
 
 use MinSal\SidPla\AdminBundle\Entity\Entidad;
+use MinSal\SidPla\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SidPla\AdminBundle\EntityDao\EntidadDao;
 use MinSal\SidPla\AdminBundle\Form\Type\EntidadType;
 use MinSal\SidPla\UsersBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use MinSal\SidPla\AdminBundle\EntityDao\RolDao;
 
 /**
 * Mantenimineto de Productores, Importadores y Compradores Locales...
@@ -44,7 +46,7 @@ class AccionAdminEntidadesController extends Controller {
 
         $numfilas = count($entidades);
         
-        $emple = new Entidad();
+        //$emple = new Entidad();
 
         if ($numfilas != 0) {
             //array_multisort($entidades, SORT_ASC);
@@ -97,15 +99,60 @@ class AccionAdminEntidadesController extends Controller {
         
         $form->bindRequest($request);
         if($form->isValid()){
-            //$operacion = $request->get('oper');
-            //$entidad = $form->getData();
             $entidad->setEntYear($entidad->getEntVenc()->format("Y"));
+            
+            //Eliminar cuotas de importación y compras locales
+            if(!$entidad->getEntImportador() || !$entidad->getEntComprador()){
+                
+                //Se realiza una busqueda de todas las cuotas que no cumplen con el nuevo perfil (Importador, Productor, Comprador Local)
+                //Luego se dejan eliminadas logicamente en la BD
+                foreach( $entidad->getCuotas() as $cuota){
+                    if(($cuota->getCuoTipo()=='I' && !$entidad->getEntImportador() || 
+                       $cuota->getCuoTipo()=='L' && !$entidad->getEntComprador()) && $cuota->getAuditDeleted()==false
+                    ){
+                        $cuota->setAuditDeleted(true);
+                        $cuota->setAuditUserUpd($user->getUsername());
+                        $cuota->setAuditDateUpd(new \DateTime());
+                    }
+                    
+                }
+            }
+            
+            //Se verifican todos los usuarios asociados a la Entidad/Empresa para que se actualicen los roles 
+            //de acuerdo a las actividades de la empresa y la de cada uno de los usuarios
+            $i=0;
+            $usuarios = array();
+            foreach( $entidad->getUsers() as $usuario){
+                $rolDao = new RolDao($this->getDoctrine());
+                
+                $user->setRols($rolDao->getRolesEspecificos(
+                        $entidad->getEntImportador(),
+                        $entidad->getEntProductor(),
+                        $entidad->getEntComprador(),
+                        $usuario->getUserTipo(),
+                        $usuario->getUserInterno(),
+                        $usuario->getUserInternoTipo()
+                ));
+                
+                $usuarios[$i] = $usuario;
+                $i+=1;
+            }
+            $entidad->setUsers($usuarios);
+            
             $entidadDao->editEntidad($entidad);
+            $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
+            return $this->redirect(
+                $this->generateUrl('MinSalSidPlaAdminBundle_mantCargarEntidad', 
+                        array('entId'=>$entidad->getEntId()))
+                );
+        }else{
+            $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
+            
+            $opciones = $this->getRequest()->getSession()->get('opciones');
+            return $this->render('MinSalSidPlaAdminBundle:Entidad:showEntidad.html.twig', 
+                array('opciones' => $opciones, 'form' => $form->createView(), 'entId'=>$entidad->getEntId(), 'entHabilitado'=>$entidad->getEntHabilitado()));
         }
-        
-        $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
-        
-        return $this->mantEntidadesAction();
+        //return $this->mantCargarEntidadAction($entidadTmp->getEntId());
     }
     
     
@@ -113,6 +160,7 @@ class AccionAdminEntidadesController extends Controller {
      * Se encarga de cargar los datos de la entidad para que sean editados
      */
     public function mantCargarEntidadAction($entId) {
+        $opciones = $this->getRequest()->getSession()->get('opciones');
         //$entidad = new Entidad();
         //$form->bindRequest($this->getRequest());//Capturar datos de Request a Form
         
@@ -126,7 +174,7 @@ class AccionAdminEntidadesController extends Controller {
         $form = $this->createForm(new EntidadType(), $entidad);
 
         return $this->render('MinSalSidPlaAdminBundle:Entidad:showEntidad.html.twig', 
-                array('form' => $form->createView(),)
+                array('form' => $form->createView(),'opciones'=>$opciones, 'entId'=>$entId, 'entHabilitado'=>$entidad->getEntHabilitado())
         );
     }
 }

@@ -13,3 +13,27 @@ MinSalSidPlaUsersBundle_editarUsuarioSinRol:
 MinSalSidPlaUsersBundle_verificaCreacion:
     pattern:  /verificaCreacion
     defaults: { _controller: MinSalSidPlaUsersBundle:Default:verificaCreacion }
+    
+    
+#*******************
+#***  USUARIOS  ****
+#*******************
+MinSalSidPlaUsersBundle_registerUsuarioInterno:
+    pattern:  /register/{userInterno}
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:register }
+    
+MinSalSidPlaUsersBundle_registerUsuarioExterno:
+    pattern:  /register/{userInterno}/{entId}
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:register }
+    
+MinSalSidPlaUsersBundle_mantMostrarUsuarios:
+    pattern:  /mantMostrarUsuarios/{userInterno}/{entId}
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:mantUsers } 
+
+MinSalSidPlaUsersBundle_consultarUsuariosJSON:
+    pattern:  /consultarUsuariosJSON/{userInterno}/{entId}
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:consultarUsuariosJSON } 
+    
+MinSalSidPlaUsersBundle_mantCargarUsuario:
+    pattern:  /mantCargarUsuario/{userInterno}/{idUsuario}/{entId}
+    defaults: { _controller: MinSalSidPlaUsersBundle:Default:mantCargarUsuario } 

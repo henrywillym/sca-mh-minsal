@@ -8,6 +8,7 @@
             myGrid.jqGrid({ 
                 url: 'consultarEntidadesJSON',
                 width: 1000,
+                height: 300,
                 datatype:'json',
                 altRows:true,            
                 rowNum:10,
@@ -25,7 +26,6 @@
                 pager: jQuery('#pager'),
                 viewrecords: true, 
                 caption: 'Empresas Registradas',
-                height: "100%",
                 //editurl: 'mantEntidadEdicion',
                 editCaption: "Editar Empresa",
                 addCaption: "Agregar Empresa",
@@ -36,12 +36,25 @@
                         name:'entId', 
                         index: 'entId', 
                         width:20
+                    },{
+                        label:'Nombre Comercial',
+                        name:'entNombComercial', 
+                        index: 'entNombComercial'
+                    },{
+                        label:'Nombre propietario, Denominación o Razón Social',
+                        name:'entNombre', 
+                        index: 'entNombre'
                     },{ 
                         label:'NCR',
                         name:'entNrc', 
                         index: 'entNrc', 
                         width:90
                     },{ 
+                        label:'NIT',
+                        name:'entNit', 
+                        index: 'entNit', 
+                        width:90
+                    },{
                         label:'Giro o Actividad Económica',
                         name:'entGiro', 
                         index: 'entGiro',
@@ -51,24 +64,11 @@
                         name:'entTipoPersona', 
                         index: 'entTipoPersona',
                         width:150 
-                    },{ 
-                        label:'E-mail',
-                        name:'entEmail', 
-                        index: 'entEmail',
-                        width:150
-                    },{
-                        label:'Nombre propietario, Denominación o Razón Social',
-                        name:'entNombre', 
-                        index: 'entNombre'
-                    },{
-                        label:'Nombre Comercial',
-                        name:'entNombComercial', 
-                        index: 'entNombComercial'
                     },{
                         label:'Nombre Rep. o Apoderado',
                         name:'entRepNombre', 
                         index: 'entRepNombre'
-                    },{
+                    },/*{
                         label:'Vencimiento',
                         name:'entVenc', 
                         index: 'entVenc',
@@ -79,8 +79,8 @@
                         formatoptions:{
                             srcformat:'Y-m-d H:i:s',
                             newformat:'Y-m-d'
-                        }*/
-                    },{
+                        }* /
+                    },/**/{
                         label:'¿Habilitado?',
                         name:'entHabilitado', 
                         index: 'entHabilitado'

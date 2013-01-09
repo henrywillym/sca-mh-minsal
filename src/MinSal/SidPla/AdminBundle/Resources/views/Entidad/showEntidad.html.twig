@@ -4,6 +4,31 @@
 {% block body %}
 
     <script type="text/javascript">
+        
+        /**
+        *
+        */
+        function ValidarCuotas(){
+            var msg ='Se quito la selección de:';
+            
+            var item='';
+            if($('#cuotaImport').is(':visible') && !$('#Entidad_entImportador').is(':checked')){
+                item='"Importador"';
+            }
+            
+            if($('#cuotaLocal').is(':visible') && !$('#Entidad_entComprador').is(':checked')){
+                item?item+=' y ':null;
+                item+='"Comprador Local"';
+            }
+            
+            msg+=item+'. Por lo que se elimaran sus cuotas respectivas de '+item+'\n\n¿Desea continuar?';
+            
+            if(item){
+                return confirm(msg);
+            }
+            return true;
+        }
+        
         /**
         * Funcion utilizada para disparar todos los triggers y ajustar el formulario al contenido cargado.
         */
@@ -12,6 +37,8 @@
             $('#Entidad_entHabilitado').trigger('change');
             HabProduccion();
             HabVendedor();
+            HabCuotaImp();
+            HabCuotaLocal()
         }
         
         /**
@@ -88,9 +115,30 @@
             }
         }
         
+        function HabCuotaImp(){
+            if( $('#Entidad_entImportador').is(':checked') && 
+                    $('#Entidad_entId').val()!= '-1' && 
+                    $('#Entidad_entId').val()!=''){
+                $('#cuotaImport').show('fast');
+            }else{
+                $('#cuotaImport').hide('fast');
+            }
+        }
+        
+        function HabCuotaLocal(){
+            if( $('#Entidad_entComprador').is(':checked') && 
+                    $('#Entidad_entId').val()!= '-1' && 
+                    $('#Entidad_entId').val()!=''){
+                $('#cuotaLocal').show('fast');
+            }else{
+                $('#cuotaLocal').hide('fast');
+            }
+        }
+        
         $(document).ready(function(){
             $('#btnGuardar').button();
             $('#btnRegresar').button();
+            $('#btnUsuarios').button();
             
             $('#Entidad_entTipoPersona').change(function(){
                 if( $('input[name="Entidad[entTipoPersona]"]:checked').val() =='N'){
@@ -113,8 +161,12 @@
                 HabVendedor();
             });
             
+            
             $('form>table').show('fast',EventosIniciales);
             
+            $('#Entidad_entImportador').parent().append($('#cuotaImport'))
+            $('#Entidad_entComprador').parent().append($('#cuotaLocal'))
+            $('#Entidad_entVenc').attr('readonly','readonly');
        });
     </script>
     
@@ -122,11 +174,42 @@
     <form id="formulario" action="{{ path('MinSalSidPlaAdminBundle_mantEntidadEdicion') }}" method="post" {{ form_enctype(form) }}>
         
         <table align='center' style="display:none">
+            <tr>
+                <td colspan="2" align="center">
+                    <h1>Formulario de Importadores, Productores, Compradores Locales</h1>
+                    
+                    {% if app.session.hasFlash('notice') %}
+                        <div class="flash-notice">
+                            {{ app.session.flash('notice') }}
+                        </div><br/>
+                    {% endif %}
+                    
+                        
+                    {% if entHabilitado == false %}
+                        <div class="flash-notice">
+                            ESTA EMPRESA SE ENCUENTRA BLOQUEADA
+                        </div><br/>
+                    {% endif %}
+                </td>
+            </tr>
             {{ form_widget(form) }}
         </table>
+        
         <center>
-            <input id="btnGuardar" type="submit" value="Guardar"/> &nbsp;
+            <!--El boton tiene que ser submit, sino causa problemas con el envio-->
+            <input id="btnGuardar" type="submit" value="Guardar" onclick="return ValidarCuotas();"/> &nbsp;
+            <input id="btnUsuarios" type="button" value="Ver Usuarios" onclick="location.href = '{{ url('MinSalSidPlaUsersBundle_mantMostrarUsuarios', {'userInterno': 'false', 'entId': entId})}}';"/>
             <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSidPlaAdminBundle_mantEntidades')}}';"/>
+            
+            <span id="cuotaImport">
+                &nbsp;&nbsp;
+                <a href="{{ url('MinSalSidPlaAdminBundle_mantCargarCuotas',{'entId': entId,'cuoTipo':'I'})}}"> Cuotas de Importación </a>
+            </span>
+            
+            <span id="cuotaLocal">
+                &nbsp;&nbsp;
+                <a href="{{ url('MinSalSidPlaAdminBundle_mantCargarCuotas',{'entId': entId,'cuoTipo':'L'})}}"> Cuotas de Compras Locales</a>
+            </span>
         </center>
     </form>
 {% endblock %}

@@ -130,7 +130,6 @@ MinSalSidPlaAdminBundle_consultarUnidadesOrgJSONSelect:
     pattern:  /admin/consultarUnidadesOrgJSONSelect
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:consultarUnidadesOrgJSONSelect } 
     
-    
 MinSalSidPlaAdminBundle_editarUnidadesOrg:
     pattern:  /admin/editarUnidadesOrg    
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:editarUnidadesOrg }  
@@ -138,12 +137,14 @@ MinSalSidPlaAdminBundle_editarUnidadesOrg:
 MinSalSidPlaAdminBundle_editandoUnidadesOrg:
     pattern:  /admin/editandoUnidadesOrg    
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:editandoUnidadesOrg }  
-    
-#Empresas o Entidades
+
+#****************************
+#*** Empresas o Entidades ***
+#****************************
 MinSalSidPlaAdminBundle_mantEntidades:
-    pattern:  /admin/mantEntidades
+    pattern:  /empresa/mantEntidades
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantEntidades } 
- 
+    
 #listado autorizado
 MinSalSidPlaAdminBundle_listadoDNM:
     pattern:  /admin/listadoDNM
@@ -159,13 +160,32 @@ MinSalSidPlaAdminBundle_manttListadoDNMEdicion:
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:manttListadoDNMedicion }
     
 MinSalSidPlaAdminBundle_consultarEntidadesJSON:
-    pattern:  /admin/consultarEntidadesJSON
+    pattern:  /empresa/consultarEntidadesJSON
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:consultarEntidadesJSON } 
 
 MinSalSidPlaAdminBundle_mantEntidadEdicion:
-    pattern:  /admin/mantEntidadEdicion
+    pattern:  /empresa/mantEntidadEdicion
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantEntidadEdicion }
 
 MinSalSidPlaAdminBundle_mantCargarEntidad:
-    pattern:  /admin/mantCargarEntidad/{entId}
+    pattern:  /empresa/mantCargarEntidad/{entId}
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantCargarEntidad } 
+
+#******************
+#****  Cuotas   ***
+#******************
+MinSalSidPlaAdminBundle_mantCargarCuotas:
+    pattern:  /empresa/mantCargarCuotas/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:mantCuotas } 
+
+MinSalSidPlaAdminBundle_mantCuotaEdicion:
+    pattern:  /empresa/mantCuotaEdicion/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:mantCuotaEdicion } 
+
+MinSalSidPlaAdminBundle_consultarCuotasJSON:
+    pattern:  /empresa/consultarCuotasJSON/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:consultarCuotasJSON } 
+
+MinSalSidPlaAdminBundle_consultarAlcoholesJSONSelect:
+    pattern:  /empresa/consultarAlcoholesOrgJSONSelect
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminAlcoholes:consultarAlcoholesJSONSelect }

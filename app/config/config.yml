@@ -65,3 +65,4 @@ fos_user:
     registration:
          form:
             type: sidpla_user_registration
+            handler: sidpla_user.form.handler.registration

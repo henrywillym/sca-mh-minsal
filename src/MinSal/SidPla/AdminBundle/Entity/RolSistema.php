@@ -11,8 +11,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="sca_rol")
  * @ORM\Entity
  */
-class RolSistema
-{
+class RolSistema{
+
      /**
      * @var integer $idRol
      *
@@ -51,6 +51,49 @@ class RolSistema
      * @ORM\OrderBy({"idOpcionSistema" = "ASC"})
      */
     private $opcionesSistema;
+    
+    /**
+     * @var boolean $rolImportador
+     *
+     * @ORM\Column(name="rol_compra_inter", type="boolean")
+     */
+    private $rolImportador;
+    
+    /**
+     * @var boolean $rolProductor
+     *
+     * @ORM\Column(name="rol_productor", type="boolean")
+     */
+    private $rolProductor;
+    
+    /**
+     * @var boolean $rolComprador
+     *
+     * @ORM\Column(name="rol_compra_local", type="boolean")
+     */
+    private $rolComprador;
+    
+    /**
+     * @var string $rolTipo
+     *
+     * @ORM\Column(name="rol_tipo", type="string", length=20)
+     */
+    private $rolTipo;
+    
+    /**
+     * @var boolean $rolInterno
+     *
+     * @ORM\Column(name="rol_interno", type="boolean")
+     */
+    private $rolInterno;
+    
+    /**
+     * @var string $rolInternoTipo
+     *
+     * @ORM\Column(name="rol_interno_tipo", type="string", length=20)
+     */
+    private $rolInternoTipo;
+    
     
     /**
      * ORM\ManyToMany(targetEntity="MinSal\SidPla\UserBundle\Entity\User", mappedBy="rols")\
@@ -187,5 +230,53 @@ class RolSistema
     public function addOpcionSistema(\MinSal\SidPla\AdminBundle\Entity\OpcionSistema $opcionesSistema)
     {
         $this->opcionesSistema[] = $opcionesSistema;
+    }
+    
+    public function getRolImportador() {
+        return $this->rolImportador;
+    }
+
+    public function setRolImportador($rolImportador) {
+        $this->rolImportador = $rolImportador;
+    }
+
+    public function getRolProductor() {
+        return $this->rolProductor;
+    }
+
+    public function setRolProductor($rolProductor) {
+        $this->rolProductor = $rolProductor;
+    }
+
+    public function getRolComprador() {
+        return $this->rolComprador;
+    }
+
+    public function setRolComprador($rolComprador) {
+        $this->rolComprador = $rolComprador;
+    }
+
+    public function getRolTipo() {
+        return $this->rolTipo;
+    }
+
+    public function setRolTipo($rolTipo) {
+        $this->rolTipo = $rolTipo;
+    }
+
+    public function getRolInterno() {
+        return $this->rolInterno;
+    }
+
+    public function setRolInterno($rolInterno) {
+        $this->rolInterno = $rolInterno;
+    }
+
+    public function getRolInternoTipo() {
+        return $this->rolInternoTipo;
+    }
+
+    public function setRolInternoTipo($rolInternoTipo) {
+        $this->rolInternoTipo = $rolInternoTipo;
     }
 }

@@ -4,19 +4,25 @@
 namespace MinSal\SidPla\AdminBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use MinSal\SidPla\UsersBundle\Entity\User;
+use MinSal\SidPla\AdminBundle\Entity\Cuota;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="sca_entidades_ctg")
+ * @UniqueEntity(fields="entNit",message="Ya existe otra empresa con este número de NIT")
  */
 class Entidad {
     
     public function __construct() {
         $this->users = new ArrayCollection();
+        $this->cuotas = new ArrayCollection();
         $this->entHabilitado = true;
         $this->entTipoPersona = 'N';
         
@@ -29,7 +35,12 @@ class Entidad {
     }
     
     /**
-     * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad")
+     * @ORM\OneToMany(targetEntity="MinSal\SidPla\AdminBundle\Entity\Cuota", mappedBy="entidad")
+     */
+    protected $cuotas;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad", cascade={"persist"})
      */
     protected $users;
     
@@ -46,14 +57,14 @@ class Entidad {
     /**
      * @var string $entRegDgii
      *
-     * @ORM\Column(name="ent_reg_dgii", type="text", nullable=false)
+     * @ORM\Column(name="ent_reg_dgii", type="text")
      */
     private $entRegDgii;
 
     /**
      * @var string $entRegMinsal
      *
-     * @ORM\Column(name="ent_reg_minsal", type="text", nullable=false)
+     * @ORM\Column(name="ent_reg_minsal", type="text")
      */
     private $entRegMinsal;
 
@@ -437,7 +448,7 @@ class Entidad {
     }
 
     public function getEntImportador() {
-        return $this->entImportador;
+        return $this->entImportador === 'true' || $this->entImportador === true;
     }
 
     public function setEntImportador($entImportador) {
@@ -445,7 +456,7 @@ class Entidad {
     }
 
     public function getEntProductor() {
-        return $this->entProductor;
+        return $this->entProductor === 'true' || $this->entProductor === true;
     }
 
     public function setEntProductor($entProductor) {
@@ -453,7 +464,7 @@ class Entidad {
     }
 
     public function getEntComprador() {
-        return $this->entComprador;
+        return $this->entComprador === 'true' || $this->entComprador === true;
     }
 
     public function setEntComprador($entComprador) {
@@ -461,7 +472,7 @@ class Entidad {
     }
 
     public function getEntCompVend() {
-        return $this->entCompVend;
+        return $this->entCompVend === 'true' || $this->entCompVend === true;
     }
 
     public function setEntCompVend($entCompVend) {
@@ -524,8 +535,22 @@ class Entidad {
         $this->auditUserUpd = $auditUserUpd;
     }
 
-    
-    public function __toString() {
-        return 'ID ' . $this->getIdEmpleado() . ' ' . $this->getPrimerNombre() . ' ' . $this->getPrimerApellido();
+    public function getCuotas() {
+        return $this->cuotas;
+    }
+
+    public function setCuotas($cuotas) {
+        $this->cuotas = $cuotas;
+    }
+
+    public function getUsers() {
+        return $this->users;
+    }
+
+    public function setUsers($users) {
+        foreach($users as $tmp){
+            $tmp->setEntidad($this);
+        }
+        $this->users = $users;
     }
 }

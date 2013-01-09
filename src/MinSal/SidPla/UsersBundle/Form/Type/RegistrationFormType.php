@@ -1,65 +1,89 @@
 <?php
-
-/*
-  SIDPLA - MINSAL
-  Copyright (C) 2011  Bruno González   e-mail: bagonzalez.sv EN gmail.com
-  Copyright (C) 2011  Universidad de El Salvador
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  
-  
- */
-
 namespace  MinSal\SidPla\UsersBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use FOS\UserBundle\Form\Type\RegistrationFormType as BaseType;
 use Doctrine\ORM\EntityRepository;
-
+use MinSal\SidPla\UsersBundle\Entity\User;
 
 /**
  * Description of RegistrationFormType
  *
- * @author Bruno González
+ * @author Henry Willy Melara
  */
 
-class RegistrationFormType  extends BaseType
-{
-    public function buildForm(FormBuilder $builder, array $options)
-    {
+class RegistrationFormType  extends BaseType{
+    
+    /**
+     * Utilizado en Symfony 2.1
+     * 
+     * @param \Symfony\Component\OptionsResolver\OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions1(OptionsResolverInterface $resolver){
+        $resolver->setDefaults(array(
+            'data_class' => 'MinSal\SidPla\UsersBundle\Entity\User',
+            'csrf_protection' => false,
+            'cascade_validation' => false,
+        ));
+    }
+    
+    /**
+     * Utilizado en Symfony 2.0
+     * @param array $options
+     * @return type
+     */
+    public function getDefaultOption1(array $options){
+        return array(
+            'data_class' => 'MinSal\SidPla\UsersBundle\Entity\User',
+            'csrf_protection' => false,
+            'cascade_validation' => false,
+        );
+    }
+    public function buildForm(FormBuilder $builder, array $options){
+        
         parent::buildForm($builder, $options);
-
-        // add your custom field
-        /*$builder->add('empleado', 'entity',
-                array( 'class' => 'MinSal\\SidPla\\AdminBundle\\Entity\\Empleado',
-               'query_builder' => function(EntityRepository $er) {
-                        return $er->createQueryBuilder('u')
-                                    ->orderBy('u.primerNombre', 'ASC');
-                },
-        ));*/
-        $builder->add('idEmpleado','integer');
-       /* $builder->add('rol', 'entity',
-                array( 'class' => 'MinSal\\SidPla\\AdminBundle\\Entity\\RolSistema',
-               'query_builder' => function(EntityRepository $er) {
-                        return $er->createQueryBuilder('u')
-                                    ->orderBy('u.nombreRol', 'ASC');
-                },
-        ));*/
+        
+        $builder->add('idUsuario',  'hidden');
+        $builder->add('userPrimerNombre',  null, array('label' => 'Primer Nombre'));
+        $builder->add('userSegundoNombre',  null, array('label' => 'Segundo Nombre'));
+        $builder->add('userApellidos',  null, array('label' => 'Apellidos'));
+        $builder->add('userDui',  null, array('label' => 'DUI'));
+        $builder->add('userNit',  null, array('label' => 'NIT'));
+        $builder->add('userCargo',  null, array('label' => 'Cargo que desempeña'));
+        $builder->add('userTelefono',  'text', array('label' => 'Teléfono', 'required'=>true));
+        $builder->add('userInterno',  'hidden', array('label' => 'Usuario Interno?'));
+        $builder->add('userInternoTipo',  'choice', array(
+            'label'=>'Ministerio al que pertenece',
+            'empty_value' => 'Seleccione un Ministerio',
+            'required'=>false,
+            'expanded'=>false,
+            'multiple'=>false,
+            'choices'=> array(
+                User::$MINSAL => User::$MINSAL_TEXT, 
+                User::$DGII => User::$DGII_TEXT,
+                User::$DGA => User::$DGA_TEXT, 
+                User::$MH => User::$MH_TEXT,
+                User::$DNM => User::$DNM_TEXT, 
+            )
+        ));
+        
+        $builder->add('userTipo',  'choice', array(
+            'label'=>'Acciones que Realizará',
+            'empty_value' => 'Seleccione una Acción',
+            'required'=>true,
+            'expanded'=>false,
+            'multiple'=>false,
+            'choices'=> array(
+                User::$VENDEDOR => User::$VENDEDOR_TEXT, 
+                User::$COMPRADOR => User::$COMPRADOR_TEXT,
+                User::$DIGITADOR => User::$DIGITADOR_TEXT, 
+                User::$APROBADOR => User::$APROBADOR_TEXT
+            )
+        ));
+        
     }
 
-    public function getName()
-    {
+    public function getName(){
         return 'sidpla_user_registration';
     }
 }
