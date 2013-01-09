@@ -143,6 +143,20 @@ MinSalSidPlaAdminBundle_editandoUnidadesOrg:
 MinSalSidPlaAdminBundle_mantEntidades:
     pattern:  /admin/mantEntidades
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantEntidades } 
+ 
+#listado autorizado
+MinSalSidPlaAdminBundle_listadoDNM:
+    pattern:  /admin/listadoDNM
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:LoadListadoDNM } 
+#consulta listado
+MinSalSidPlaAdminBundle_ConsultarListadoDNM:
+    pattern:  /admin/ConsultarListadoDNM
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:ConsultarListadoDNM, _format: json }
+    requirements: { _format: (xml|json), _method: GET }  
+#manttlistado
+MinSalSidPlaAdminBundle_manttListadoDNMEdicion:
+    pattern:  /admin/manttListadoDNMEdicion
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:manttListadoDNMedicion }
     
 MinSalSidPlaAdminBundle_consultarEntidadesJSON:
     pattern:  /admin/consultarEntidadesJSON
@@ -155,22 +169,3 @@ MinSalSidPlaAdminBundle_mantEntidadEdicion:
 MinSalSidPlaAdminBundle_mantCargarEntidad:
     pattern:  /admin/mantCargarEntidad/{entId}
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantCargarEntidad } 
-
-#******************
-#****  Cuotas   ***
-#******************
-MinSalSidPlaAdminBundle_mantCargarCuotas:
-    pattern:  /admin/mantCargarCuotas/{entId}/{cuoTipo}
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:mantCuotas } 
-
-MinSalSidPlaAdminBundle_mantCuotaEdicion:
-    pattern:  /admin/mantCuotaEdicion/{entId}/{cuoTipo}
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:mantCuotaEdicion } 
-
-MinSalSidPlaAdminBundle_consultarCuotasJSON:
-    pattern:  /admin/consultarCuotasJSON/{entId}/{cuoTipo}
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminCuotas:consultarCuotasJSON } 
-
-MinSalSidPlaAdminBundle_consultarAlcoholesJSONSelect:
-    pattern:  /admin/consultarAlcoholesOrgJSONSelect
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminAlcoholes:consultarAlcoholesJSONSelect }

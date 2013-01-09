@@ -4,25 +4,19 @@
 namespace MinSal\SidPla\AdminBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use MinSal\SidPla\UsersBundle\Entity\User;
-use MinSal\SidPla\AdminBundle\Entity\Cuota;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
 
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="sca_entidades_ctg")
- * @UniqueEntity(fields="entNit",message="Ya existe otra empresa con este número de NIT")
  */
 class Entidad {
     
     public function __construct() {
         $this->users = new ArrayCollection();
-        $this->cuotas = new ArrayCollection();
         $this->entHabilitado = true;
         $this->entTipoPersona = 'N';
         
@@ -33,11 +27,6 @@ class Entidad {
         $this->entVenc = new \DateTime(); 
         $this->entVenc->setDate($datetime, '01', '01'); 
     }
-    
-    /**
-     * @ORM\OneToMany(targetEntity="MinSal\SidPla\AdminBundle\Entity\Cuota", mappedBy="entidad")
-     */
-    protected $cuotas;
     
     /**
      * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad")
@@ -57,14 +46,14 @@ class Entidad {
     /**
      * @var string $entRegDgii
      *
-     * @ORM\Column(name="ent_reg_dgii", type="text")
+     * @ORM\Column(name="ent_reg_dgii", type="text", nullable=false)
      */
     private $entRegDgii;
 
     /**
      * @var string $entRegMinsal
      *
-     * @ORM\Column(name="ent_reg_minsal", type="text")
+     * @ORM\Column(name="ent_reg_minsal", type="text", nullable=false)
      */
     private $entRegMinsal;
 
@@ -535,23 +524,8 @@ class Entidad {
         $this->auditUserUpd = $auditUserUpd;
     }
 
-    public function getCuotas() {
-        return $this->cuotas;
-    }
-
-    public function setCuotas($cuotas) {
-        $this->cuotas = $cuotas;
-    }
-
-    public function getUsers() {
-        return $this->users;
-    }
-
-    public function setUsers($users) {
-        $this->users = $users;
-    }
-
-        public function __toString() {
+    
+    public function __toString() {
         return 'ID ' . $this->getIdEmpleado() . ' ' . $this->getPrimerNombre() . ' ' . $this->getPrimerApellido();
     }
 }
