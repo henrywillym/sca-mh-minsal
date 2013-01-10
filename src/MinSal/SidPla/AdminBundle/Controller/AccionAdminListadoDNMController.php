@@ -113,11 +113,11 @@ class AccionAdminListadoDNMController extends Controller {
      */
 
     public function LoadListadoDNMAction() {
-        $ListadoDNM = $this->getRequest()->getSession()->get('listadoDNM');
-
-        $dnmDao = new ListadoDNMDao($this->getDoctrine());
-        $listadodnm = $dnmDao->getListado();
-        return $this->render('MinSalSidPlaAdminBundle:ListadoDNM:manttListadoDNMForm.html.twig', array('listado' => $ListadoDNM, 'opcsistem' => $listadodnm));
+        $opciones = $this->getRequest()->getSession()->get('opciones');
+        
+        return $this->render('MinSalSidPlaAdminBundle:ListadoDNM:manttListadoDNMForm.html.twig', array(
+            'opciones' => $opciones
+        ));
     }
 
     public function manttListadoDNMedicionAction() {
