@@ -210,75 +210,50 @@ class RolDao {
     public function getRolesEspecificos($entImportador, $entProductor, $entComprador, $entVendedorLocal, $userTipo, $userInterno, $userInternoTipo) {
         $query = $this->repositorio->createQueryBuilder('R');
         
-        $where = '(';
-        
-        if($entImportador){
-            $where = $where.' R.rolImportador = :rolImportador ';
-            $query = $query->setParameter('rolImportador',$entImportador === true?1:0 );
-        }
-        
-        if($entProductor){
-            if($entImportador){
-                $where = $where.' OR ';
-            }
-            
-            $where = $where.'    R.rolProductor = :rolProductor ';
-            $query = $query->setParameter('rolProductor',$entProductor === true?1:0 );
-        }
-        
-        if($entComprador ){
-            if($entImportador || $entProductor){
-                $where = $where.' OR ';
-            }
-            
-            $where = $where.'    (R.rolComprador = :rolComprador AND R.rolCompVend = :rolCompVend )';
-            $query = $query->setParameter('rolComprador',$entComprador === true?1:0 );
-            $query = $query->setParameter('rolCompVend',$entVendedorLocal === true?1:0 );
-        }
-        
-        $where = $where.'     ) AND R.rolTipo = :rolTipo
-                         AND R.rolInterno = :rolInterno';
-        
-        if($userInterno==true){
-            $where = $where.' AND R.rolInternoTipo = :rolInternoTipo';
-        }
-        
-        /*
-            'rolImportador' => $entImportador === true?1:0,
-            'rolProductor' => $entProductor === true?1:0,
-            'rolComprador' => $entComprador === true?1:0,
-        */
-        
-        $query = $query->where($where);
-        
+        $where = '     R.rolTipo = :rolTipo
+                         AND R.rolInterno = :rolInterno ';
         $query = $query->setParameters(array(
             'rolTipo' => $userTipo,
             'rolInterno' => $userInterno === true?1:0
         ));
         
-        if($userInterno==true){
+        if($entImportador || $entProductor || $entComprador){
+            $where = ' AND (';
+
+            if($entImportador){
+                $where = $where.' R.rolImportador = :rolImportador ';
+                $query = $query->setParameter('rolImportador',$entImportador === true?1:0 );
+            }
+
+            if($entProductor){
+                if($entImportador){
+                    $where = $where.' OR ';
+                }
+
+                $where = $where.'    R.rolProductor = :rolProductor ';
+                $query = $query->setParameter('rolProductor',$entProductor === true?1:0 );
+            }
+
+            if($entComprador ){
+                if($entImportador || $entProductor){
+                    $where = $where.' OR ';
+                }
+
+                $where = $where.'    (R.rolComprador = :rolComprador AND R.rolCompVend = :rolCompVend )';
+                $query = $query->setParameter('rolComprador',$entComprador === true?1:0 );
+                $query = $query->setParameter('rolCompVend',$entVendedorLocal === true?1:0 );
+            }
+            $where = $where.'     ) ';
+        }
+                        
+        if($userInterno == true){
+            $where = $where.' AND R.rolInternoTipo = :rolInternoTipo';
             $query = $query->setParameter('rolInternoTipo',$userInternoTipo);
         }
+                
+        $query = $query->where($where);
         
         return $query->getQuery()->getResult();
-        
-        /*$roles = $this->em->createQuery("SELECT R
-                                        FROM MinSalSidPlaAdminBundle:RolSistema R 
-                                        WHERE R.rolImportador = :rolImportador
-                                        AND R.rolProductor = :rolProductor
-                                        AND R.rolComprador = :rolComprador
-                                        AND R.rolTipo = :rolTipo
-                                        AND R.rolInterno = :rolInterno
-                                        AND R.rolInternoTipo = :rolInternoTipo")
-                ->setParameters(array(
-                    'rolImportador' => $entImportador,
-                    'rolProductor' => $entProductor,
-                    'rolComprador' => $entComprador,
-                    'rolTipo' => $userTipo,
-                    'rolInterno' => $userInterno,
-                    'rolInternoTipo' => $userInternoTipo
-                )); 
-        return $roles->getResult();*/
     }
  
 }

@@ -22,21 +22,10 @@ class UserDao {
     }
     
     public function getUsersInternos() {
-        $User = $this->em->createQuery("SELECT U.idUsuario, 
-                                        U.username,
-                                        U.userPrimerNombre, 
-                                        U.userSegundoNombre, 
-                                        U.userApellidos, 
-                                        U.userDui, 
-                                        U.userNit, 
-                                        U.userCargo, 
-                                        U.userTelefono, 
-                                        U.userInterno, 
-                                        U.userInternoTipoText, 
-                                        U.userTipoText
+        $User = $this->em->createQuery("SELECT U
                                         FROM MinSalSidPlaUsersBundle:User U
                                         WHERE U.userInterno = true
-                                        AND U.auditDeleted = false");
+                                         AND U.auditDeleted = false");
         return $User->getArrayResult();
     }
     
@@ -44,8 +33,8 @@ class UserDao {
         $User = $this->em->createQuery("SELECT U
                                         FROM MinSalSidPlaUsersBundle:User U JOIN U.entidad B
                                         WHERE U.userInterno = false
-                                        AND B.entId = :entId
-                                        AND U.auditDeleted = false")
+                                         AND B.entId = :entId
+                                         AND U.auditDeleted = false")
                 ->setParameter('entId',$entId); 
         return $User->getArrayResult();
     }

@@ -17,9 +17,9 @@
             { name:'ldnm_nit', index: 'ldnm_nit', width:115,editable:true,editoptions:{size:70,maxlength:20,dataInit:function(el){$(el).mask("9999-999999-999-9",{placeholder:" "});}},formoptions:{ rowpos:2, label: "NIT",elmprefix:"(*)"},editrules:{required:true}  },
             { name:'ldnm_nrc', index: 'ldnm_nrc', width:100,editable:true,editoptions:{size:70,maxlength:150,dataInit:function(el){$(el).keyfilter(/[0-9]/i);}},formoptions:{ rowpos:3, label: "NRC", elmprefix:"(*)"},editrules:{required:true}  } ,
             { name:'ldnm_tipo_persona', index: 'ldnm_tipo_persona', width:100,editable:true,edittype:"select",editoptions:{size:40,value:"Natural:Natural;Juridica:Juridica"} ,formoptions:{rowpos:4, label: "Tipo de Persona :"} } ,
-           { name:'ldnm_nombres', index: 'ldnm_nombres', width:220,editable:true,editoptions:{size:40} ,formoptions:{rowpos:6, elmprefix:"(*)", label: "Nombre Persona Natural"} } ,
-           { name:'ldnm_apellidos', index: 'ldnm_apellidos', width:220,editable:true,editoptions:{size:40} ,formoptions:{rowpos:7, elmprefix:"(*)", label: "Apellido Persona Natural"}} ,
-           { name:'ldnm_razon', index: 'ldnm_razon', width:260,editable:true,editoptions:{size:40} ,formoptions:{rowpos:8, elmprefix:"(*)", label: "Raz&oacute;n Social"}}],
+           { name:'ldnm_nombres', index: 'ldnm_nombres', width:220,editable:true,editoptions:{size:40} ,formoptions:{rowpos:6, elmprefix:"(*)", label: "Nombre Persona Natural"},editrules:{required:true} } ,
+           { name:'ldnm_apellidos', index: 'ldnm_apellidos', width:220,editable:true,editoptions:{size:40} ,formoptions:{rowpos:7, elmprefix:"(*)", label: "Apellido Persona Natural"},editrules:{required:true}} ,
+           { name:'ldnm_razon', index: 'ldnm_razon', width:260,editable:true,editoptions:{size:40} ,formoptions:{rowpos:8, elmprefix:"(*)", label: "Raz&oacute;n Social"},editrules:{required:true} } ],
           rowNum:10,
           rowList:[10,20,30],//Lo cambie porque necesitaba ver las demas opciones y no m surben los botones de la siguiente pagina
           multiselect: false,
@@ -71,22 +71,31 @@
               	   $('#tr_ldnm_nombres').show();
        		       $('#tr_ldnm_apellidos').show();
        		       $('#tr_ldnm_razon').hide();
+       		        //limpia 
+       		       $('#ldnm_razon').val("-");$('#ldnm_nombres').val("");$('#ldnm_apellidos').val("");
        		 }else if ($('#ldnm_tipo_persona').val()=="Juridica"){
              	   $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
+       		         //limpia
+       		       $('#ldnm_nombres').val("-");
+       		       $('#ldnm_apellidos').val("-");$('#ldnm_razon').val("");
              }
-             //funcion oculta dinamicamente los campos nombres,apellidos y razon social
            //funcion oculta dinamicamente los campos nombres,apellidos y razon social   
                  $('#ldnm_tipo_persona').change(function () {
     			if ($(this).val()=="Natural") {
        		       $('#tr_ldnm_nombres').show();
        		       $('#tr_ldnm_apellidos').show();
        		       $('#tr_ldnm_razon').hide();
+       		        //limpia 
+       		       $('#ldnm_razon').val("-");$('#ldnm_nombres').val("");$('#ldnm_apellidos').val("");
     			}else if ($(this).val()=="Juridica"){
     			 $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
+       		         //limpia
+       		       $('#ldnm_nombres').val("-");
+       		       $('#ldnm_apellidos').val("-");$('#ldnm_razon').val("");
                 }
 				});
 				
@@ -119,35 +128,73 @@
               	   $('#tr_ldnm_nombres').show();
        		       $('#tr_ldnm_apellidos').show();
        		       $('#tr_ldnm_razon').hide();
+       		       //limpia 
+       		       $('#ldnm_razon').val("-");
        		 }else if ($('#ldnm_tipo_persona').val()=="Juridica"){
              	   $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
+       		       //limpia
+       		       $('#ldnm_nombres').val("-");
+       		       $('#ldnm_apellidos').val("-");
              }
-                   
-          
+       
               
               //VALIDACIONES AL NAVEGAR POR LOS REGISTROS EN PANTALLA DE EDICION, AL CAMBIAR DE REGISTRO Y CAMBIE EL SELECT
+              
               $("#nData").click(function(){ 
                 if ($('#ldnm_tipo_persona').val()=="Natural"){
               	   $('#tr_ldnm_nombres').show();
        		       $('#tr_ldnm_apellidos').show();
        		       $('#tr_ldnm_razon').hide();
+       		       //limpia 
+       		       $('#ldnm_razon').val("-");
        		 }else if ($('#ldnm_tipo_persona').val()=="Juridica"){
              	   $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
+       		       //limpia
+       		       $('#ldnm_nombres').val("-");
+       		       $('#ldnm_apellidos').val("-");
              }})
+             
+            
               $("#pData").click(function(){  
                 if ($('#ldnm_tipo_persona').val()=="Natural"){
               	   $('#tr_ldnm_nombres').show();
        		       $('#tr_ldnm_apellidos').show();
        		       $('#tr_ldnm_razon').hide();
+       		         //limpia 
+       		       $('#ldnm_razon').val("-");
        		 }else if ($('#ldnm_tipo_persona').val()=="Juridica"){
              	   $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
+       		         //limpia
+       		       $('#ldnm_nombres').val("-");
+       		       $('#ldnm_apellidos').val("-");
              }})
+             
+                //funcion oculta dinamicamente los campos nombres,apellidos y razon social   
+                 $('#ldnm_tipo_persona').change(function () {
+    			if ($(this).val()=="Natural") {
+       		       $('#tr_ldnm_nombres').show();
+       		       $('#tr_ldnm_apellidos').show();
+       		       $('#tr_ldnm_razon').hide();
+       		        //limpia 
+       		       $('#ldnm_razon').val("-");$('#ldnm_nombres').val("");$('#ldnm_apellidos').val("");
+    			}else if ($(this).val()=="Juridica"){
+    			 $('#tr_ldnm_nombres').hide();
+       		       $('#tr_ldnm_apellidos').hide();
+       		       $('#tr_ldnm_razon').show();
+       		         //limpia
+       		       $('#ldnm_nombres').val("-");
+       		       $('#ldnm_apellidos').val("-");$('#ldnm_razon').val("");
+                }
+				});
+				
+             
+             
           });
     
     

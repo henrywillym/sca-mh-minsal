@@ -84,7 +84,7 @@ class User extends BaseUser {
     /**
      * @var string $userNit
      *
-     * @ORM\Column(name="user_segundo_nombre", type="string", length=30)
+     * @ORM\Column(name="user_segundo_nombre", type="string", length=30, nullable=true)
      * @Assert\MaxLength(
      *     limit=30,
      *     message="Segundo Nombre no valido, es muy largo. Debe ser inferior a {{limit}} caracteres", 

@@ -27,11 +27,10 @@ class DefaultController extends BaseController {
         $opciones = $this->container->get("request")->getSession()->get('opciones');
         $entNombre = null;
         
-        if($userInterno == 'false'){
+        if($userInterno === 'false'){
             $entidadDao = new EntidadDao($this->container->get("doctrine"));
             $entNombre = $entidadDao->getEntidad($entId)->getEntNombre();
         }
-        
         return $this->container->get('templating')->renderResponse('MinSalSidPlaUsersBundle:Usuarios:mantUsuarios.html.twig', array(
             'opciones' => $opciones, 
             'userInterno'=>$userInterno, 
@@ -48,10 +47,10 @@ class DefaultController extends BaseController {
         $userDao = new UserDao($this->container->get("doctrine"));
         $usuarios =null;
         
-        if($userInterno == 'true'){
-            $usuarios = $userDao->getUsersInternos();
-        }else{
+        if($userInterno == 'false'){
             $usuarios = $userDao->getUsersExternos($entId);
+        }else{
+            $usuarios = $userDao->getUsersInternos();
         }
 
         $numfilas = count($usuarios);
@@ -127,8 +126,9 @@ class DefaultController extends BaseController {
         }
         
         $entId = '';
-        $entNombre = '';
-        if($userInterno == 'false'){
+        $entNombre = ''; 
+        
+        if($userInterno === 'false'){
             $entId = $request->get("entId");
             $entidadDao = new EntidadDao($this->container->get("doctrine"));//fos_user.user_manager
             $entNombre = $entidadDao->getEntidad($entId)->getEntNombre();
@@ -142,7 +142,7 @@ class DefaultController extends BaseController {
         
         $confirmationEnabled = $this->container->getParameter('fos_user.registration.confirmation.enabled');
         
-        $process = $formHandler->processIns($entId, $auditUser, $confirmationEnabled);
+        $process = $formHandler->processIns($entId, $userInterno, $auditUser, $confirmationEnabled);
         
         if ($process) {
             $user = $form->getData();
@@ -266,14 +266,10 @@ class DefaultController extends BaseController {
         $username = $request->get('username');
         $email = $request->get('email');
 
-        //$empleadoDao = new EmpleadoDao($this->getDoctrine());
-        
-        //$be = $empleadoDao->existeEmpleado($idEmpleado);
 
         $userDao = new UserDao($this->container->get("doctrine"));
         
         //Se verifica si se encuentra registrado el usuario registrado 
-        //$bu = $userDao->tieneOtroUsuario($idEmpleado);
         $bud = $userDao->usernameDisponible($username, $idUsuario);
         $bemail = $userDao->emailDisponible($email, $idUsuario);
         /*

@@ -37,7 +37,7 @@ class DefaultController extends Controller {
 
         $user = $this->get('security.context')->getToken()->getUser();
 
-        if ($user != 'anon.') {
+        if ($user != 'anon.' && $user->getAuditDeleted() == false) {
             $roles = $user->getRols();
             
             if (isset($roles)){
@@ -53,6 +53,10 @@ class DefaultController extends Controller {
                 return $this->render('MinSalSidPlaBundle:Default:index.html.twig', array('opciones' => $opciones));
             }
         }else{
+            if ($user != 'anon.' && $user->getAuditDeleted() == true) {
+                $this->get('session')->setFlash('notice', 'El usuario "" se encuentra inactivo');
+            }
+            
             return $this->render('MinSalSidPlaBundle:Default:index.html.twig');
         }
     }

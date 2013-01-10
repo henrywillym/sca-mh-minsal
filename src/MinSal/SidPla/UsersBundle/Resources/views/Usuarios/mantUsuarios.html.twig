@@ -102,10 +102,10 @@
         );
        
         $("#agregarUsuario").click(function(){
-            {% if(userInterno=='true') %}
-                location.href = '{{ url('MinSalSidPlaUsersBundle_registerUsuarioInterno', {'userInterno':userInterno}) }}';
-            {%else%}
+            {% if(userInterno=='false') %}
                 location.href = '{{ url('MinSalSidPlaUsersBundle_registerUsuarioExterno', {'userInterno':userInterno, 'entId':entId}) }}';
+            {%else%}
+                location.href = '{{ url('MinSalSidPlaUsersBundle_registerUsuarioInterno', {'userInterno':userInterno}) }}';
             {%endif%}
         });
         

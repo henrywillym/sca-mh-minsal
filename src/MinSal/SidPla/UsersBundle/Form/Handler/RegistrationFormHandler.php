@@ -14,6 +14,7 @@ use MinSal\SidPla\UsersBundle\EntityDao\UserDao;
 class RegistrationFormHandler extends BaseHandler{
     private $auditUser;
     private $entId;
+    private $userInterno;
     
     private $container;
 
@@ -22,9 +23,10 @@ class RegistrationFormHandler extends BaseHandler{
         $this->container = $container;
     }
     
-    public function processIns($entId, $auditUserIns, $confirmation = false){
+    public function processIns($entId, $userInterno, $auditUserIns, $confirmation = false){
         $this->auditUser = $auditUserIns;
         $this->entId = $entId;
+        $this->userInterno = $userInterno;
         
         return $this->process($confirmation);
     }
@@ -45,6 +47,8 @@ class RegistrationFormHandler extends BaseHandler{
                 
                 $tmp = $user->getIdUsuario();
                 
+                
+                //Si es update
                 if(empty($tmp) ){
                     $user->setAuditUserIns($this->auditUser);
                     $user->setAuditDateIns(new \DateTime());
@@ -55,27 +59,50 @@ class RegistrationFormHandler extends BaseHandler{
                         $entidad = $entidadDao->getEntidad($this->entId);
                         $user->setEntidad($entidad);
                     }
+                
+                //Si es Insert    
                 }else{
                     $userDao = new UserDao($this->container->get("doctrine"));
+                    
+                    //Se obtiene el registro de la BD
                     $tmp = $userDao->getUserEspecifico($user->getIdUsuario());
                     
+                    //Se le asigna al Formulario
                     $this->form->setData($tmp);
+                    
+                    //Se realiza un merge con lo que se envio en el Request
                     $this->form->bindRequest($this->request);
+                    
                     $user = $tmp;
                     $tmp->setAuditUserUpd($this->auditUser);
                     $tmp->setAuditDateUpd(new \DateTime());
                 }
                 
                 $rolDao= new RolDao($this->container->get("doctrine"));
-                $user->setRols($rolDao->getRolesEspecificos(
-                        $user->getEntidad()->getEntImportador(),
-                        $user->getEntidad()->getEntProductor(),
-                        $user->getEntidad()->getEntComprador(),
-                        $user->getEntidad()->getEntCompVend(),
-                        $user->getUserTipo(),
-                        $user->getUserInterno(),
-                        $user->getUserInternoTipo()
-                ));
+                
+                //Se asignan roles dependiendo del usuario interno
+                if($this->userInterno =='false'){
+                    $user->setRols($rolDao->getRolesEspecificos(
+                            $user->getEntidad()->getEntImportador(),
+                            $user->getEntidad()->getEntProductor(),
+                            $user->getEntidad()->getEntComprador(),
+                            $user->getEntidad()->getEntCompVend(),
+                            $user->getUserTipo(),
+                            $user->getUserInterno(),
+                            $user->getUserInternoTipo()
+                    ));
+                }else{
+                    $user->setRols($rolDao->getRolesEspecificos(
+                            false,
+                            false,
+                            false,
+                            false,
+                            $user->getUserTipo(),
+                            $user->getUserInterno(),
+                            $user->getUserInternoTipo()
+                    ));
+                }
+                
                 
                 //Hacer busqueda de los roles segun los campos de tipos y obtener el listado de objetos.
                 $this->onSuccess($user, $confirmation);
