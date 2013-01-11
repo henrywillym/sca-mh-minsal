@@ -153,11 +153,11 @@
                     </div><br/>
                 {% endif %}
                     
-                {% for key, message in app.session.getFlashes() %}
+                {# for key, message in app.session.getFlashes() %}
                     <div class="flash-notice" id="{{ key }}">
                         {{ message|trans({}, 'FOSUserBundle') }}
                     </div>
-                {% endfor %}
+                {% endfor #}
             <table id="theGrid" class="scroll">
             </table> 
             

@@ -7,12 +7,13 @@
 
 namespace MinSal\SidPla\AdminBundle\Controller;
 
-use MinSal\SidPla\AdminBundle\Entity\Cuota;
 use MinSal\SidPla\AdminBundle\Entity\Alcohol;
+use MinSal\SidPla\AdminBundle\Entity\Cuota;
 use MinSal\SidPla\AdminBundle\Entity\Entidad;
 use MinSal\SidPla\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SidPla\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SidPla\AdminBundle\EntityDao\EntidadDao;
+use MinSal\SidPla\AdminBundle\EntityDao\ListadoDNMDao;
 use MinSal\SidPla\AdminBundle\Form\Type\CuotaType;
 use MinSal\SidPla\AdminBundle\Form\Type\EntidadType;
 use MinSal\SidPla\UsersBundle\Entity\User;
@@ -31,9 +32,20 @@ class AccionAdminCuotasController extends Controller {
      * @return type HTML.twig
      */
     public function mantCuotasAction($entId, $cuoTipo) {
+        $entidadDao = new EntidadDao($this->getDoctrine());
+        $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
+        $entidad = $entidadDao->getEntidad($entId);
+        
+        $year = new \DateTime();
+        $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
+
+        if(!$autorizadoDNM){
+            $this->get('session')->setFlash('notice', ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH);
+        }
+        
         $opciones = $this->getRequest()->getSession()->get('opciones');
         return $this->render('MinSalSidPlaAdminBundle:Cuota:mantCuotas.html.twig', 
-                array('opciones' => $opciones, 'cuoTipo'=>$cuoTipo, 'entId'=>$entId));
+                array('opciones' => $opciones, 'cuoTipo'=>$cuoTipo, 'entId'=>$entId, 'autorizadoDNM'=>$autorizadoDNM));
     }
 
     /**

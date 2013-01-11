@@ -41,7 +41,7 @@ class EntidadType extends AbstractType {
         ));
         $builder->add('entRegDgii', 'text', array('label' => 'Registro de Usuario (MINSAL)'));
         $builder->add('entRegMinsal',  'text', array('label' => 'Número Resolución DGII'));
-        $builder->add('entNrc', 'text', array('label' => 'NCR','required'=>false));
+        $builder->add('entNrc', 'text', array('label' => 'NRC','required'=>false));
         $builder->add('entTel',  null, array('label' => 'Teléfono'));
         $builder->add('entGiro', null, array('label' => 'Giro o Actividad Económica'));
         $builder->add('entEmail',  'email', array('label' => 'E-mail', 'max_length'=>'50'));

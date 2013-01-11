@@ -19,6 +19,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity(fields="entNit",message="Ya existe otra empresa con este número de NIT")
  */
 class Entidad {
+    public static $SI = 'Si';
+    public static $NO = 'No';
+    
+    public static $NATURAL = 'Natural';
+    public static $JURIDICA = 'Jurídica';
     
     public function __construct() {
         $this->users = new ArrayCollection();
@@ -552,5 +557,71 @@ class Entidad {
             $tmp->setEntidad($this);
         }
         $this->users = $users;
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getEntImportadorText() {
+        if($this->getEntImportador()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getEntProductorText() {
+        if($this->getEntProductor()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getEntCompVendText() {
+        if($this->getEntCompVend()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getEntHabilitadoText() {
+        if($this->getEntHabilitado()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getEntCompradorText() {
+        if($this->getEntComprador()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getEntTipoPersonaText() {
+        if($this->getEntTipoPersona()=='J'){
+            return Entidad::$JURIDICA;
+        }else if($this->getEntTipoPersona()=='N'){
+            return Entidad::$NATURAL;
+        }
     }
 }
