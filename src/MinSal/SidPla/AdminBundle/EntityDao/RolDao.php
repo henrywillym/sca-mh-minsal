@@ -218,7 +218,7 @@ class RolDao {
         ));
         
         if($entImportador || $entProductor || $entComprador){
-            $where = ' AND (';
+            $where = $where.' AND (';
 
             if($entImportador){
                 $where = $where.' R.rolImportador = :rolImportador ';

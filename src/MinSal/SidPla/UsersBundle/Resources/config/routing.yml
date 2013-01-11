@@ -13,8 +13,8 @@ MinSalSidPlaUsersBundle_editarUsuarioSinRol:
 MinSalSidPlaUsersBundle_verificaCreacion:
     pattern:  /verificaCreacion
     defaults: { _controller: MinSalSidPlaUsersBundle:Default:verificaCreacion }
-    
-    
+
+
 #*******************
 #***  USUARIOS  ****
 #*******************
