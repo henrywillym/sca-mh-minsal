@@ -154,7 +154,12 @@
                             required:true
                         }
                     }
-                ]
+                ],
+                ondblClickRow: function(){
+                    {%if(autorizadoDNM)%}
+                        $("#editarCuota").click();
+                    {%endif%}
+                }
             });
             
             myGrid.jqGrid('navGrid','#pager',{
@@ -198,6 +203,9 @@
                 width:550,
                 height:220,
                 bottominfo:"Campos marcados con (*) son obligatorios",
+                beforeSubmit: function(){
+                    $('[id="alcohol.alcNombre"]').attr('name','alcId');
+                },
                 afterSubmit:despuesAgregarEditar,
                 closeAfterAdd:true,
                 closeOnEscape: true,
@@ -227,6 +235,9 @@
                     editCaption: "Editar Cuota",
                     bottominfo:"Campos marcados con (*) son obligatorios",
                     closeAfterEdit:true,
+                    beforeSubmit: function(){
+                        $('[id="alcohol.alcNombre"]').attr('name','alcId');
+                    },
                     afterSubmit:despuesAgregarEditar,
                     reloadAfterSubmit:true,
                     closeOnEscape: true,

@@ -92,12 +92,16 @@ class AccionAdminEntidadesController extends Controller {
      * del mantenimiento
      */
     public function mantEntidadEdicionAction(Request $request) {
+        $autorizadoDNM = null;
+        $autorizadoDNMText = null;
         $entidadTmp = new Entidad();
         $form = $this->createForm(new EntidadType(), $entidadTmp);
         $form->bindRequest($request);
         
         $entidad = new Entidad();
         $entidadDao = new EntidadDao($this->getDoctrine());
+        $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
+        
         $user = $this->get('security.context')->getToken()->getUser();
         
         if( $entidadTmp->getEntId() ){
@@ -105,6 +109,14 @@ class AccionAdminEntidadesController extends Controller {
             //#### Auditoría 
             $entidad->setAuditUserUpd($user->getUsername());
             $entidad->setAuditDateUpd(new \DateTime());
+            
+            //## Mensaje de validacion de DNM
+            $year = new \DateTime();
+            $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
+            
+            if(!$autorizadoDNM){
+                $autorizadoDNMText = ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH;
+            }
         }else{
             //#### Auditoría 
             $entidad->setAuditUserIns($user->getUsername());
@@ -166,8 +178,15 @@ class AccionAdminEntidadesController extends Controller {
             $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
             
             $opciones = $this->getRequest()->getSession()->get('opciones');
-                return $this->render('MinSalSidPlaAdminBundle:Entidad:showEntidad.html.twig', 
-                    array('opciones' => $opciones, 'form' => $form->createView(), 'entId'=>$entidad->getEntId(), 'entHabilitado'=>$entidad->getEntHabilitado()));
+                return $this->render('MinSalSidPlaAdminBundle:Entidad:showEntidad.html.twig', array(
+                        'opciones' => $opciones, 
+                        'form' => $form->createView(), 
+                        'entId'=>$entidad->getEntId(), 
+                        'entHabilitado'=>$entidad->getEntHabilitado(),
+                        'autorizadoDNM' => $autorizadoDNM,
+                        'autorizadoDNMText' => $autorizadoDNMText
+                    )
+                );
         }
     }
     
