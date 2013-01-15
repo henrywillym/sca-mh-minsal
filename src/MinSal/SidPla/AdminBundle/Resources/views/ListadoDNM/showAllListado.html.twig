@@ -13,9 +13,9 @@
           colNames:['Id','A&ntilde;o', 'NIT', 'NRC', 'Tipo de Persona','Nombre Persona Natural', 'Apellido Persona Natural','Razon Social'],
           colModel:[            
             { name:'ldnm_id', index: 'ldnm_id', width:20,editable:false,editoptions:{size:10},sorttype:'int',searchtype:"integer", searchrules:{"required":true, "number":true, "maxValue":2000000}   },
-            { name:'ldnm_year', index: 'ldnm_year', width:50,editable:true,editoptions:{size:40,maxlength:4,dataInit:function(el){$(el).mask("9999",{placeholder:" "});}},formoptions:{rowpos:1, label: "A&ntilde;o", elmprefix:"(*)"},editrules:{required:true}  },
-            { name:'ldnm_nit', index: 'ldnm_nit', width:115,editable:true,editoptions:{size:70,maxlength:20,dataInit:function(el){$(el).mask("9999-999999-999-9",{placeholder:" "});}},formoptions:{ rowpos:2, label: "NIT",elmprefix:"(*)"},editrules:{required:true}  },
-            { name:'ldnm_nrc', index: 'ldnm_nrc', width:100,editable:true,editoptions:{size:70,maxlength:150,dataInit:function(el){$(el).keyfilter(/[0-9]/i);}},formoptions:{ rowpos:3, label: "NRC", elmprefix:"(*)"},editrules:{required:true}  } ,
+            { name:'ldnm_year', index: 'ldnm_year', width:50,editable:true,editoptions:{size:40,maxlength:4,dataInit:function(el){$(el).mask("9999",{placeholder:"_"});}},formoptions:{rowpos:1, label: "A&ntilde;o", elmprefix:"(*)"},editrules:{required:true}  },
+            { name:'ldnm_nit', index: 'ldnm_nit', width:115,editable:true,editoptions:{size:70,maxlength:20,dataInit:function(el){$(el).mask("9999-999999-999-9",{placeholder:"_"});}},formoptions:{ rowpos:2, label: "NIT",elmprefix:"(*)"},editrules:{required:true}  },
+            { name:'ldnm_nrc', index: 'ldnm_nrc', width:100,editable:true,editoptions:{size:70,maxlength:150,dataInit:function(el){$(el).mask("999999-9",{placeholder:"_"});}},formoptions:{ rowpos:3, label: "NRC", elmprefix:"(*)"},editrules:{required:true}  } ,
             { name:'ldnm_tipo_persona', index: 'ldnm_tipo_persona', width:100,editable:true,edittype:"select",editoptions:{size:40,value:"Natural:Natural;Juridica:Juridica"} ,formoptions:{rowpos:4, label: "Tipo de Persona :"} } ,
            { name:'ldnm_nombres', index: 'ldnm_nombres', width:220,editable:true,editoptions:{size:40} ,formoptions:{rowpos:6, elmprefix:"(*)", label: "Nombre Persona Natural"},editrules:{required:true} } ,
            { name:'ldnm_apellidos', index: 'ldnm_apellidos', width:220,editable:true,editoptions:{size:40} ,formoptions:{rowpos:7, elmprefix:"(*)", label: "Apellido Persona Natural"},editrules:{required:true}} ,
@@ -29,10 +29,11 @@
           pager: jQuery('#pager'),
           viewrecords: true,          
           caption: 'Listado de Entidades Autorizadas',
-          height: "100%",
+          height: 200,
           editCaption: "Editar Listado",
           addCaption: "Agregar Al Listado",
-          editurl:'manttListadoDNMEdicion'            
+          editurl:'manttListadoDNMEdicion',
+          ondblClickRow: function(){$("#editarOpcionesButton").click()}
         });
         
         myGrid.jqGrid('navGrid','#pager',

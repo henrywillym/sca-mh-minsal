@@ -1,3 +1,11 @@
+#Global Index Redirect:
+root:
+  pattern: /
+  defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /login
+        permanent: true
+
 #app/config/rounting.yml
 MinSalSidPlaDependenciaBundle:
     resource: "@MinSalSidPlaDependenciaBundle/Resources/config/routing.yml"

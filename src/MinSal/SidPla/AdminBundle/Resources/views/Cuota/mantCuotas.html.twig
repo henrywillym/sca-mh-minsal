@@ -11,9 +11,9 @@
         <center>
             <h1>
                 {% if(cuoTipo=='I') %}
-                    Listado de Cuotas de Importación Registradas
+                    Listado de Cuotas de Importación Registradas de "{{entNombre}}"
                 {%else%}
-                    Listado de Cuotas de Compras Locales Registradas
+                    Listado de Cuotas de Compras Locales Registradas de "{{entNombre}}"
                 {%endif%}
             </h1>
             {% if app.session.hasFlash('notice') %}

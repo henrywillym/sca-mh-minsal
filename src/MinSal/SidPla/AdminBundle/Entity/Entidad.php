@@ -29,6 +29,10 @@ class Entidad {
         $this->users = new ArrayCollection();
         $this->cuotas = new ArrayCollection();
         $this->entHabilitado = true;
+        $this->entImportador = false;
+        $this->entProductor = false;
+        $this->entComprador = false;
+        $this->entCompVend = false;
         $this->entTipoPersona = 'N';
         
         $datetime = strval(Date('d/m/Y'));

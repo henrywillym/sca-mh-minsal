@@ -38,7 +38,16 @@
             HabProduccion();
             HabVendedor();
             HabCuotaImp();
-            HabCuotaLocal()
+            HabCuotaLocal();
+            
+            $('#Entidad_entImportador').parent().append($('#cuotaImport'))
+            $('#Entidad_entComprador').parent().append($('#cuotaLocal'))
+            $('#Entidad_entVenc').attr('readonly','readonly');
+            
+            
+            $('#Entidad_entNit').mask('9999-999999-999-9');
+            $('#Entidad_entNrc').mask('999999-9');
+            $('#Entidad_entRepNit').mask('9999-999999-999-9');
         }
         
         /**
@@ -173,14 +182,6 @@
             
             
             $('form>table').show('fast',EventosIniciales);
-            
-            $('#Entidad_entImportador').parent().append($('#cuotaImport'))
-            $('#Entidad_entComprador').parent().append($('#cuotaLocal'))
-            $('#Entidad_entVenc').attr('readonly','readonly');
-            
-            
-            $('#Entidad_entNit').mask('9999-999999-999-9');
-            $('#Entidad_entRepNit').mask('9999-999999-999-9');
        });
     </script>
     
