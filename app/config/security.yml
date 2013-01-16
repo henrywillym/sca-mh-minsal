@@ -23,6 +23,7 @@ security:
 
     access_control:
         - { path: ^/SidPla/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/changePassword*, role: ROLE_USER }
         - { path: ^/SidPla/users*, role: ROLE_USER }
         - { path: ^/SidPla/empresa*, role: ROLE_USER }
         - { path: ^/SidPla/DNM*, role: ROLE_USER }

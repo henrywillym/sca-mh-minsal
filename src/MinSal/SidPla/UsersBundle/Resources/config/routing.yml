@@ -37,3 +37,14 @@ MinSalSidPlaUsersBundle_consultarUsuariosJSON:
 MinSalSidPlaUsersBundle_mantCargarUsuario:
     pattern:  /mantCargarUsuario/{userInterno}/{idUsuario}/{entId}
     defaults: { _controller: MinSalSidPlaUsersBundle:Default:mantCargarUsuario } 
+    
+#*******************
+#***  PASSWORD  ****
+#*******************
+MinSalSidPlaUsersBundle_mantChangePassword:
+    pattern:  /changePassword/load
+    defaults: { _controller: MinSalSidPlaUsersBundle:ChangePassword:mantChangePassword } 
+    
+MinSalSidPlaUsersBundle_changePassword:
+    pattern:  /changePassword/edit
+    defaults: { _controller: MinSalSidPlaUsersBundle:ChangePassword:changePassword }
