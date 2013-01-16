@@ -66,3 +66,7 @@ fos_user:
          form:
             type: sidpla_user_registration
             handler: sidpla_user.form.handler.registration
+    change_password:
+        form:
+            type: sidpla_change_password
+            #handler:  sidpla_user.form.handler.changePassword

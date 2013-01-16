@@ -21,7 +21,7 @@ class DefaultController extends BaseController {
 
     /**
      * Retorna la página principal donde se muestra el listado de usuarios Internos u Externos
-     * @return type HTML.twig
+     * @return RenderResponse HTML.twig
      */
     public function mantUsersAction($entId, $userInterno) {
         $opciones = $this->container->get("request")->getSession()->get('opciones');
@@ -85,6 +85,14 @@ class DefaultController extends BaseController {
         return new Response($jsonresponse);
     }
     
+    /**
+     * Carga el formulario de registro de usuario
+     * 
+     * @param boolean $userInterno
+     * @param int $idUsuario
+     * @param int $entId
+     * @return RenderResponse
+     */
     public function mantCargarUsuarioAction($userInterno, $idUsuario, $entId){
         $opciones = $this->container->get("request")->getSession()->get('opciones');
         $entNombre = null;
@@ -114,6 +122,11 @@ class DefaultController extends BaseController {
         ));
     }
     
+    /**
+     * Accion encargada de realizar el registro del usuario en la BD
+     * 
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function registerAction(){
         $request = $this->container->get("request");
         $opciones = $request->getSession()->get('opciones');
@@ -310,6 +323,12 @@ class DefaultController extends BaseController {
         return $response;
     }
     
+    /**
+     * Eliminacion logica de usuarios en la tabla. Se encargada colocar el flag audit_deleted =true
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     private function eliminarAction($request){
         $opciones = $request->getSession()->get('opciones');
         $userInterno = $request->get("userInterno");
@@ -344,5 +363,5 @@ class DefaultController extends BaseController {
         ));
         return new RedirectResponse($url);
     }
-
+    
 }

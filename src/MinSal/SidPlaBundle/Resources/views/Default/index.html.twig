@@ -62,6 +62,7 @@
                                         $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_security_logout') }}"><span >{{ 'Salir'|trans({}, 'FOSUserBundle') }} </span></a></li>');                                           
                                  {% endif %}  
                              {% endif %}  
+                             $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('MinSalSidPlaUsersBundle_mantChangePassword') }}"><span >{{ 'Cambiar Contraseña'|trans({}, 'FOSUserBundle') }}</span></a></li>');
                              $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_security_logout') }}"><span >{{ 'Salir'|trans({}, 'FOSUserBundle') }}</span></a></li>');                                
                              <!--$('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_profile_show') }}"><span >{{ 'Perfil'|trans({}, 'FOSUserBundle') }}</span></a></li>');-->
                          {% else %}                                 
