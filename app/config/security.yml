@@ -28,8 +28,8 @@ security:
         - { path: ^/SidPla/empresa*, role: ROLE_USER }
         - { path: ^/SidPla/DNM*, role: ROLE_USER }
         - { path: ^/SidPla/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/admin/, role: ROLE_ADMIN }
-        - { path: ^/SidPla/admin/, role: ROLE_ADMIN }
+        - { path: /admin/*, role: ROLE_ADMIN }
+        - { path: /SidPla/admin/*, role: ROLE_ADMIN }
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER

@@ -38,8 +38,8 @@
                      {% set nivel = 1 %} 
                      $(function crearMenu() {
                          {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %} 
-                             {% if opciones is defined %}
-                                 $('#nav').append('<li id="liInicio0" class="top"><a  class="top_link" href="{{ path('MinSalSidPlaBundle_homepage') }}"><span >Inicio</span></a></li>');                                        
+                            $('#nav').append('<li id="liInicio0" class="top"><a  class="top_link" href="{{ path('MinSalSidPlaBundle_homepage') }}"><span >Inicio</span></a></li>'); 
+                            {% if opciones is defined %}
                                  {% if nivel < 3  %}                                    
                                     {% for opc in opciones %}
                                         {% if opc.idOpcionSistema2 is empty %}
