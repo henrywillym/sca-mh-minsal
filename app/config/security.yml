@@ -18,7 +18,7 @@ security:
                use_referer:                    true
             logout:
                path: fos_user_security_logout
-               target: /SidPla
+               target: /login
             anonymous:    true
 
     access_control:
