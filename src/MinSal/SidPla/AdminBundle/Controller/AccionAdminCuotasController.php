@@ -7,12 +7,13 @@
 
 namespace MinSal\SidPla\AdminBundle\Controller;
 
-use MinSal\SidPla\AdminBundle\Entity\Cuota;
 use MinSal\SidPla\AdminBundle\Entity\Alcohol;
+use MinSal\SidPla\AdminBundle\Entity\Cuota;
 use MinSal\SidPla\AdminBundle\Entity\Entidad;
 use MinSal\SidPla\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SidPla\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SidPla\AdminBundle\EntityDao\EntidadDao;
+use MinSal\SidPla\AdminBundle\EntityDao\ListadoDNMDao;
 use MinSal\SidPla\AdminBundle\Form\Type\CuotaType;
 use MinSal\SidPla\AdminBundle\Form\Type\EntidadType;
 use MinSal\SidPla\UsersBundle\Entity\User;
@@ -31,9 +32,25 @@ class AccionAdminCuotasController extends Controller {
      * @return type HTML.twig
      */
     public function mantCuotasAction($entId, $cuoTipo) {
+        $entidadDao = new EntidadDao($this->getDoctrine());
+        $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
+        $entidad = $entidadDao->getEntidad($entId);
+        
+        $year = new \DateTime();
+        $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
+
+        if(!$autorizadoDNM){
+            $this->get('session')->setFlash('notice', ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH);
+        }
+        
         $opciones = $this->getRequest()->getSession()->get('opciones');
-        return $this->render('MinSalSidPlaAdminBundle:Cuota:mantCuotas.html.twig', 
-                array('opciones' => $opciones, 'cuoTipo'=>$cuoTipo, 'entId'=>$entId));
+        return $this->render('MinSalSidPlaAdminBundle:Cuota:mantCuotas.html.twig', array(
+                'opciones' => $opciones, 
+                'cuoTipo'=>$cuoTipo, 
+                'entId'=>$entId, 
+                'entNombre' => $entidad->getEntNombre(),
+                'autorizadoDNM'=>$autorizadoDNM
+        ));
     }
 
     /**
@@ -168,98 +185,5 @@ class AccionAdminCuotasController extends Controller {
             return new Response('{"status":false,"msg":"No se encuentra la Entidad o Nombre Alcohol"}');
         };
     }
-    
-    /*
-    public function mantCuotaEdicionAction(Request $request) {
-        //$request = $this->getRequest();
-        //$user = new User();
-        //Request 
-        //$request = $this->get('request');
-        
-        $cuotaTmp = new Cuota();
-        $form = $this->createForm(new CuotaType(),$cuotaTmp);
-        $form->bindRequest($request);
-        
-        $cuota = new Cuota();
-        
-        $cuotaDao = new CuotaDao($this->getDoctrine());
-        $alcoholDao = new AlcoholDao($this->getDoctrine());
-        $entidadDao = new EntidadDao($this->getDoctrine());
-        
-        $user = $this->get('security.context')->getToken()->getUser();
-
-        if( $cuotaTmp->getCuoId() ){
-            $cuota = $cuotaDao->getCuota($cuotaTmp->getCuoId());
-            //#### Auditoría 
-            $cuota->setAuditUserUpd($user->getUsername());
-            $cuota->setAuditDateUpd(new \DateTime());
-        }else{
-            //#### Auditoría 
-            $cuota->setAuditUserIns($user->getUsername());
-            $cuota->setAuditDateIns(new \DateTime());
-        }
-        
-        $form = $this->createForm(new CuotaType(),$cuota);
-        
-        //if ($this->getRequest()->getMethod() == 'POST') {
-            $form->bindRequest($request);
-            //if($form->isValid()){
-                $cuota->setCuoYear(date('yyyy')+0);
-
-                $operacion = $request->get('oper');
-                
-                //Asociamos el objeto seleccionado en el formulario
-                $cuota->setAlcohol($alcoholDao->getAlcohol($request->get('alcohol.alcId')));
-                
-                $cuota->setEntidad($entidadDao->getEntidad($request->get('entidad.entId')));
-                
-                if($cuota->getEntidad()){
-                    if ($operacion == 'edit') {
-                        $cuotaDao->editCuota($cuota);
-                    }else if ($operacion == 'del') {
-                        $cuota->setAuditDeleted(true);
-
-                        $cuotaDao->editCuota($cuota);
-                    }else if ($operacion == 'add') {
-                        $cuotaDao->editCuota($cuota);
-                    }
-                    return new Response("{sc:true,msg:'' }");
-                }
-                //$cuotaDao->editCuota($cuota);
-
-                return new Response("{sc:true,msg:'NO ENTIDAD' }");
-        /*    }else{
-                return new Response(json_encode($form->getErrors()));//"{sc:false,msg:'Hubo errores en la actualización'}");
-            }
-        }else{
-            return new Response("{sc:true,msg:'NO POST METHOD', }");
-        }* /
-        $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
-    }
-    /***/
-    
-    /*
-     * Se encarga de cargar los datos de la cuota para que sean editados
-     * /
-    public function mantCargarCuotaAction($entId) {
-        $opciones = $this->getRequest()->getSession()->get('opciones');
-        //$cuota = new Cuota();
-        //$form->bindRequest($this->getRequest());//Capturar datos de Request a Form
-        
-        $cuotaDao = new CuotaDao($this->getDoctrine());
-        $cuota = $cuotaDao->getCuota($entId);
-        
-        if( !$cuota ){
-            $cuota = new Cuota();
-        }
-        
-        $form = $this->createForm(new CuotaType(), $cuota);
-
-        return $this->render('MinSalSidPlaAdminBundle:Cuota:showCuota.html.twig', 
-                array('form' => $form->createView(),'opciones'=>$opciones)
-        );
-    }*/
-    
-    
 }
 ?>

@@ -29,13 +29,14 @@
 
 namespace MinSal\SidPla\AdminBundle\Controller;
 
+use MinSal\SidPla\AdminBundle\Entity\OpcionSistema;
+use MinSal\SidPla\AdminBundle\Entity\RolSistema;
 use MinSal\SidPla\AdminBundle\EntityDao\RolDao;
 use MinSal\SidPla\AdminBundle\Form\Type\RolSistemaType;
-use MinSal\SidPla\AdminBundle\Entity\RolSistema;
-use MinSal\SidPla\AdminBundle\Entity\OpcionSistema;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
+use MinSal\SidPla\UsersBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AccionAdminRolesController extends Controller {
 
@@ -44,6 +45,8 @@ class AccionAdminRolesController extends Controller {
      *  un formulario, luego instancia una clase RolSistemaDao para
      *  manejar la persistencia de la entidad RolSistema, y retornara los
      *  mensajes de exito/fracaso del sistema.
+     * 
+     * @deprecated
      */
     public function addRolAction(Request $peticion) {
         $rol = new RolSistema();
@@ -80,31 +83,49 @@ class AccionAdminRolesController extends Controller {
      */
 
     public function consultarRolesAction() {
-        $opciones = $this->getRequest()->getSession()->get('opciones');
-
         $rolDao = new RolDao($this->getDoctrine());
         $roles = $rolDao->getRoles();
 
         $numfilas = count($roles);
 
-        $rol = new RolSistema();
-        $i = 0;
-
-        foreach ($roles as $rol) {
-            $rows[$i]['id'] = $rol->getIdRol();
-            $rows[$i]['cell'] = array($rol->getIdRol(),
-                $rol->getNombreRol(),
-                $rol->getFuncionesRol());
-            $i++;
-        }
-
         if ($numfilas != 0) {
-            array_multisort($rows, SORT_ASC);
+            //array_multisort($rows, SORT_ASC);
+            $tmpRol = new RolSistema();
+            $i = 0;
+
+            foreach ($roles as $rol) {
+                $tmpRol->setRolImportador($rol['rolImportador']);
+                $tmpRol->setRolProductor($rol['rolProductor']);
+                $tmpRol->setRolComprador($rol['rolComprador']);
+                $tmpRol->setRolCompVend($rol['rolCompVend']);
+
+                $tmpRol->setRolTipo($rol['rolTipo']);
+                $tmpRol->setRolInterno($rol['rolInterno']);
+                $tmpRol->setRolInternoTipo($rol['rolInternoTipo']);
+
+                $roles[$i]['rolImportadorText'] = $tmpRol->getRolImportadorText();
+                $roles[$i]['rolProductorText'] = $tmpRol->getRolProductorText();
+                $roles[$i]['rolCompradorText'] = $tmpRol->getRolCompradorText();
+                $roles[$i]['rolCompVendText'] = $tmpRol->getRolCompVendText();
+
+                $roles[$i]['rolTipoText'] = $tmpRol->getRolTipoText();
+                $roles[$i]['rolInternoText'] = $tmpRol->getRolInternoText();
+                $roles[$i]['rolInternoTipoText'] = $tmpRol->getRolInternoTipoText();
+
+                /*$roles[$i]['id'] = $rol->getIdRol();
+                $roles[$i]['cell'] = array(
+                    $rol->getIdRol(),
+                    $rol->getNombreRol(),
+                    $rol->getFuncionesRol()
+                );*/
+
+                $i++;
+            }
         } else {
-            $rows[0]['id'] = 0;
-            $rows[0]['cell'] = array(' ', ' ', ' ', ' ', ' ');
+            /*$rows[0]['id'] = 0;
+            $rows[0]['cell'] = array(' ', ' ', ' ', ' ', ' ');/**/
         }
-        $datos = json_encode($rows);
+        $datos = json_encode($roles);
 
         $pages = floor($numfilas / 10) + 1;
 
@@ -146,27 +167,65 @@ class AccionAdminRolesController extends Controller {
 
         $request = $this->getRequest();
 
-        $nombreRol = $request->get('nombre');
-        $funciones = $request->get('funciones');
+        $nombreRol = $request->get('nombreRol');
+        $funciones = $request->get('funcionesRol');
+        $rolImportador = $request->get('rolImportador');
+        $rolProductor = $request->get('rolProductor');
+        $rolComprador = $request->get('rolComprador');
+        $rolCompVend = $request->get('rolCompVend');
+        $rolInterno = $request->get('rolInterno');
+        $rolTipo = $request->get('rolTipo');
+        $rolInternoTipo = $request->get('rolInternoTipo');
+        
         $id = $request->get('id');
-
+        
         $operacion = $request->get('oper');
 
         $rolDao = new RolDao($this->getDoctrine());
 
         if ($operacion == 'edit') {
-            $rolDao->editRol($nombreRol, $funciones, $id);
-        }
-
-        if ($operacion == 'del') {
+            $rolSistema = new RolSistema();
+            $rolDao = new RolDao($this->getDoctrine());
+            $rolSistema = $rolDao->repositorio->find($id);
+            
+            if(!$rolSistema){
+                //throw $this->createNotFoundException('No se encontro rol con ese id '.$id);
+                return new Response('{"status":false,"msg":"No se encontro rol con este id->'.$id.'"}');
+            }
+            
+            $rolSistema->setNombreRol($nombreRol);
+            $rolSistema->setFuncionesRol($funciones);
+            $rolSistema->setRolImportador($rolImportador);
+            $rolSistema->setRolProductor($rolProductor);
+            
+            $rolSistema->setRolComprador($rolComprador);
+            $rolSistema->setRolCompVend($rolCompVend);
+            $rolSistema->setRolInterno($rolInterno);
+            $rolSistema->setRolTipo($rolTipo);
+            $rolSistema->setRolInternoTipo($rolInternoTipo);
+            
+            $rolDao->editRol($rolSistema);
+        }else if ($operacion == 'del') {
             $rolDao->delRol($id);
+            
+        }else if ($operacion == 'add') {
+            $rolSistema=new RolSistema();
+            
+            $rolSistema->setNombreRol($nombreRol);
+            $rolSistema->setFuncionesRol($funciones);
+            $rolSistema->setRolImportador($rolImportador);
+            $rolSistema->setRolProductor($rolProductor);
+            
+            $rolSistema->setRolComprador($rolComprador);
+            $rolSistema->setRolCompVend($rolCompVend);
+            $rolSistema->setRolInterno($rolInterno);
+            $rolSistema->setRolTipo($rolTipo);
+            $rolSistema->setRolInternoTipo($rolInternoTipo);
+            
+            $rolDao->addRol($rolSistema);
         }
 
-        if ($operacion == 'add') {
-            $rolDao->addRol($nombreRol, $funciones);
-        }
-
-        return new Response("{sc:true,msg:''}");
+        return new Response('{"status":true,"msg":""}');
     }
 
     public function asignarOpcRolesAction() {
@@ -285,6 +344,38 @@ class AccionAdminRolesController extends Controller {
         $rolDao = new RolDao($this->getDoctrine());
         $rolDao->deleteOpcSeleccRol($idRol, $idOpc);
         return $this->opcionesAsignadasAction();
+    }
+    
+    /**
+     * Devuelve el Select a utilizar para seleccionar los tipos de acciones que tendra asignado el Rol
+     * 
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function consultarTiposJSONSelectAction() {
+        $select = "<select>";
+        //$select = $select . "<option value='' >Seleccione una Acción</option>";
+        $select = $select . "<option value=" . User::$VENDEDOR . " >" . User::$VENDEDOR_TEXT . "</option>";
+        $select = $select . "<option value=" . User::$COMPRADOR . " >" . User::$COMPRADOR_TEXT . "</option>";
+        $select = $select . "<option value=" . User::$APROBADOR . " >" . User::$APROBADOR_TEXT . "</option>";
+        $select = $select . "<option value=" . User::$DIGITADOR . " >" . User::$DIGITADOR_TEXT . "</option>";
+        $select = $select . "</select>";
+
+        $response = new Response($select);
+        return $response;
+    }
+    
+    public function consultarInternoTiposJSONSelectAction() {
+        $select = "<select>";
+        $select = $select . "<option value='' >Seleccione un Ministerio</option>";
+        $select = $select . "<option value=" . User::$MINSAL . " >" . User::$MINSAL_TEXT . "</option>";
+        $select = $select . "<option value=" . User::$DGII . " >" . User::$DGII_TEXT . "</option>";
+        $select = $select . "<option value=" . User::$DGA . " >" . User::$DGA_TEXT . "</option>";
+        $select = $select . "<option value=" . User::$MH . " >" . User::$MH_TEXT . "</option>";
+        $select = $select . "<option value=" . User::$DNM . " >" . User::$DNM_TEXT . "</option>";
+        $select = $select . "</select>";
+
+        $response = new Response($select);
+        return $response;
     }
 
 }

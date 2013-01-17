@@ -2,45 +2,25 @@
 MinSalSidPlaAdminBundle_homepage:
     pattern:  /admin/
     defaults: { _controller: MinSalSidPlaAdminBundle:Default:index }
-    
-MinSalSidPlaAdminBundle_crearOpc:
-    pattern:  /admin/crearOpc
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:addOcp }
-    
-MinSalSidPlaAdminBundle_nuevaOpc:
-    pattern:  /admin/nuevaOpc
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:nuevaOpc }
 
+#**************#
+#**   ROLES  **#
+#**************#
 MinSalSidPlaAdminBundle_nuevoRol:
     pattern:  /admin/nuevoRol
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminRoles:nuevoRol }
-    
         
 MinSalSidPlaAdminBundle_crearRol:
     pattern:  /admin/crearRol
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminRoles:addRol }
-
         
 MinSalSidPlaAdminBundle_consultarRoles:
     pattern:  /admin/consultarRoles
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminRoles:consultarRoles }
     
-MinSalSidPlaAdminBundle_consultarOpciones:
-    pattern:  /admin/consultarOpc
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:consultarOpc, _format: json }
-    requirements: { _format: (xml|json), _method: GET }  
-
 MinSalSidPlaAdminBundle_manttRoles:
     pattern:  /admin/manttRoles
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminRoles:mattRoles }
-    
-MinSalSidPlaAdminBundle_mattOpciones:
-    pattern:  /admin/mattOpciones
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:mattOpciones }
-    
-MinSalSidPlaAdminBundle_manttOpcEdicion:
-    pattern:  /admin/manttOpcEdicion
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:manttOpcEdicion }
     
 MinSalSidPlaAdminBundle_manttRolEdicion:
     pattern:  /admin/manttRolEdicion
@@ -66,25 +46,39 @@ MinSalSidPlaAdminBundle_opcionesSinAsignar:
     pattern:  /admin/opcionesSinAsignar    
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminRoles:opcionesSinAsignar }
 
-MinSalSidPlaAdminBundle_consultarUnidadesOrg:
-    pattern:  /admin/consultarUnidadesOrg    
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:consultarUnidadesOrg }
+MinSalSidPlaAdminBundle_consultarTiposJSONSelect:
+    pattern:  /admin/consultarTiposJSONSelect
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminRoles:consultarTiposJSONSelect }
 
-MinSalSidPlaAdminBundle_ingresoNuevaUnidadesOrg:
-    pattern:  /admin/ingresoNuevaUnidadesOrg    
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:ingresoNuevaUnidadesOrg }
+MinSalSidPlaAdminBundle_consultarInternoTiposJSONSelect:
+    pattern:  /admin/consultarInternoTiposJSONSelect
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminRoles:consultarInternoTiposJSONSelect }
+
+#****************#
+#*** OPCIONES ***#
+#****************#
+MinSalSidPlaAdminBundle_crearOpc:
+    pattern:  /admin/crearOpc
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:addOcp }
     
-MinSalSidPlaAdminBundle_ingresarUnidadOrg:
-    pattern:  /admin/ingresarUnidadOrg    
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:ingresarUnidadOrg }  
+MinSalSidPlaAdminBundle_nuevaOpc:
+    pattern:  /admin/nuevaOpc
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:nuevaOpc }
+
+MinSalSidPlaAdminBundle_consultarOpciones:
+    pattern:  /admin/consultarOpc
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:consultarOpc, _format: json }
+    requirements: { _format: (xml|json), _method: GET }  
+
+MinSalSidPlaAdminBundle_mattOpciones:
+    pattern:  /admin/mattOpciones
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:mattOpciones }
     
-MinSalSidPlaAdminBundle_consultarMunicipiosJSON:
-    pattern:  /admin/consultarMunicipiosJSON    
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:consultarMunicipiosJSON } 
-    
-MinSalSidPlaAdminBundle_consultarUnidadesOrgJSON:
-    pattern:  /admin/consultarUnidadesOrgJSON    
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:consultarUnidadesOrgJSON }    
+MinSalSidPlaAdminBundle_manttOpcEdicion:
+    pattern:  /admin/manttOpcEdicion
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminOpciones:manttOpcEdicion }
+
+
 
 MinSalSidPlaAdminBundle_consultarMenCorrtemp:
     pattern:  /admin/consultarMenCorrtemp    
@@ -97,6 +91,8 @@ MinSalSidPlaAdminBundle_consultarMenCorrtempJSON:
 MinSalSidPlaAdminBundle_manttMenCorrtempEdicion:
     pattern:  /admin/manttMenCorrtempEdicion
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminMenCorreTemp:manttMenCorrtempEdicion }  
+    
+    
          
 MinSalSidPlaAdminBundle_mantenimientoNotificacion:
     pattern:  /admin/mantenimientoNotificacion   
@@ -109,34 +105,6 @@ MinSalSidPlaAdminBundle_consultarNotificacionJSON:
 MinSalSidPlaAdminBundle_manttNotificacionEdicion:
     pattern:  /admin/manttNotificacionEdicion
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionNotificacionSistema:manttNotificacionEdicion }   
-  
-MinSalSidPlaAdminBundle_mattUnidadesOrg:
-    pattern:  /admin/mattUnidadesOrg
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:mattUnidadesOrg }
-    
-MinSalSidPlaAdminBundle_mattEmpleados:
-    pattern:  /admin/mattEmpleados
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEmpleados:mattEmpleados } 
-    
-MinSalSidPlaAdminBundle_consultarEmpleadosJSON:
-    pattern:  /admin/consultarEmpleadosJSON
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEmpleados:consultarEmpleadosJSON } 
-
-MinSalSidPlaAdminBundle_manttEmpleadoEdicion:
-    pattern:  /admin/manttEmpleadoEdicion
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEmpleados:manttEmpleadoEdicion } 
-
-MinSalSidPlaAdminBundle_consultarUnidadesOrgJSONSelect:
-    pattern:  /admin/consultarUnidadesOrgJSONSelect
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:consultarUnidadesOrgJSONSelect } 
-    
-MinSalSidPlaAdminBundle_editarUnidadesOrg:
-    pattern:  /admin/editarUnidadesOrg    
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:editarUnidadesOrg }  
-    
-MinSalSidPlaAdminBundle_editandoUnidadesOrg:
-    pattern:  /admin/editandoUnidadesOrg    
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminUnidadOrg:editandoUnidadesOrg }  
 
 #****************************
 #*** Empresas o Entidades ***
@@ -144,20 +112,6 @@ MinSalSidPlaAdminBundle_editandoUnidadesOrg:
 MinSalSidPlaAdminBundle_mantEntidades:
     pattern:  /empresa/mantEntidades
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminEntidades:mantEntidades } 
-    
-#listado autorizado
-MinSalSidPlaAdminBundle_listadoDNM:
-    pattern:  /admin/listadoDNM
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:LoadListadoDNM } 
-#consulta listado
-MinSalSidPlaAdminBundle_ConsultarListadoDNM:
-    pattern:  /admin/ConsultarListadoDNM
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:ConsultarListadoDNM, _format: json }
-    requirements: { _format: (xml|json), _method: GET }  
-#manttlistado
-MinSalSidPlaAdminBundle_manttListadoDNMEdicion:
-    pattern:  /admin/manttListadoDNMEdicion
-    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:manttListadoDNMedicion }
     
 MinSalSidPlaAdminBundle_consultarEntidadesJSON:
     pattern:  /empresa/consultarEntidadesJSON
@@ -189,3 +143,21 @@ MinSalSidPlaAdminBundle_consultarCuotasJSON:
 MinSalSidPlaAdminBundle_consultarAlcoholesJSONSelect:
     pattern:  /empresa/consultarAlcoholesOrgJSONSelect
     defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminAlcoholes:consultarAlcoholesJSONSelect }
+
+#**********************
+#****  LISTADO DNM  ***
+#**********************
+#listado autorizado
+MinSalSidPlaAdminBundle_listadoDNM:
+    pattern:  /DNM/listadoDNM
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:LoadListadoDNM } 
+#consulta listado
+MinSalSidPlaAdminBundle_ConsultarListadoDNM:
+    pattern:  /DNM/ConsultarListadoDNM
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:ConsultarListadoDNM, _format: json }
+    requirements: { _format: (xml|json), _method: GET }  
+#manttlistado
+MinSalSidPlaAdminBundle_manttListadoDNMEdicion:
+    pattern:  /DNM/manttListadoDNMEdicion
+    defaults: { _controller: MinSalSidPlaAdminBundle:AccionAdminListadoDNM:manttListadoDNMedicion }
+    

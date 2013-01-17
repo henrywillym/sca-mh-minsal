@@ -33,15 +33,15 @@ class EntidadType extends AbstractType {
     
     public function buildForm(FormBuilder $builder, array $opciones){
         $builder->add('entId', 'hidden');
-        $builder->add('entVenc', 'date', array(
+        /*$builder->add('entVenc', 'date', array(
             'label' => 'Vencimiento del Permiso', 
             'widget'=>'choice',
             'input'=>'datetime',
             'format'=>'dd/MM/yyyy'
-        ));
+        ));/***/
         $builder->add('entRegDgii', 'text', array('label' => 'Registro de Usuario (MINSAL)'));
         $builder->add('entRegMinsal',  'text', array('label' => 'Número Resolución DGII'));
-        $builder->add('entNrc', 'text', array('label' => 'NCR','required'=>false));
+        $builder->add('entNrc', 'text', array('label' => 'NRC','required'=>false));
         $builder->add('entTel',  null, array('label' => 'Teléfono'));
         $builder->add('entGiro', null, array('label' => 'Giro o Actividad Económica'));
         $builder->add('entEmail',  'email', array('label' => 'E-mail', 'max_length'=>'50'));

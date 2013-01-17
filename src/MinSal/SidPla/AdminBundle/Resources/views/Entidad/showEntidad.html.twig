@@ -38,7 +38,16 @@
             HabProduccion();
             HabVendedor();
             HabCuotaImp();
-            HabCuotaLocal()
+            HabCuotaLocal();
+            
+            $('#Entidad_entImportador').parent().append($('#cuotaImport'))
+            $('#Entidad_entComprador').parent().append($('#cuotaLocal'))
+            $('#Entidad_entVenc').attr('readonly','readonly');
+            
+            
+            $('#Entidad_entNit').mask('9999-999999-999-9');
+            $('#Entidad_entNrc').mask('999999-9');
+            $('#Entidad_entRepNit').mask('9999-999999-999-9');
         }
         
         /**
@@ -149,6 +158,16 @@
                 }
             });
             
+            $('#Entidad_entTipoDoc').change(function(){
+                if( $('input[name="Entidad[entTipoDoc]"]:checked').val() =='P'){
+                    $('#Entidad_entRepDoc').unmask();
+                    
+                }else if ( $('input[name="Entidad[entTipoDoc]"]:checked').val() =='D'){
+                    $('#Entidad_entRepDoc').mask('99999999-9');
+                }
+            });
+            $('#Entidad_entTipoDoc').change();
+            
             $('#Entidad_entHabilitado').change(function(){
                 HabComentario();
             });
@@ -163,10 +182,6 @@
             
             
             $('form>table').show('fast',EventosIniciales);
-            
-            $('#Entidad_entImportador').parent().append($('#cuotaImport'))
-            $('#Entidad_entComprador').parent().append($('#cuotaLocal'))
-            $('#Entidad_entVenc').attr('readonly','readonly');
        });
     </script>
     
@@ -184,6 +199,12 @@
                         </div><br/>
                     {% endif %}
                     
+                        
+                    {% if autorizadoDNM == false %}
+                        <div class="flash-notice">
+                            {{autorizadoDNMText}}
+                        </div><br/>
+                    {% endif %}
                         
                     {% if entHabilitado == false %}
                         <div class="flash-notice">
