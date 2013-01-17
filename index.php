@@ -6,7 +6,7 @@
 	}
 	$uri .= $_SERVER['HTTP_HOST'];
 	
-	//header('Location: '.$uri.'/sca-mh-minsal/web/app_dev.php/SidPla');
+	//header('Location: '.$uri.'/sca-mh-minsal/web/app.php/login');
 	exit;
 ?>
 Something is wrong with the XAMPP installation :-(

@@ -50,13 +50,7 @@ class RolDao {
      *  Almacena un rol ingresado en el sistema
      */
     
-    public function addRol($nombreRol, $funciones) {
-        
-        $rolSistema=new RolSistema();
-        
-        $rolSistema->setNombreRol($nombreRol);
-        $rolSistema->setFuncionesRol($funciones);
-	    
+    public function addRol($rolSistema) {
         $this->em->persist($rolSistema);
         $this->em->flush();	    
         $matrizMensajes = array('El proceso de almacenar rol termino con exito', 'Rol '.$rolSistema->getIdRol());
@@ -69,8 +63,14 @@ class RolDao {
      */    
     
     public function getRoles() {	    
-        $roles=$this->repositorio->findAll();
-        return $roles;
+        $roles = $this->em->createQuery("SELECT R
+                                          FROM MinSalSidPlaAdminBundle:RolSistema R
+                                          order by R.nombreRol DESC");
+        
+        return $roles->getArrayResult();
+        
+        //$roles=$this->repositorio->findAll();
+        //return $roles;
     }
     
      public function getRolEspecifico($id) {	    
@@ -84,18 +84,7 @@ class RolDao {
          */
         
         
-        public function editRol($nombre, $funciones, $id){
-            
-            $rol=new RolSistema();            
-            $rol=$this->repositorio->find($id);
-            
-            if(!$rol){
-                throw $this->createNotFoundException('No se encontro rol con ese id '.$id);
-            }
-            
-            $rol->setFuncionesRol($funciones);
-            $rol->setNombreRol($nombre);
-            
+        public function editRol($rol){
             $this->em->flush();            
             $matrizMensajes = array('El proceso de almacenar termino con exito', 'Rol '.$rol->getIdRol());
  

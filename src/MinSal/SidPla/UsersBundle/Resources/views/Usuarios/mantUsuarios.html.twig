@@ -85,7 +85,8 @@
                             //width:90
                         }
                     {%endif%}
-                ]
+                ],
+                ondblClickRow: function(){$("#editarUsuario").click()}
             });
             
             myGrid.jqGrid('navGrid','#pager',{
@@ -143,7 +144,7 @@
                 {% if(userInterno=='true') %}
                     Listado de Usuarios de Ministerios
                 {%else%}
-                    Listado de Usuarios de {{entNombre}}
+                    Listado de Usuarios de "{{entNombre}}"
                 {%endif%}
             </h1>
             
@@ -153,11 +154,11 @@
                     </div><br/>
                 {% endif %}
                     
-                {% for key, message in app.session.getFlashes() %}
+                {# for key, message in app.session.getFlashes() %}
                     <div class="flash-notice" id="{{ key }}">
                         {{ message|trans({}, 'FOSUserBundle') }}
                     </div>
-                {% endfor %}
+                {% endfor #}
             <table id="theGrid" class="scroll">
             </table> 
             

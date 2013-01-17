@@ -1,32 +1,10 @@
 <?php
 
-/*
-  SIDPLA - MINSAL
-  Copyright (C) 2011  Bruno González   e-mail: bagonzalez.sv EN gmail.com
-  Copyright (C) 2011  Universidad de El Salvador
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.  
-  
- */
-
 /**
  * Description of ListadoDNMDao
  *
- * @author Bruno González
+ * @author Daniel Diaz
  */
-
-
 namespace MinSal\SidPla\AdminBundle\EntityDao;
 
 use MinSal\SidPla\AdminBundle\Entity\ListadoDNM;
@@ -35,9 +13,9 @@ use MinSal\SidPla\AdminBundle\Entity\ListadoDNM;
  *  ListadoDNMDao: Parte de la capa de Acceso a Datos, para separar la logica de
  *  Acceso a Datos 
  */
-
-class ListadoDNMDao 
-{
+class ListadoDNMDao {
+        public static $MSG_ERROR_DNM_NOAUTH = '**** ERROR **** La empresa no se encuentra registrada en el Listado de Personas Autorizadas por la Dirección Nacional de Medicamentos';
+        
 	var $doctrine;
         var $repositorio;
         var $em;    
@@ -54,7 +32,6 @@ class ListadoDNMDao
    	 *  
    	 *  Retorna mensajes del sistema que indican si es exito o fracaso.
    	 */	
-
 	public function addListadoDNM($id, $nombres, $apellidos, $year, $nit,$nrc,$tipo_persona,$razon) {
             
             $ListadoDNM=new ListadoDNM();            
@@ -76,9 +53,8 @@ class ListadoDNMDao
 	}
         
          /*
-         *  Obtiene todos los roles del sistema.
+         *  Obtiene todos los registros de DNM del sistema.
          */    
-
         public function getListado() {	    
             $listadoDNM=$this->repositorio->findAll();
             return $listadoDNM;
@@ -87,8 +63,6 @@ class ListadoDNMDao
         /*
          * Actualizar ListadoDNM
          */
-        
-        
         public function editListadoDNM($id, $nombres, $apellidos, $year, $nit,$nrc,$tipo_persona,$razon){
             
             $ListadoDNM= new ListadoDNM();            
@@ -118,8 +92,6 @@ class ListadoDNMDao
         /*
          * eliminar ListadoDNM
          */
-        
-        
         public function delListadoDNM($id){            
   
             $ListadoDNM=$this->repositorio->find($id);
@@ -135,5 +107,30 @@ class ListadoDNMDao
 
             return $matrizMensajes;
         }
-       
+        
+        /**
+         * Funcion que verifica si la persona natural o juridica se encuentra registrada en el listado de autorizados por DNM
+         * para permitirle la inscripción y actualización de cuotas.
+         * @param int $year Año para el cual se verificará si se encuentra registrado
+         * @param string $NRC Numero de Registro de Contribuyente con el cual se realizara la busqueda.
+         * @return boolean true= Se encuentra autorizado , False= No tiene permisos.
+         */
+        public function estaAutorizado($year, $NRC, $NIT){
+            $result = $this->em->createQuery("SELECT count(e) 
+                                          FROM MinSalSidPlaAdminBundle:ListadoDNM e
+                                          WHERE e.ldnm_year = :ldnm_year
+                                            AND e.ldnm_nrc = :ldnm_nrc
+                                            AND e.ldnm_nit = :ldnm_nit")
+                ->setParameter('ldnm_year',$year)
+                ->setParameter('ldnm_nrc',$NRC)
+                ->setParameter('ldnm_nit',$NIT);
+            
+            $cant = $result->getSingleScalarResult();
+            
+            if($cant == 0){
+                return false;
+            }else{
+                return true;
+            }
+        }
 }

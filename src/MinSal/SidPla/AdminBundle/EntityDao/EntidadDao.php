@@ -20,7 +20,9 @@ class EntidadDao {
     }
 
     /**
-     *  Obtiene todos las entidades.
+     * Obtiene todos las entidades.
+     * 
+     * @return Array
      */
     public function getEntidades() {
         $entidades = $this->em->createQuery("SELECT E

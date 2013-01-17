@@ -1,0 +1,17 @@
+{% extends 'MinSalSidPlaBundle:Default:index.html.twig' %}
+
+{% block body %}
+    <h1>Ocurrio un Error</h1>
+    <h2>El servidor retorno "{{ status_code }} {{ status_text }}".</h2>
+
+    <div><H3>
+        {% if(status_code == 403) %}
+            No tiene permisos de Administrador para ingresar a esta opción. Regrese a la página anterior e intente nuevamente.
+        {% else %}
+            Ocurrio un error en la aplicación. Regrese a la página anterior e intente nuevamente. Si el problema persiste, contacte al 
+            departamento de informática del Ministerio de Salud.
+        {% endif %}
+        </H3>
+    </div>
+    <br/><hr/>
+{% endblock body%}

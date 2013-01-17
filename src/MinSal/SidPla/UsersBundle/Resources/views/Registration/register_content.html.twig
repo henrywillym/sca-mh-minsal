@@ -1,4 +1,4 @@
-{% form_theme form theme %}
+{% form_theme form 'MinSalSidPlaUsersBundle:ChangePassword/Form:fields.html.twig' %}
 
 <script type="text/javascript">
     $(document).ready(function(){
@@ -62,7 +62,6 @@
             $('#userInternoTipo').parent().parent().show();     //Mostrar Ministerio
             
             $('#fos_user_registration_form_userInternoTipo').attr('required','required');
-            //TODO: Agregar validacion del ROL
             
             var opciones = $('#fos_user_registration_form_userTipo').children();
             opciones.filter(function(index){
@@ -85,7 +84,6 @@
             $('#userInternoTipo').parent().parent().hide();
             
             $('#fos_user_registration_form_userInternoTipo').removeAttr('required');
-            //TODO: Agregar validacion del ROL
             
             var opciones = $('#fos_user_registration_form_userTipo').children();
             opciones.filter(function(index){
@@ -159,7 +157,9 @@
                     <td><label id="plainPasswordfirst" >Contraseña:</label></td>
                     <td>
                         {{ form_widget(form.plainPassword.first) }}
-                        {{ form_errors(form.plainPassword) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.plainPassword) }}
+                        </div>
                     </td>
                 </tr>   
                 <tr>
@@ -170,7 +170,9 @@
                     <td><label id="email" >Email:</label></td>
                     <td>
                         {{ form_widget(form.email) }}
-                        {{ form_errors(form.email) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.email) }}
+                        </div>
                     </td>
                 </tr>            
                 
