@@ -59,16 +59,15 @@
          beforeRefresh: function() {myGridSeleccionadas.jqGrid('setGridParam',{datatype:'json',loadonce:true}).trigger('reloadGrid');}}).hideCol('id');         
             
             
-      $.getJSON('consultarRoles', function(data) {
-              var i=0;
-              $.each(data, function(key, val) {
-                  if(key=='rows'){
-                    $.each(val, function(id, registro){
-                        $('#selecrol').append('<option value="'+registro['cell'][0]+'">'+registro['cell'][1]+'</option>');
-                    });                    
-                  }
-              });
-      });
+    $.getJSON('{{ url('MinSalSidPlaAdminBundle_consultarRoles')}}', function(data) {
+        $.each(data, function(key, val) {
+            if(key=='rows'){
+                $.each(val, function(key, registro){
+                    $('#selecrol').append('<option value="'+registro.idRol+'">'+registro.nombreRol+'</option>');
+                });                    
+            }
+        });
+    });
   
   function cargarSeleccionado(){
         $('#gridSelecc').setGridParam({url:'opcionesAsignadas?reg='+$('#selecrol').val()}); 

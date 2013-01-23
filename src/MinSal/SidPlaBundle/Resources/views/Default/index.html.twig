@@ -12,6 +12,11 @@
         <link href="{{ asset('bundles/minsalsidpla/css/jqModal.css') }}" type="text/css" rel="stylesheet" />           
         <link href="{{ asset('bundles/minsalsidpla/menuSidPla/pro_drop_1.css') }}" type="text/css" rel="stylesheet" /> 
         <link href="{{ asset('bundles/minsalsidpla/images/icono.png') }}" type="imagen/png" rel="Shortcut Icon" /> 
+        <style>
+            label{
+                font-size: small;
+            }
+        </style>
         {% endblock %}
 
 
@@ -38,8 +43,8 @@
                      {% set nivel = 1 %} 
                      $(function crearMenu() {
                          {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %} 
-                             {% if opciones is defined %}
-                                 $('#nav').append('<li id="liInicio0" class="top"><a  class="top_link" href="{{ path('MinSalSidPlaBundle_homepage') }}"><span >Inicio</span></a></li>');                                        
+                            $('#nav').append('<li id="liInicio0" class="top"><a  class="top_link" href="{{ path('MinSalSidPlaBundle_homepage') }}"><span >Inicio</span></a></li>'); 
+                            {% if opciones is defined %}
                                  {% if nivel < 3  %}                                    
                                     {% for opc in opciones %}
                                         {% if opc.idOpcionSistema2 is empty %}
@@ -62,7 +67,7 @@
                                         $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_security_logout') }}"><span >{{ 'Salir'|trans({}, 'FOSUserBundle') }} </span></a></li>');                                           
                                  {% endif %}  
                              {% endif %}  
-                             $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('MinSalSidPlaUsersBundle_mantChangePassword') }}"><span >{{ 'Cambiar Contraseña'|trans({}, 'FOSUserBundle') }}</span></a></li>');
+                             $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('MinSalSidPlaUsersBundle_mantChangePassword') }}"><span >{{ 'Cambiar Clave'|trans({}, 'FOSUserBundle') }}</span></a></li>');
                              $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_security_logout') }}"><span >{{ 'Salir'|trans({}, 'FOSUserBundle') }}</span></a></li>');                                
                              <!--$('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_profile_show') }}"><span >{{ 'Perfil'|trans({}, 'FOSUserBundle') }}</span></a></li>');-->
                          {% else %}                                 

@@ -1,0 +1,37 @@
+<html>
+    <head>
+    </head>
+    <body>
+        Buen día <b>{{ user.userPrimerNombre}} {{ user.userSegundoNombre}} {{ user.userApellidos}}</b><br/>
+        <br/>
+        Para activar su cuenta del Sistema de Control de Alcoholes debe ingresar al siguiente link: <br/>
+        <br/>
+            {{ confirmationUrl }}
+        <br/>
+        Sus credenciales son:<br/>
+        <table style="border:0">
+            <tr>
+                <td align="right">
+                    <b>Usuario</b>:
+                </td><td>
+                    {{ user.username }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Clave</b>:
+                </td>
+                <td>
+                    {{ user.plainPassword }}
+                </td>
+            </tr>
+        </table><br/>
+        Le recomendamos cambiar su clave al ingresar al sitio web, utilizando la opcion "Cambiar Clave".<br/>
+        <br/>
+        Saludos,<br/>
+        Equipo Sistema de Control de Alcoholes<br/>
+        SCA - MINSAL/MH<br/>
+        El Salvador<br/>
+
+    </body>
+</html>

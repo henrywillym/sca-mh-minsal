@@ -38,9 +38,9 @@ MinSalSidPlaUsersBundle_mantCargarUsuario:
     pattern:  /mantCargarUsuario/{userInterno}/{idUsuario}/{entId}
     defaults: { _controller: MinSalSidPlaUsersBundle:Default:mantCargarUsuario } 
     
-#*******************
-#***  PASSWORD  ****
-#*******************
+#************************
+#***  Cambiar Clave  ****
+#************************
 MinSalSidPlaUsersBundle_mantChangePassword:
     pattern:  /changePassword/load
     defaults: { _controller: MinSalSidPlaUsersBundle:ChangePassword:mantChangePassword } 
@@ -48,3 +48,11 @@ MinSalSidPlaUsersBundle_mantChangePassword:
 MinSalSidPlaUsersBundle_changePassword:
     pattern:  /changePassword/edit
     defaults: { _controller: MinSalSidPlaUsersBundle:ChangePassword:changePassword }
+
+#************************
+#***  Resset Clave  ****
+#************************
+#MinSalSidPlaUsersBundle_reset:
+# Esta definicion de ruta se encuentra en app/routing.yml
+# Esta ahí debido a que este bundle utiliza un prefijo /users/
+# Entonces se dejo asi para evitar otra regla de seguridad en security.yml.

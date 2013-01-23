@@ -43,3 +43,12 @@ fos_user_resetting:
 fos_user_change_password:
     resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"
     prefix: /change-password
+
+
+    
+#************************
+#***  Resset Clave  ****
+#************************
+MinSalSidPlaUsersBundle_reset:
+    pattern:  /resetting/resetPassword/{token}
+    defaults: { _controller: MinSalSidPlaUsersBundle:Resetting:reset } 

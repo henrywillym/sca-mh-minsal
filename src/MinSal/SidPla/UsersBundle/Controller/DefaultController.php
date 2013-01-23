@@ -165,17 +165,21 @@ class DefaultController extends BaseController {
              *****************************************************/
             
             $url= null;
-            if ($confirmationEnabled) {
+            /*if ($confirmationEnabled) {
                 $this->container->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
                 $route = 'fos_user_registration_check_email';
                 
                 $this->setFlash('fos_user_success', 'registration.flash.user_created');
                 $url = $this->container->get('router')->generate($route);
 
-            } else {
+            } else {/**/
                 //$this->authenticateUser($user);
                 //$route = 'fos_user_registration_confirmed';
-                $this->setFlash('fos_user_success', 'El usuario ha sido guardado exitosamente');
+                if($confirmationEnabled){
+                    $this->setFlash('notice', 'El usuario ha sido guardado exitosamente y se envio correo electrónico para su activación');
+                }else{
+                    $this->setFlash('notice', 'El usuario ha sido guardado exitosamente');
+                }
                 
                 $route = 'MinSalSidPlaUsersBundle_mantMostrarUsuarios';
                 $url = $this->container->get('router')->generate($route, array(
@@ -184,7 +188,7 @@ class DefaultController extends BaseController {
                     'entNombre' => $entNombre,
                     'opciones' => $opciones,
                 ));
-            }
+            //}
             return new RedirectResponse($url);
         }
         
@@ -200,79 +204,6 @@ class DefaultController extends BaseController {
         ));
     }
     
-    /*
-    public function mostrarUsuariosSinRolAction() {
-        $opciones = $this->getRequest()->getSession()->get('opciones');
-
-        $rolDao = new RolDao($this->getDoctrine());
-        $roles = $rolDao->getRoles();
-        $aux = new RolSistema();
-        $cadena = '';
-        $i = 1;
-        $n = count($roles);
-        foreach ($roles as $aux) {
-            if ($i != $n)
-                $cadena.=$aux->getIdRol() . ':' . $aux->getNombreRol() . ';';
-            else
-                $cadena.=$aux->getIdRol() . ':' . $aux->getNombreRol();
-            $i++;
-        }
-
-        return $this->render('MinSalSidPlaUsersBundle:Usuarios:manttUsuariosSinRol.html.twig', array('opciones' => $opciones, 'roles' => $cadena));
-    }
-
-    public function consultarUsuarioSinRolJSONAction() {
-
-        $usuarioDao = new UserDao($this->getDoctrine());
-        $usuarios = $usuarioDao->getUserSinRol();
-
-        $numfilas = count($usuarios);
-
-        $aux = new User();
-        $i = 0;
-
-        foreach ($usuarios as $aux) {
-            $rows[$i]['id'] = $aux->getIdUsuario();
-            $rows[$i]['cell'] = array($aux->getIdUsuario(),
-                $aux->getUsername(),
-                $aux->getUserPrimerNombre() . ' ' . $aux->getUserApellidos(),
-                $aux->getUserInternoTipo()
-            );
-            $i++;
-        }
-
-        if ($numfilas != 0) {
-            array_multisort($rows, SORT_ASC);
-        } else {
-            $rows[0]['id'] = 0;
-            $rows[0]['cell'] = array(' ', ' ', ' ', ' ');
-        }
-
-        $datos = json_encode($rows);
-        $pages = floor($numfilas / 10) + 1;
-
-        $jsonresponse = '{
-               "page":"1",
-               "total":"' . $pages . '",
-               "records":"' . $numfilas . '", 
-               "rows":' . $datos . '}';
-
-
-        $response = new Response($jsonresponse);
-        return $response;
-    }
-
-    public function editarUsuarioSinRolAction() {
-        $request = $this->getRequest();
-        $codigoUsuario = $request->get('id');
-        $numRol = $request->get('rol');
-
-        $userDao = new UserDao($this->getDoctrine());
-        $userDao->editUserSinRol($codigoUsuario, $numRol);
-
-        return new Response("{sc:true,msg:''}");
-    }/**/
-
     public function verificaCreacionAction() {
         $request = $this->container->get("request");
         $idUsuario = $request->get('idUsuario');
