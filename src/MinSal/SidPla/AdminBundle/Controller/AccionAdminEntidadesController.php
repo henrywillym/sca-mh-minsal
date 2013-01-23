@@ -52,7 +52,8 @@ class AccionAdminEntidadesController extends Controller {
         if ($numfilas != 0) {
             //array_multisort($entidades, SORT_ASC);
             $entidad = new Entidad();
-            $i=0;
+            $i = 0;
+            
             foreach ($entidades as $ent) {
                 $entidad->setEntImportador($ent['entImportador']);
                 $entidad->setEntProductor($ent['entProductor']);

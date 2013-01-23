@@ -2,8 +2,10 @@
 
 namespace MinSal\SidPla\AdminBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use MinSal\SidPla\AdminBundle\Entity\Entidad;
+use MinSal\SidPla\UsersBundle\Entity\User;
 
 /**
  * MinSal\SidPla\AdminBundle\Entity\RolSistema
@@ -112,6 +114,12 @@ class RolSistema{
     {
         $this->usuarios = new ArrayCollection();
         $this->opcionesSistema = new ArrayCollection();
+        $this->rolImportador = false;
+        $this->rolProductor = false;
+        $this->rolComprador = false;
+        $this->rolCompVend = false;
+        $this->rolInterno = true; //No hay razon especial por la cual se le puso true
+        $this->rolInternoTipo = null;
     }
 
     
@@ -175,9 +183,9 @@ class RolSistema{
     /**
      * Add usuarios
      *
-     * @param MinSAl\SidPla\UsersBundle\Entity\User $usuarios
+     * @param MinSal\SidPla\UsersBundle\Entity\User $usuarios
      */
-    /*public function addUsuarios(\MinSAl\SidPla\UsersBundle\Entity\User $usuarios)
+    /*public function addUsuarios(\MinSal\SidPla\UsersBundle\Entity\User $usuarios)
     {
         $this->usuarios[] = $usuarios;
     }*/
@@ -202,7 +210,7 @@ class RolSistema{
     /**
      * Add opcionesSistema
      *
-     * @param MinSal\SidPla\AdminBundle\Entity\OpcionSistema $opcionesSistema
+     * @param \MinSal\SidPla\AdminBundle\Entity\OpcionSistema $opcionesSistema
      */
     public function addOpcionesSistema(\MinSal\SidPla\AdminBundle\Entity\OpcionSistema $opcionesSistema)
     {
@@ -232,7 +240,7 @@ class RolSistema{
     /**
      * Add opcionesSistema
      *
-     * @param MinSal\SidPla\AdminBundle\Entity\OpcionSistema $opcionesSistema
+     * @param \MinSal\SidPla\AdminBundle\Entity\OpcionSistema $opcionesSistema
      */
     public function addOpcionSistema(\MinSal\SidPla\AdminBundle\Entity\OpcionSistema $opcionesSistema)
     {
@@ -292,6 +300,92 @@ class RolSistema{
     }
 
     public function setRolInternoTipo($rolInternoTipo) {
+        if($rolInternoTipo == ''){
+            $rolInternoTipo = null;
+        }
         $this->rolInternoTipo = $rolInternoTipo;
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getRolInternoText() {
+        if($this->getRolInterno()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getRolImportadorText() {
+        if($this->getRolImportador()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getRolProductorText() {
+        if($this->getRolProductor()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getRolCompVendText() {
+        if($this->getRolCompVend()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    /**
+     * Aca se determina el texto que se presenta en el grid
+     */
+    public function getRolCompradorText() {
+        if($this->getRolComprador()){
+            return Entidad::$SI;
+        }else {
+            return Entidad::$NO;
+        }
+    }
+    
+    public function getRolInternoTipoText() {
+    	//ACA SE FILTRA CUAL ES EL TIPO DE MINISTERIO AL QUE PERTENECE
+        if($this->getRolInternoTipo() == User::$MINSAL){
+            return User::$MINSAL_TEXT;
+        }else if($this->getRolInternoTipo() == User::$DGII){
+            return User::$DGII_TEXT;
+        }else if($this->getRolInternoTipo() == User::$DGA){
+            return User::$DGA_TEXT;
+        }else if($this->getRolInternoTipo() == User::$MH){
+            return User::$MH_TEXT;
+        }else if($this->getRolInternoTipo() == User::$DNM){
+            return User::$DNM_TEXT;
+        }
+    }
+    
+    public function getRolTipoText() {
+        //Aca se determina el texto de que tipo de usuario es y las acciones que puede realizar.
+        if($this->getRolTipo() == User::$VENDEDOR){
+            return User::$VENDEDOR_TEXT;
+        }else if($this->getRolTipo() == User::$COMPRADOR){
+            return User::$COMPRADOR_TEXT;
+        }else if($this->getRolTipo() == User::$APROBADOR){
+            return User::$APROBADOR_TEXT;
+        }else if($this->getRolTipo() == User::$DIGITADOR){
+            return User::$DIGITADOR_TEXT;
+        }
     }
 }
