@@ -26,17 +26,21 @@ class AlcoholDao {
     }
 
     /*
-     *  Obtiene todos los registros de alcoholes
+     *  Obtiene todos los registros de alcoholes activos
      */
-
     public function getAlcoholes() {
-        $alcoholes = $this->repositorio->findAll();
-        return $alcoholes;
+        //$alcoholes = $this->repositorio->findAll();
+        $alcoholes = $this->em->createQuery("SELECT A
+                                                FROM MinSalSidPlaAdminBundle:Alcohol A
+                                                WHERE A.auditDeleted = false
+                                                order by A.alchNombre ASC");
+        return $alcoholes->getArrayResult();
     }
     
     public function getAlcohol($id) {
         return $this->repositorio->find($id);
     }
+    
     /*
      * Insertar nueva unidad organizativa
      */

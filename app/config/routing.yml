@@ -47,8 +47,15 @@ fos_user_change_password:
 
     
 #************************
-#***  Resset Clave  ****
+#***  Reset Clave  ****
 #************************
 MinSalSidPlaUsersBundle_reset:
     pattern:  /resetting/resetPassword/{token}
     defaults: { _controller: MinSalSidPlaUsersBundle:Resetting:reset } 
+
+#************************************************
+#***     Solicitudes, Auditoria Externas     ****
+#************************************************
+MinSalSidPlaSCAProcesosBundle:
+    resource: "@MinSalSidPlaSCAProcesosBundle/Resources/config/routing.yml"
+    prefix:   /SidPla/
