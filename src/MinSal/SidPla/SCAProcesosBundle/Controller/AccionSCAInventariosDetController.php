@@ -79,6 +79,9 @@ class AccionSCAInventariosDetController extends Controller {
      */
     public function mantInventarioDetEdicionAction(Request $request) {
         $inventarioDetTmp = new InventarioDet();
+        $alcoholDao = new AlcoholDao($this->getDoctrine());
+        var_dump($alcoholDao->getAlcohol(1));die;
+        //$this->getDoctrine()->getEntityManager()->persist($inventarioDetTmp->getAlcohol());
         $form = $this->createForm(new InventarioDetType(), $inventarioDetTmp);
         $form->bindRequest($request);
         
@@ -88,13 +91,14 @@ class AccionSCAInventariosDetController extends Controller {
         $alcoholDao = new AlcoholDao($this->getDoctrine());
         
         $user = $this->get('security.context')->getToken()->getUser();
-        
-        
+        //$this->getDoctrine()->getEntityManager()->persist($inventarioDet->getAlcohol());
         $form = $this->createForm(new InventarioDetType(),$inventarioDet);
         
         $form->bindRequest($request);
         
         if($form->isValid()){
+            $inventarioDet->setAlcohol($alcoholDao->getAlcohol($inventarioDetTmp->getAlcohol()->getAlcId()));
+            $inventarioDetTmp->setAlcohol($alcoholDao->getAlcohol($inventarioDetTmp->getAlcohol()->getAlcId()));
             
             if( $inventarioDet->getInvDetId() ){
                 $inventarioDetOld = $inventarioDetDao->getInventarioDet($inventarioDetTmp->getInvDetId());
@@ -144,7 +148,7 @@ class AccionSCAInventariosDetController extends Controller {
 
                     //## Detalle de inventario
                     $inventarioDet->getInventario()->addInventarioDet($inventarioDet);
-                    $inventarioDet->setInvDetFecha(new \Date());
+                    $inventarioDet->setInvDetFecha(new \DateTime());
                 }else{
                     //Si el encabezado no cambia
                     $invLitros = $inventarioDet->getInventario()->getInvLitros();
@@ -192,7 +196,7 @@ class AccionSCAInventariosDetController extends Controller {
             }
 
             //##################################################################################################
-            
+            var_dump($inventarioDet->getInventario()->getAlcohol());die;
             $inventarioDetDao->editInventarioDet($inventarioDet);
             $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
             return $this->redirect(

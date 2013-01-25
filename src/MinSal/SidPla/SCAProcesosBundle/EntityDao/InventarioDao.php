@@ -55,7 +55,13 @@ class InventarioDao {
                 ->setParameter('alcId', $alcId)
                 ->setParameter('invGrado', $invGrado)
                 ->setParameter('invNombreEsp', $invNombreEsp);
-        return $registros->getSingleResult();
+        $result= $registros->getResult();
+        
+        if($result !=null && count($result)>0){
+            return $result[0];
+        }else{
+            return null;
+        }
     }
 
     public function addInventario(Inventario $inventario) {

@@ -38,7 +38,12 @@ class AlcoholDao {
     }
     
     public function getAlcohol($id) {
-        return $this->repositorio->find($id);
+        //return $this->repositorio->find($id);
+        $registros = $this->em->createQuery("SELECT E, A
+                                          FROM MinSalSidPlaAdminBundle:Alcohol E JOIN E.grupo A
+                                          WHERE E.alcId= :alcId")
+                ->setParameter('alcId',$id);
+        return $registros->getSingleResult();
     }
     
     /*
