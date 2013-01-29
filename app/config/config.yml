@@ -73,7 +73,7 @@ fos_user:
             type: sidpla_user_registration
             handler: sidpla_user.form.handler.registration
         confirmation:
-            enabled: true
+            enabled: false
             from_email:
                 address: registration@sca.gob.sv
                 sender_name: SCA Registro Usuario
