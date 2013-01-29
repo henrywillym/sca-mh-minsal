@@ -1,11 +1,12 @@
 <?php
 namespace MinSal\SidPla\SCAProcesosBundle\Form\Type;
 
+use Doctrine\ORM\EntityRepository;
+use MinSal\SidPla\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SidPla\AdminBundle\Form\Type\AlcoholType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Doctrine\ORM\EntityRepository;
 
 
 /**
@@ -14,7 +15,13 @@ use Doctrine\ORM\EntityRepository;
  * @author Henry Willy Melara
  */
 class InventarioDetType extends AbstractType {
-   
+    private $doctrine;
+    
+    public function __construct($doctrine){
+        $this->doctrine = $doctrine;
+    }
+    
+    
     /**
      * Utilizado en Symfony 2.1
      * 
@@ -31,7 +38,7 @@ class InventarioDetType extends AbstractType {
      * @param array $options
      * @return type
      */
-    public function getDefaultOption(array $options){
+    public function getDefaultOptions(array $options){
         return array(
             'data_class' => 'MinSal\SidPla\SCAProcesosBundle\Entity\InventarioDet'
         );
@@ -39,20 +46,26 @@ class InventarioDetType extends AbstractType {
     
     public function buildForm(FormBuilder $builder, array $opciones){
         $builder->add('invDetId', 'hidden');
-        //$builder->add('alcohol.alcId', null, array('label' => 'Nombre del Alcohol', 'property_path' => false));
-        //$builder->add('entidad.entId', null, array('label' => 'Nombre del Alcohol', 'property_path' => false));
         
-        $builder->add('alcohol', 'entity', array(
+        /*$builder->add('alcohol', 'entity', array(
             'class'=>'MinSalSidPlaAdminBundle:Alcohol',
             'query_builder' => function(EntityRepository $er) {
                 return $er->createQueryBuilder('u')
                         ->where('u.auditDeleted = false');
-            },/**/
+            },
             'property'=> 'alcNombre',
             'expanded'=>false,
-            'multiple'=>false
+            'multiple'=>false,
+            //'em'=> 'doctrine.orm.entity_manager'
         ));/**/
-        
+        $builder->add('alcId', 'choice', array(
+            'choices' => $this->getAlcoholes(),
+            'required' => true,
+            'expanded' => false,
+            'multiple' => false,
+            'empty_value' => 'Debe Seleccionar un Alcohol'
+        ));
+            
         $builder->add('invNombreEsp', null, array('label' => 'Nombre Específico'));
         $builder->add('invGrado', null, array('label' => 'Grado'));
         $builder->add('invDetLitros',  null, array('label' => 'Cuota (Lts)'));
@@ -61,6 +74,19 @@ class InventarioDetType extends AbstractType {
 
     public function getName(){
         return 'InventarioDet';
+    }
+    
+    private function getAlcoholes(){
+        $alcoholDao = new AlcoholDao($this->doctrine);
+        $alcoholes = $alcoholDao->getAlcoholes();
+        
+        $lista = array();
+        
+        foreach($alcoholes as $alc){
+            $lista[$alc['alcId']] = $alc['alcNombre'];
+        }
+        
+        return $lista;
     }
 }
 

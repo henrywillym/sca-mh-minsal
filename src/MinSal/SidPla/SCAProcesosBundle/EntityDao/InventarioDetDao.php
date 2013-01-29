@@ -30,20 +30,21 @@ class InventarioDetDao {
                                                 JOIN E.inventario A 
                                                 JOIN A.entidad B
                                                 JOIN A.alcohol C
-                                          WHERE B.entId = :entId")
+                                          WHERE B.entId = :entId
+                                            AND E.auditDeleted = false")
                 ->setParameter('entId', $entId);
         return $registros->getArrayResult();
     }
 
     public function getInventarioDet($id) {
-        //return $this->repositorio->find($id);
-         $registros = $this->em->createQuery("SELECT E
+        return $this->repositorio->find($id);/*
+        $registros = $this->em->createQuery("SELECT E
                                           FROM MinSalSidPlaSCAProcesosBundle:InventarioDet E
                                           WHERE E.invDetId = :invDetId
+                                            AND E.audit_deleted = false
                                           order by E.auditDateUpd DESC, E.auditDateIns DESC")
-                //->setParameter('entId',$entId)
                 ->setParameter('invDetId',$id);
-        return $registros->getSingleResult();
+        return $registros->getSingleResult();/**/
     }
 
     public function addInventarioDet(InventarioDet $inventarioDet) {
@@ -62,13 +63,16 @@ class InventarioDetDao {
         return $matrizMensajes;
     }
     
-    public function delInventarioDet(InventarioDet $inventarioDet) {
-        if (!$inventarioDet) {
-            throw $this->createNotFoundException('No se encontro entidad con ese id ' . $inventarioDet->getInvDetId());
-        }
-        //$this->em->remove($entidad);
+    public function delInventarioDet($invDetId, $auditUser) {
+        $reg = $this->getInventarioDet($invDetId);
+        
+        $reg->setAuditUserUpd($auditUser);
+        $reg->setAuditDateUpd(new \DateTime());
+        $reg->setAuditDeleted(true);
+        
+        $this->em->persist($reg);
         $this->em->flush();
-        $matrizMensajes = array('El proceso de eliminar termino con exito', 'InventarioDet ' . $inventarioDet->getInvDetId());
+        $matrizMensajes = array('El proceso de eliminar termino con exito', 'InventarioDet ' . $invDetId);
         
         return $matrizMensajes;
     }

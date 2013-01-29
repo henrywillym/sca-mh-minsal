@@ -92,7 +92,7 @@ class Alcohol {
     private $auditDeleted;
     
     
-
+    
     public function getCuotas() {
         return $this->cuotas;
     }

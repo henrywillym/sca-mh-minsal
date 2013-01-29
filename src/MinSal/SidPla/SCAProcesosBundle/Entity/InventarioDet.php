@@ -20,6 +20,23 @@ class InventarioDet {
         //$this->entidad = new ArrayCollection();
         $this->inventario = new Inventario();
         $this->invDetAccion = '+';
+        $this->invDetComentario = 'Inventario Inicial';
+    }
+    
+    /**
+     * Se encarga de validar que el valor de los grados se encuentre dentro del rango
+     */
+    public function isValid(){
+        $msg = array();
+        if($this->getInvGrado()){
+            if($this->getInvGrado()+0 <=0 || $this->getInvGrado()+0 >100 ){
+                $msg[]='- El grado ingresado "'.$this->getInvGrado().'" debe ser mayor a 0 y menor a 100';
+            }
+        }else{
+            $msg[]='- El campo "Grados" se encuentra vacio';
+        }
+        
+        return $msg;
     }
     
     /**
@@ -135,6 +152,13 @@ class InventarioDet {
      * @ORM\Column(name="audit_user_upd", type="string", length=50, nullable=true)
      */
     private $auditUserUpd;
+    
+    /**
+     * @var string $auditDeleted
+     *
+     * @ORM\Column(name="audit_deleted", type="boolean", nullable=false)
+     */
+    private $auditDeleted;
     
     
     
@@ -258,9 +282,16 @@ class InventarioDet {
         $this->auditUserUpd = $auditUserUpd;
     }
     
+    public function getAuditDeleted() {
+        return $this->auditDeleted;
+    }
+
+    public function setAuditDeleted($auditDeleted) {
+        $this->auditDeleted = $auditDeleted;
+    }
     
     /******  CUSTOM SET/GET *******/
-    public function getAlcohol() {
+    /*public function getAlcohol() {
         if($this->inventario != null){
             return $this->inventario->getAlcohol();
         }else{
@@ -272,7 +303,22 @@ class InventarioDet {
         if($this->inventario == null){
             $this->inventario = new Inventario();
         }
-        $this->inventario->setAlcohol($alcohol);/**/
+        $this->inventario->setAlcohol($alcohol);
+    }/**/
+    
+    public function getAlcId() {
+        if($this->inventario != null){
+            return $this->inventario->getAlcohol()->getAlcId();
+        }else{
+            return null;
+        }
+    }
+    
+    public function setAlcId($alcId) {
+        if($this->inventario == null){
+            $this->inventario = new Inventario();
+        }
+        $this->inventario->getAlcohol()->setAlcId($alcId);
     }
     
     public function getInvNombreEsp() {

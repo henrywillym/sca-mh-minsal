@@ -30,12 +30,19 @@ class AccionSCAInventariosDetController extends Controller {
     public function mantInventariosDetAction() {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
-        //var_dump($user->getEntidad());die;
-        return $this->render('MinSalSidPlaSCAProcesosBundle:InventarioDet:mantInventariosDet.html.twig', array(
-                    'opciones' => $opciones,
-                    'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
-                )
-        );
+        
+        if($user->getEntidad()==null){
+            return $this->render('MinSalSidPlaSCAProcesosBundle:InventarioDet:mantInventariosDetNoEntidad.html.twig', array(
+                        'opciones' => $opciones
+                    )
+            );
+        }else{
+            return $this->render('MinSalSidPlaSCAProcesosBundle:InventarioDet:mantInventariosDet.html.twig', array(
+                        'opciones' => $opciones,
+                        'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
+                    )
+            );
+        }
     }
 
     /**
@@ -79,52 +86,50 @@ class AccionSCAInventariosDetController extends Controller {
      */
     public function mantInventarioDetEdicionAction(Request $request) {
         $inventarioDetTmp = new InventarioDet();
-        $alcoholDao = new AlcoholDao($this->getDoctrine());
-        var_dump($alcoholDao->getAlcohol(1));die;
-        //$this->getDoctrine()->getEntityManager()->persist($inventarioDetTmp->getAlcohol());
-        $form = $this->createForm(new InventarioDetType(), $inventarioDetTmp);
+        $inventarioDet = new InventarioDet();
+        
+        $form = $this->createForm(new InventarioDetType($this->getDoctrine()), $inventarioDetTmp);
         $form->bindRequest($request);
         
-        $inventarioDet = new InventarioDet();
         $inventarioDao = new InventarioDao($this->getDoctrine());
         $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
         $alcoholDao = new AlcoholDao($this->getDoctrine());
         
         $user = $this->get('security.context')->getToken()->getUser();
-        //$this->getDoctrine()->getEntityManager()->persist($inventarioDet->getAlcohol());
-        $form = $this->createForm(new InventarioDetType(),$inventarioDet);
+        $errores = $inventarioDetTmp->isValid();
         
-        $form->bindRequest($request);
+        $eliminar = $request->get("eliminar");
+        if($eliminar === 'true'){
+            $inventarioDet = $inventarioDetDao->getInventarioDet($inventarioDetTmp->getInvDetId());
+            return $this->eliminarAction($inventarioDet);
+        }
         
-        if($form->isValid()){
-            $inventarioDet->setAlcohol($alcoholDao->getAlcohol($inventarioDetTmp->getAlcohol()->getAlcId()));
-            $inventarioDetTmp->setAlcohol($alcoholDao->getAlcohol($inventarioDetTmp->getAlcohol()->getAlcId()));
-            
-            if( $inventarioDet->getInvDetId() ){
-                $inventarioDetOld = $inventarioDetDao->getInventarioDet($inventarioDetTmp->getInvDetId());
+        if(($form->isValid() && count($errores)==0)){
+            if( $inventarioDetTmp->getInvDetId() ){
+                $inventarioDet = $inventarioDetDao->getInventarioDet($inventarioDetTmp->getInvDetId());
 
                 //Primero es de revisar si ha cambiado la información de la tabla encabezado.
-                if( $inventarioDetTmp->getAlcohol()->getAlcId() != $inventarioDetOld->getAlcohol()->getAlcId() ||
-                    $inventarioDetTmp->getInvGrado() != $inventarioDetOld->getInvGrado() ||
-                    $inventarioDetTmp->getInvNombreEsp() != $inventarioDetOld->getInvNombreEsp()
+                if( $inventarioDetTmp->getAlcId() != $inventarioDet->getAlcId() ||
+                    $inventarioDetTmp->getInvGrado() != $inventarioDet->getInvGrado() ||
+                    $inventarioDetTmp->getInvNombreEsp() != $inventarioDet->getInvNombreEsp()
                         ){
                     //Si alguno de los campos es diferente, se debe actualizar los registros encabezados antiguos
                     $inventarioOld = $inventarioDao->findInventario(
                                         $user->getEntidad()->getEntId(), 
-                                        $inventarioDetOld->getAlcohol()->getAlcId(), 
-                                        $inventarioDetOld->getInvGrado(), 
-                                        $inventarioDetOld->getInvNombreEsp()
+                                        $inventarioDet->getAlcId(), 
+                                        $inventarioDet->getInvGrado(), 
+                                        $inventarioDet->getInvNombreEsp()
                                     );
                     $invLitros = $inventarioOld->getInvLitros();
-                    $inventarioOld->setInvLitros($invLitros - $inventarioDetOld->getInvDetLitros());
+                    $inventarioOld->setInvLitros($invLitros - $inventarioDet->getInvDetLitros());
                     $inventarioOld->setAuditUserUpd($user->getUsername());
                     $inventarioOld->setAuditDateUpd(new \DateTime());
                     //$inventarioDao->editInventario($inventarioOld);
-                    
+
                     //Buscamos si existe el NUEVO encabezado en la tabla de "Inventario"
                     $inventario = $inventarioDao->findInventario(
                                         $user->getEntidad()->getEntId(), 
-                                        $inventarioDetTmp->getAlcohol()->getAlcId(), 
+                                        $inventarioDetTmp->getAlcId(), 
                                         $inventarioDetTmp->getInvGrado(), 
                                         $inventarioDetTmp->getInvNombreEsp()
                                     );
@@ -137,13 +142,14 @@ class AccionSCAInventariosDetController extends Controller {
                         $inventarioDet->setInventario($inventario);
                     }else{
                         //#### Encabezado de Inventario
+                        $inventarioDet->setInventario(new Inventario());
                         $inventarioDet->getInventario()->setEntidad($user->getEntidad());
-                        $inventarioDet->getInventario()->setAlcohol($alcoholDao->getAlcohol($inventarioDetTmp->getAlcohol()->getAlcId()));
+                        $inventarioDet->getInventario()->setAlcohol($alcoholDao->getAlcohol($inventarioDetTmp->getAlcId()));
                         $inventarioDet->getInventario()->setInvLitros($inventarioDetTmp->getInvDetLitros());
                         $inventarioDet->getInventario()->setAuditUserIns($user->getUsername());
                         $inventarioDet->getInventario()->setAuditDateIns(new \DateTime());
-                        //$inventarioDet->getInventario()->setInvGrado($inventarioDetTmp->getInvGrado());
-                        //$inventarioDet->getInventario()->setInvNombreEsp($inventarioDetTmp->getInvNombreEsp());
+                        $inventarioDet->getInventario()->setInvGrado($inventarioDetTmp->getInvGrado());
+                        $inventarioDet->getInventario()->setInvNombreEsp($inventarioDetTmp->getInvNombreEsp());
                     }
 
                     //## Detalle de inventario
@@ -152,7 +158,7 @@ class AccionSCAInventariosDetController extends Controller {
                 }else{
                     //Si el encabezado no cambia
                     $invLitros = $inventarioDet->getInventario()->getInvLitros();
-                    $inventarioDet->getInventario()->setInvLitros($invLitros + $inventarioDetTmp->getInvDetLitros());
+                    $inventarioDet->getInventario()->setInvLitros($invLitros + $inventarioDetTmp->getInvDetLitros() - $inventarioDet->getInvDetLitros());
                     $inventarioDet->getInventario()->setAuditUserUpd($user->getUsername());
                     $inventarioDet->getInventario()->setAuditDateUpd(new \DateTime());
                 }
@@ -164,26 +170,27 @@ class AccionSCAInventariosDetController extends Controller {
                 //Buscamos si el encabezado en la tabla de "Inventario" existe
                 $inventario = $inventarioDao->findInventario(
                                     $user->getEntidad()->getEntId(),
-                                    $inventarioDetTmp->getAlcohol()->getAlcId(),
+                                    $inventarioDetTmp->getAlcId(),
                                     $inventarioDetTmp->getInvGrado(),
                                     $inventarioDetTmp->getInvNombreEsp()
                                 );
                 
                 if($inventario != null){
                     $invLitros = $inventario->getInvLitros();
-                    $inventario->setInvLitros( $invLitros + $inventarioDetTmp->getInvDetLitros() );
+                    $inventario->setInvLitros( $invLitros + $inventarioDetTmp->getInvDetLitros());
                     $inventario->setAuditUserUpd($user->getUsername());
                     $inventario->setAuditDateUpd(new \DateTime());
                     $inventarioDet->setInventario($inventario);
                 }else{
                     //#### Encabezado de Inventario
+                    $inventarioDet->setInventario(new Inventario());
                     $inventarioDet->getInventario()->setEntidad($user->getEntidad());
-                    $inventarioDet->getInventario()->setAlcohol($alcoholDao->getAlcohol($inventarioDetTmp->getAlcohol()->getAlcId()));
+                    $inventarioDet->getInventario()->setAlcohol($alcoholDao->getAlcohol($inventarioDetTmp->getAlcId()));
                     $inventarioDet->getInventario()->setInvLitros($inventarioDetTmp->getInvDetLitros());
                     $inventarioDet->getInventario()->setAuditUserIns($user->getUsername());
                     $inventarioDet->getInventario()->setAuditDateIns(new \DateTime());
-                    //$inventarioDet->getInventario()->setInvGrado($inventarioDetTmp->getInvGrado());
-                    //$inventarioDet->getInventario()->setInvNombreEsp($inventarioDetTmp->getInvNombreEsp());
+                    $inventarioDet->getInventario()->setInvGrado($inventarioDetTmp->getInvGrado());
+                    $inventarioDet->getInventario()->setInvNombreEsp($inventarioDetTmp->getInvNombreEsp());
                 }
 
                 //## Detalle de inventario
@@ -196,23 +203,35 @@ class AccionSCAInventariosDetController extends Controller {
             }
 
             //##################################################################################################
-            var_dump($inventarioDet->getInventario()->getAlcohol());die;
+            $form = $this->createForm(new InventarioDetType($this->getDoctrine()), $inventarioDet);
+        
+            $form->bindRequest($request);
+            
             $inventarioDetDao->editInventarioDet($inventarioDet);
             $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
-            return $this->redirect(
-                $this->generateUrl('MinSalSidPlaSCAProcesosBundle_mantCargarInventarioDet', 
-                        array('invDetId'=>$inventarioDet->getInvDetId()))
-                );
+            
+            return $this->redirect($this->generateUrl('MinSalSidPlaSCAProcesosBundle_mantInventariosDet'));
         }else{
-            $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
+            $listaErrores = '';
+            
+            foreach($errores as $error){
+                $listaErrores = $listaErrores.$error;
+            }
+            
+            if($listaErrores != ''){
+                $this->get('session')->setFlash('notice', $listaErrores);
+            }else{
+                $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
+            }
             
             $opciones = $this->getRequest()->getSession()->get('opciones');
-                return $this->render('MinSalSidPlaSCAProcesosBundle:InventarioDet:showInventarioDet.html.twig', array(
-                        'opciones' => $opciones, 
-                        'form' => $form->createView(), 
-                        'invDetId'=>$inventarioDet->getInvDetId()
-                    )
-                );
+            return $this->render('MinSalSidPlaSCAProcesosBundle:InventarioDet:showInventarioDet.html.twig', array(
+                    'opciones' => $opciones, 
+                    'form' => $form->createView(), 
+                    'invDetId'=>$inventarioDet->getInvDetId(),
+                    'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
+                )
+            );
         }
     }
     
@@ -232,7 +251,7 @@ class AccionSCAInventariosDetController extends Controller {
         }else{
         }
         
-        $form = $this->createForm(new InventarioDetType(), $inventarioDet);
+        $form = $this->createForm(new InventarioDetType($this->getDoctrine()), $inventarioDet);
 
         return $this->render('MinSalSidPlaSCAProcesosBundle:InventarioDet:showInventarioDet.html.twig', array(
             'form' => $form->createView(),
@@ -240,6 +259,38 @@ class AccionSCAInventariosDetController extends Controller {
             'invDetId' => $invDetId,
             'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
         ));
+    }
+    
+    /**
+     * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    private function eliminarAction(InventarioDet $inventarioDet){
+        $auditUser = $this->container->get('security.context')->getToken()->getUser();
+        
+        $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
+        $inventarioDao = new InventarioDao($this->getDoctrine());
+        
+        //Buscamos el encabezado para quitarle la cantidad a eliminar
+        $inventarioOld = $inventarioDao->findInventario(
+                            $auditUser->getEntidad()->getEntId(), 
+                            $inventarioDet->getAlcId(), 
+                            $inventarioDet->getInvGrado(), 
+                            $inventarioDet->getInvNombreEsp()
+                        );
+        //$inventarioOld = $inventarioDet->getInventario();
+        $invLitros = $inventarioOld->getInvLitros();
+        $inventarioOld->setInvLitros($invLitros - $inventarioDet->getInvDetLitros());
+        $inventarioOld->setAuditUserUpd($auditUser->getUsername());
+        $inventarioOld->setAuditDateUpd(new \DateTime());
+        
+        $inventarioDetDao->delInventarioDet($inventarioDet->getInvDetId(), $auditUser->getUsername());
+        
+        $this->get('session')->setFlash('notice', '#### El registro ha sido eliminado ####');
+
+        return $this->redirect($this->generateUrl('MinSalSidPlaSCAProcesosBundle_mantInventariosDet'));
     }
 }
 ?>

@@ -1,38 +1,34 @@
 {% extends 'MinSalSidPlaBundle:Default:index.html.twig' %}
 {% form_theme form 'MinSalSidPlaUsersBundle:ChangePassword/Form:fields.html.twig' %}
 {% block body %}
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('#btnGuardar').button();
-        $('#btnEliminar').button();
-        $('#btnRegresar').button();
-        
-        //Hoja de estilo a tabla
-       $('td>label').parent().attr('align','right');
-       
-    });
-    
-    
-    function enviarEliminarUsuario(){
-        if(confirm('!Desea eliminar el usuario "'+$('#fos_user_registration_form_username').val()+'"?')){
-            if(!confirm('!Desea abortar la eliminacion??')){
-                $('#valido').val(true);
-                $('#eliminar').val(true);
-                $('#formUsuario').submit();
-                return true;
-            }
-        }
-        return false;
-    }
-</script>
-    
-    {% for key, message in app.session.getFlashes() %}
-        <div class="{{ key }}">
-            {{ message|trans({}, 'FOSUserBundle') }}
-        </div>
-    {% endfor %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#btnGuardar').button();
+            $('#btnEliminar').button();
+            $('#btnRegresar').button();
 
-    <form id="formUsuario" action="{{ path('MinSalSidPlaSCAProcesosBundle_mantInventarioDetEdicion') }}" {{ form_enctype(form) }} method="POST" >
+            //Hoja de estilo a tabla
+           $('td>label').parent().attr('align','right');
+           if($('#InventarioDet_invDetId').val()=='' || $('#InventarioDet_invDetId').val()==-1){
+               $('#btnEliminar').hide();
+           }
+        });
+
+
+        function enviarEliminar(){
+            if(confirm('!Desea eliminar el registro "'+$('#InventarioDet_invNombreEsp').val()+'"?')){
+                if(!confirm('!Desea abortar la eliminacion??')){
+                    $('#valido').val(true);
+                    $('#eliminar').val(true);
+                    $('#formulario').submit();
+                    return true;
+                }
+            }
+            return false;
+        }
+    </script>
+    
+    <form id="formulario" action="{{ path('MinSalSidPlaSCAProcesosBundle_mantInventarioDetEdicion') }}" {{ form_enctype(form) }} method="POST" class="InventarioDetTypeForm">
         <input type="hidden" id="valido" value=false/>
         <input type="hidden" id="eliminar" name="eliminar" value=false/>
         
@@ -42,13 +38,18 @@
                         <h1>
                             Registro de Inventario de Alcohol de "{{entNombComercial}}"
                         </h1>
+                        {% if app.session.hasFlash('notice') %}
+                            <div class="flash-notice">
+                                {{ app.session.flash('notice') }}
+                            </div><br/>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
                     <td><label id="username" >Nombre de Alcohol:</label></td>
                     <td>
-                        {{ form_widget(form.alcohol) }}
-                        {{ form_errors(form.alcohol) }}
+                        {{ form_widget(form.alcId) }}
+                        {{ form_errors(form.alcId) }}
                     </td>
                 </tr>
                 <tr>
@@ -98,9 +99,9 @@
                         </div>
                         <br>
                         
-                        <input id="btnGuardar" type="submit" value="{{ 'Guardar Usuario'|trans({}, 'FOSUserBundle') }}" />
+                        <input id="btnGuardar" type="submit" value="Guardar" />
                         
-                        <input id="btnEliminar" type="button" value=" ** Eliminar Usuario ** " onclick="return enviarEliminarUsuario();"/>
+                        <input id="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>
 
                         <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSidPlaSCAProcesosBundle_mantInventariosDet')}}';"/>
                     </td>
