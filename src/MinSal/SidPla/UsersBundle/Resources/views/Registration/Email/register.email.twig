@@ -1,0 +1,31 @@
+{% block subject %}Activación de su Cuenta SCA{% endblock %}
+
+{% block body_text %}
+{% autoescape false %}
+Buen día {{ user.userPrimerNombre}} {{ user.userSegundoNombre}} {{ user.userApellidos}}
+
+Su usuario ha sido ingresado o actualizado en el Sistema de Control de Alcoholes (SCA). Para activar su cuenta SCA debe ingresar al siguiente link: 
+
+    {{ confirmationUrl }}
+
+Sus credenciales son:
+    Usuario: {{ user.username }}
+       Clave: {{ user.plainPassword }}
+
+Le recomendamos cambiar su clave al ingresar por primera vez al sitio web, utilizando la opcion "Cambiar Clave".
+      
+Saludos,
+Equipo Sistema de Control de Alcoholes
+SCA - MINSAL/MH
+El Salvador
+{% endautoescape %}
+{% endblock %}
+
+{% block body_html %}
+{#
+    You can of course render the html directly here.
+    Including a template as done here allows keeping things DRY by using
+    the template inheritance in it
+#}
+{#% include 'MinSalSidPlaUsersBundle:Registration\\Email:register_email.html.twig' %#}
+{% endblock %}

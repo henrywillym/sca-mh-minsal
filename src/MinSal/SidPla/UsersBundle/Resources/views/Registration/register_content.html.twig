@@ -26,6 +26,17 @@
                                 $.each(val, function(id, registro){
                                     if(!registro[1]){
                                         $("#mensaje").attr('value', registro[0]);
+                                        
+                                        $('#msgDialog').html(registro[0]).dialog({
+                                            modal:true,
+                                            title: 'Error',
+                                            buttons: {
+                                                Ok: function() {
+                                                  $( this ).dialog( "close" );
+                                                }
+                                            }
+                                        });
+                                        
                                         return false;
                                     }else{
                                         $('#valido').val(true)
@@ -139,9 +150,9 @@
                     <td align='center' colspan="2">
                         <h1>
                             {% if(userInterno == 'true') %}
-                                Registro de Usuarios de Ministerios
+                                Registro de Usuario de Ministerios
                             {%else%}
-                                Registro de Usuarios de {{entNombre}}
+                                Registro de Usuario de {{entNombre}}
                             {%endif%}
                         </h1>
                     </td>
@@ -264,6 +275,8 @@
                         <input style="visibility: hidden" type="button" value="  Registrar Usuario  "/>
                         <br>
                         <textarea readonly="readonly" rows="2" cols="50" id="mensaje" style="font-family: Verdana, Geneva, sans-serif; color: red; border: none; background-color: white; font-weight: bolder; font-size: 10px" ></textarea>
+                        <div id="msgDialog">
+                        </div>
                         <br>
                         
                         <input id="verificarUsuario" type="submit" value="{{ 'Guardar Usuario'|trans({}, 'FOSUserBundle') }}" />

@@ -12,6 +12,11 @@
         <link href="{{ asset('bundles/minsalsidpla/css/jqModal.css') }}" type="text/css" rel="stylesheet" />           
         <link href="{{ asset('bundles/minsalsidpla/menuSidPla/pro_drop_1.css') }}" type="text/css" rel="stylesheet" /> 
         <link href="{{ asset('bundles/minsalsidpla/images/icono.png') }}" type="imagen/png" rel="Shortcut Icon" /> 
+        <style>
+            label{
+                font-size: small;
+            }
+        </style>
         {% endblock %}
 
 
@@ -62,7 +67,7 @@
                                         $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_security_logout') }}"><span >{{ 'Salir'|trans({}, 'FOSUserBundle') }} </span></a></li>');                                           
                                  {% endif %}  
                              {% endif %}  
-                             $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('MinSalSidPlaUsersBundle_mantChangePassword') }}"><span >{{ 'Cambiar Contraseña'|trans({}, 'FOSUserBundle') }}</span></a></li>');
+                             $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('MinSalSidPlaUsersBundle_mantChangePassword') }}"><span >{{ 'Cambiar Clave'|trans({}, 'FOSUserBundle') }}</span></a></li>');
                              $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_security_logout') }}"><span >{{ 'Salir'|trans({}, 'FOSUserBundle') }}</span></a></li>');                                
                              <!--$('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_profile_show') }}"><span >{{ 'Perfil'|trans({}, 'FOSUserBundle') }}</span></a></li>');-->
                          {% else %}                                 
@@ -124,7 +129,10 @@
                                 {% endblock %} 
                              {% endif %} 
                     </div>
-                    <div id="pie">Copyright (C) 2013 Ministerio de Salud</div>
+                    <div id="pie">
+                        Copyright (C) 2013 Ministerio de Salud<br/>
+                        Copyright (C) 2013 Ministerio de Hacienda<br/>
+                    </div>
 
                 </div>
             </body>

@@ -118,7 +118,18 @@ class RegistrationFormHandler extends BaseHandler{
         // Note: if you plan on modifying the user then do it before calling the 
         // parent method as the parent method will flush the changes
 
-        parent::onSuccess($user, $confirmation);
+        //parent::onSuccess($user, $confirmation);
+        
+        if ($confirmation) {
+            $user->setEnabled(false);
+            $user->generateConfirmationToken();
+            $this->mailer->sendConfirmationEmailMessage($user);
+        } else {
+            $user->setConfirmationToken(null);
+            $user->setEnabled(true);
+        }
+
+        $this->userManager->updateUser($user);
 
         // otherwise add your functionality here
     }
