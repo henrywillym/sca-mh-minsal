@@ -1,0 +1,18 @@
+#****************************
+#*** Inventario Detallado ***
+#****************************
+MinSalSidPlaSCAProcesosBundle_mantInventariosDet:
+    pattern:  /inventario/mantInventariosDet
+    defaults: { _controller: MinSalSidPlaSCAProcesosBundle:AccionSCAInventariosDet:mantInventariosDet } 
+    
+MinSalSidPlaSCAProcesosBundle_consultarInventariosDetJSON:
+    pattern:  /inventario/consultarInventariosDetJSON
+    defaults: { _controller: MinSalSidPlaSCAProcesosBundle:AccionSCAInventariosDet:consultarInventariosDetJSON } 
+
+MinSalSidPlaSCAProcesosBundle_mantInventarioDetEdicion:
+    pattern:  /inventario/mantInventarioDetEdicion
+    defaults: { _controller: MinSalSidPlaSCAProcesosBundle:AccionSCAInventariosDet:mantInventarioDetEdicion }
+
+MinSalSidPlaSCAProcesosBundle_mantCargarInventarioDet:
+    pattern:  /inventario/mantCargarInventarioDet/{invDetId}
+    defaults: { _controller: MinSalSidPlaSCAProcesosBundle:AccionSCAInventariosDet:mantCargarInventarioDet } 

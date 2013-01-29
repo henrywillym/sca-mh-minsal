@@ -22,6 +22,7 @@ class AppKernel extends Kernel
             new MinSal\SidPla\AdminBundle\MinSalSidPlaAdminBundle(),
 	    new MinSal\SidPla\UsersBundle\MinSalSidPlaUsersBundle(),
             new MinSal\SidPla\DependenciaBundle\MinSalSidPlaDependenciaBundle(),
+            new MinSal\SidPla\SCAProcesosBundle\MinSalSidPlaSCAProcesosBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
