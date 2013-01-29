@@ -9,12 +9,12 @@
 <br></br>
     
 <form  action="{{ path("fos_user_security_check") }}" method="post">
-    <table align='center'>
+    <table align='center' style="border: 1px solid; padding: 20px;">
         <tr>
-            <td colspan="2" align='center' ><h1>Ingreso al Sistema</h1></td>
+            <td colspan="2" align='center' ><h1>Ingreso a SCA</h1></td>
         </tr>
         <tr>
-            <td>
+            <td align="right">
                 <label for="username">{{ 'Usuario:'|trans({}, 'FOSUserBundle') }}</label>
             </td>
             <td>
@@ -23,18 +23,19 @@
         </tr>
         
          <tr>
-            <td>
-                 <label for="password">{{ 'Password:'|trans({}, 'FOSUserBundle') }}</label>
+            <td align="right">
+                 <label for="password">{{ 'Clave:'|trans({}, 'FOSUserBundle') }}</label>
             </td>
             <td>
                 <input type="password" id="password" name="_password" />                
             </td>            
         </tr>   
-        <tr><td colspan="2" align="center" >
+        <!--<tr> <td></td>
+            <td align="left" >
                 <input type="checkbox" id="remember_me" name="_remember_me" value="on" />
-                <label for="remember_me">{{ 'Recordar'|trans({}, 'FOSUserBundle') }}</label>
+                <label for="remember_me">{{ 'Recordarme'|trans({}, 'FOSUserBundle') }}</label>
             </td>            
-        </tr>
+        </tr>-->
         <tr>
             <td colspan="2" style=" font-size: 12px; font-family: Verdana, Geneva, sans-serif; color: red " >
                 {% if error %}
@@ -50,6 +51,11 @@
         <tr>
             <td colspan="2" align='center' >
                 <input type="submit" id="_submit" name="_submit" value="{{ 'Ingresar'|trans({}, 'FOSUserBundle') }}" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <a href="{{url('fos_user_resetting_request')}}">Olvidé mi clave</a>
             </td>
         </tr>
     </table>

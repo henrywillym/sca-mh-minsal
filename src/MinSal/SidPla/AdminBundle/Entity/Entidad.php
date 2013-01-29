@@ -28,6 +28,7 @@ class Entidad {
     public function __construct() {
         $this->users = new ArrayCollection();
         $this->cuotas = new ArrayCollection();
+        $this->inventarios = new ArrayCollection();
         $this->entHabilitado = true;
         $this->entImportador = false;
         $this->entProductor = false;
@@ -52,6 +53,11 @@ class Entidad {
      * @ORM\OneToMany(targetEntity="MinSal\SidPla\UsersBundle\Entity\User", mappedBy="entidad", cascade={"persist"})
      */
     protected $users;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="MinSal\SidPla\SCAProcesosBundle\Entity\Inventario", mappedBy="entidad")
+     */
+    protected $inventarios;
     
     
     /**
@@ -627,5 +633,13 @@ class Entidad {
         }else if($this->getEntTipoPersona()=='N'){
             return Entidad::$NATURAL;
         }
+    }
+    
+    public function getInventarios() {
+        return $this->inventarios;
+    }
+
+    public function setInventarios($inventarios) {
+        $this->inventarios = $inventarios;
     }
 }

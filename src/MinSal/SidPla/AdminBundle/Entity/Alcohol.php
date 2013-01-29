@@ -3,11 +3,11 @@
 
 namespace MinSal\SidPla\AdminBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 use MinSal\SidPla\AdminBundle\Entity\Cuota;
+use MinSal\SidPla\AdminBundle\Entity\GrupoAlcohol;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -17,12 +17,19 @@ class Alcohol {
     
     public function __construct() {
         $this->cuotas = new ArrayCollection();
+        //$this->grupo = new GrupoAlcohol();
     }
     
     /**
      * @ORM\OneToMany(targetEntity="MinSal\SidPla\AdminBundle\Entity\Cuota", mappedBy="alcohol")
      */
     protected $cuotas;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="MinSal\SidPla\AdminBundle\Entity\GrupoAlcohol", inversedBy="alcoholes")
+     * @ORM\JoinColumn(name="grp_id", referencedColumnName="grp_id")
+     */
+    protected $grupo;
     
     
     /**
@@ -85,7 +92,7 @@ class Alcohol {
     private $auditDeleted;
     
     
-
+    
     public function getCuotas() {
         return $this->cuotas;
     }
@@ -158,4 +165,11 @@ class Alcohol {
         $this->auditDeleted = $auditDeleted;
     }
 
+    public function getGrupo() {
+        return $this->grupo;
+    }
+
+    public function setGrupo($grupo) {
+        $this->grupo = $grupo;
+    }
 }

@@ -5,11 +5,7 @@
     <script type="text/javascript">
        $(document).ready(function(){
             $('input[type="button"]').button();
-       });
-    </script>
     
-    <script type="text/javascript">
-        $(document).ready(function(){
             var myGrid = $('#theGrid');
             
             myGrid.jqGrid({ 
@@ -143,6 +139,9 @@
             <h1>
                 {% if(userInterno=='true') %}
                     Listado de Usuarios de Ministerios
+                    <script type="text/javascript">
+                        $('#btnRegresar').hide();
+                    </script>
                 {%else%}
                     Listado de Usuarios de "{{entNombre}}"
                 {%endif%}
