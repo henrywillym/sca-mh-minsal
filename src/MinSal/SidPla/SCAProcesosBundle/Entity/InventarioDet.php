@@ -21,6 +21,7 @@ class InventarioDet {
         $this->inventario = new Inventario();
         $this->invDetAccion = '+';
         $this->invDetComentario = 'Inventario Inicial';
+        $this->auditDeleted = false;
     }
     
     /**

@@ -75,7 +75,7 @@ class AccionAdminAlcoholesController extends Controller {
     public function consultarAlcoholesJSONSelectAction() {
         $alcoholDao = new AlcoholDao($this->getDoctrine());
         $alcoholes = $alcoholDao->getAlcoholes();
-
+        
         $numfilas = count($alcoholes);
         
         $alc = new Alcohol();
@@ -83,7 +83,7 @@ class AccionAdminAlcoholesController extends Controller {
 
         $select = "<select>";
         foreach ($alcoholes as $alc) {
-            $select = $select . "<option value=" . $alc->getAlcId() . " grado=" . $alc->getAlcGrado() . ">" . $alc->getAlcNombre() . "</option>";
+            $select = $select . "<option value=" . $alc['alcId'] . " grado=" . $alc['alcGrado'] . ">" . $alc['alcNombre'] . "</option>";
         }
         $select = $select . "</select>";
 
