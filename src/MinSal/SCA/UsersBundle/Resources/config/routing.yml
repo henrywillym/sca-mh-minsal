@@ -1,0 +1,58 @@
+MinSalSCAUsersBundle_mostrarUsuariosSinRol:
+    pattern:  /mostrarUsuariosSinRol
+    defaults: { _controller: MinSalSCAUsersBundle:Default:mostrarUsuariosSinRol}
+    
+MinSalSCAUsersBundle_consultarUsuarioSinRolJSON:
+    pattern:  /consultarUsuarioSinRolJSON
+    defaults: { _controller: MinSalSCAUsersBundle:Default:consultarUsuarioSinRolJSON }
+    
+MinSalSCAUsersBundle_editarUsuarioSinRol:
+    pattern:  /editarUsuarioSinRol
+    defaults: { _controller: MinSalSCAUsersBundle:Default:editarUsuarioSinRol }
+
+MinSalSCAUsersBundle_verificaCreacion:
+    pattern:  /verificaCreacion
+    defaults: { _controller: MinSalSCAUsersBundle:Default:verificaCreacion }
+
+
+#*******************
+#***  USUARIOS  ****
+#*******************
+MinSalSCAUsersBundle_registerUsuarioInterno:
+    pattern:  /register/{userInterno}
+    defaults: { _controller: MinSalSCAUsersBundle:Default:register }
+    
+MinSalSCAUsersBundle_registerUsuarioExterno:
+    pattern:  /register/{userInterno}/{entId}
+    defaults: { _controller: MinSalSCAUsersBundle:Default:register }
+    
+MinSalSCAUsersBundle_mantMostrarUsuarios:
+    pattern:  /mantMostrarUsuarios/{userInterno}/{entId}
+    defaults: { _controller: MinSalSCAUsersBundle:Default:mantUsers , userInterno: 'true', entId: 'Ministerios'} 
+
+MinSalSCAUsersBundle_consultarUsuariosJSON:
+    pattern:  /consultarUsuariosJSON/{userInterno}/{entId}
+    defaults: { _controller: MinSalSCAUsersBundle:Default:consultarUsuariosJSON } 
+    
+MinSalSCAUsersBundle_mantCargarUsuario:
+    pattern:  /mantCargarUsuario/{userInterno}/{idUsuario}/{entId}
+    defaults: { _controller: MinSalSCAUsersBundle:Default:mantCargarUsuario } 
+    
+#************************
+#***  Cambiar Clave  ****
+#************************
+MinSalSCAUsersBundle_mantChangePassword:
+    pattern:  /changePassword/load
+    defaults: { _controller: MinSalSCAUsersBundle:ChangePassword:mantChangePassword } 
+    
+MinSalSCAUsersBundle_changePassword:
+    pattern:  /changePassword/edit
+    defaults: { _controller: MinSalSCAUsersBundle:ChangePassword:changePassword }
+
+#************************
+#***  Resset Clave  ****
+#************************
+#MinSalSCAUsersBundle_reset:
+# Esta definicion de ruta se encuentra en app/routing.yml
+# Esta ahí debido a que este bundle utiliza un prefijo /users/
+# Entonces se dejo asi para evitar otra regla de seguridad en security.yml.
