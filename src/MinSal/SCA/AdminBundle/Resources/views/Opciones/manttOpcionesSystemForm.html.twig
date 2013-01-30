@@ -1,0 +1,22 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{% block body %}
+  
+    <form>
+        <table align="center">
+            <tr><td align="center">
+                    <h1>Mantenimiento de Opciones del Sistema</h1>
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                <br></br>                
+                {% include 'MinSalSCAAdminBundle:Opciones:showAllOpciones.html.twig'%}
+                </td>
+            </tr>        
+        </table>        
+    </form>
+    <br></br>
+    <br></br>
+    
+    
+{% endblock %}
