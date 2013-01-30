@@ -1,0 +1,40 @@
+{% form_theme form theme %}
+{#fos_user_resetting_reset#}
+<form action="{{ path('MinSalSCAUsersBundle_reset', {'token': token}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_resetting_reset">
+    <table align='center' style="border: 1px solid;" >
+        <tr>
+            <td align='center' colspan="2">
+                <h1>
+                    Restablecer Clave <!--de "{#{user.username}#}"-->
+                </h1>
+            </td>
+        </tr>
+        <tr>
+            <td align="right"><label id="plainPasswordfirst" >Nueva Clave:</label></td>
+            <td>
+                {{ form_widget(form.new.first) }}
+                <div class="flash-notice">
+                    {{ form_errors(form.new) }}
+                </div>
+            </td>
+        </tr>   
+        <tr>
+            <td align="right"><label id="plainPasswordsecond" >Confirmación de Clave:</label></td>
+            <td>{{ form_widget(form.new.second) }}</td>                
+        </tr>
+        <tr>
+            <td align="center" colspan="2">
+                <input type="submit" value="Restablecer" />
+            </td>
+        </tr>
+    </table>
+    
+    <div class="flash-notice">
+        {{ form_errors(form) }}
+    </div>
+    
+    {{ form_rest(form) }}
+</form>
+<script lang="javascript/text">
+    $('input[type="submit"]').button();
+</script>

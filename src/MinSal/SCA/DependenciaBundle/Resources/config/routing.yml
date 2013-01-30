@@ -1,0 +1,4 @@
+#src/MinSal/SCA/DependenciaBundle/Resources/config/rounting.yml
+MinSalSCADependenciaBundle_homepage:
+    pattern:  /Dependencia
+    defaults: { _controller: MinSalSCADependenciaBundle:Default:index }
