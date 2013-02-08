@@ -1,0 +1,3 @@
+MinSalSCABundle_homepage:
+    pattern:  /
+    defaults: { _controller: MinSalSCABundle:Default:index }
