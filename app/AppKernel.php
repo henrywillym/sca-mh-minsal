@@ -18,11 +18,11 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new JMS\SecurityExtraBundle\JMSSecurityExtraBundle(),
 	    new FOS\UserBundle\FOSUserBundle(),
-            new MinSal\SidPlaBundle\MinSalSidPlaBundle(),
-            new MinSal\SidPla\AdminBundle\MinSalSidPlaAdminBundle(),
-	    new MinSal\SidPla\UsersBundle\MinSalSidPlaUsersBundle(),
-            new MinSal\SidPla\DependenciaBundle\MinSalSidPlaDependenciaBundle(),
-            new MinSal\SidPla\SCAProcesosBundle\MinSalSidPlaSCAProcesosBundle(),
+            new MinSal\SCABundle\MinSalSCABundle(),
+            new MinSal\SCA\AdminBundle\MinSalSCAAdminBundle(),
+	    new MinSal\SCA\UsersBundle\MinSalSCAUsersBundle(),
+            new MinSal\SCA\DependenciaBundle\MinSalSCADependenciaBundle(),
+            new MinSal\SCA\ProcesosBundle\MinSalSCAProcesosBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

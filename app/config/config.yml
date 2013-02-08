@@ -64,27 +64,27 @@ jms_security_extra:
 fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb'
     firewall_name: main
-    user_class: MinSal\SidPla\UsersBundle\Entity\User
+    user_class: MinSal\SCA\UsersBundle\Entity\User
     from_email:
         address: noreply@sca.gob.sv
         sender_name: SCA
     registration:
         form:
-            type: sidpla_user_registration
-            handler: sidpla_user.form.handler.registration
+            type: sca_user_registration
+            handler: sca_user.form.handler.registration
         confirmation:
             enabled: false
             from_email:
                 address: registration@sca.gob.sv
                 sender_name: SCA Registro Usuario
-            template: MinSalSidPlaUsersBundle:Registration\Email:register.email.twig
+            template: MinSalSCAUsersBundle:Registration\Email:register.email.twig
     change_password:
         form:
-            type: sidpla_change_password
-            #handler:  sidpla_user.form.handler.changePassword
+            type: sca_change_password
+            #handler:  sca_user.form.handler.changePassword
     resetting:
         email:
-            template: MinSalSidPlaUsersBundle:Resetting\Email:resetting.email.twig
+            template: MinSalSCAUsersBundle:Resetting\Email:resetting.email.twig
             from_email:
                 address:  reset@sca.gob.sv
                 sender_name: SCA Restauración Clave

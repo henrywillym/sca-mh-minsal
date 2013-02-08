@@ -1,0 +1,26 @@
+parameters:
+#    min_sal_sid_pla_users.example.class: MinSal\SCA\UsersBundle\Example
+
+services:
+    sca_user.registration.form.type:
+        class: MinSal\SCA\UsersBundle\Form\Type\RegistrationFormType
+        arguments: [%fos_user.model.user.class%]
+        tags:
+            - { name: form.type, alias: sca_user_registration }
+            
+    sca_user.form.handler.registration:
+        class: MinSal\SCA\UsersBundle\Form\Handler\RegistrationFormHandler
+        arguments: ["@fos_user.registration.form", "@request", "@fos_user.user_manager", "@fos_user.mailer", "@service_container"]
+        scope: request
+        public: false
+    
+    sca_user.change_password.form.type:
+        class: MinSal\SCA\UsersBundle\Form\Type\ChangePasswordFormType
+        tags:
+            - { name: form.type, alias: sca_change_password }
+            
+    #sca_user.form.handler.changePassword:
+    #    class: MinSal\SCA\UsersBundle\Form\Handler\ChangePasswordFormHandler
+    #    arguments: ["@fos_user.change_password.form", "@request", "@fos_user.user_manager", "@service_container"]
+    #    scope: request
+    #    public: false
