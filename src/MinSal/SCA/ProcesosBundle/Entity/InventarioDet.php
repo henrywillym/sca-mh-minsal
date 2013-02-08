@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class InventarioDet {
     
     public function __construct() {
-        //$this->alcohol = new ArrayCollection();
-        //$this->entidad = new ArrayCollection();
         $this->inventario = new Inventario();
         $this->invDetAccion = '+';
         $this->invDetComentario = 'Inventario Inicial';
@@ -39,14 +37,7 @@ class InventarioDet {
         
         return $msg;
     }
-    
-    /**
-     * Es Many-To-One, Unidirectional
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Cuota")
-     * @ORM\JoinColumn(name="cuo_id", referencedColumnName="cuo_id")
-     */
-    protected $cuota;
-    
+        
     /**
      * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Inventario", inversedBy="inventariosDet", cascade={"persist"})
      * @ORM\JoinColumn(name="inv_id", referencedColumnName="inv_id")
@@ -68,16 +59,16 @@ class InventarioDet {
     protected $entidad;
     
     /**
-     * ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolicitudImportacion", inversedBy="inventariosDet")
-     * ORM\JoinColumn(name="alc_id", referencedColumnName="alc_id")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacion", inversedBy="inventariosDet")
+     * @ORM\JoinColumn(name="solimp_id", referencedColumnName="solimp_id")
      */
-    protected $solImportacion;
+    protected $solImportacionDet;
     
     /**
-     * ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolicitudLocal", inversedBy="inventariosDet")
-     * ORM\JoinColumn(name="alc_id", referencedColumnName="alc_id")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", inversedBy="inventariosDet")
+     * @ORM\JoinColumn(name="sollocal_id", referencedColumnName="sollocal_id")
      */
-    protected $solLocal;
+    protected $solLocalDet;
     
     
     /**
@@ -163,14 +154,6 @@ class InventarioDet {
     
     
     
-    public function getCuota() {
-        return $this->cuota;
-    }
-
-    public function setCuota($cuota) {
-        $this->cuota = $cuota;
-    }
-
     public function getInventario() {
         return $this->inventario;
     }
@@ -195,20 +178,20 @@ class InventarioDet {
         $this->entidad = $entidad;
     }
 
-    public function getSolImportacion() {
+    public function getSolImportacionDet() {
         return $this->solImportacion;
     }
 
-    public function setSolImportacion($solImportacion) {
-        $this->solImportacion = $solImportacion;
+    public function setSolImportacionDet($solImportacionDet) {
+        $this->solImportacion = $solImportacionDet;
     }
 
-    public function getSolLocal() {
-        return $this->solLocal;
+    public function getSolLocalDet() {
+        return $this->solLocalDet;
     }
 
-    public function setSolLocal($solLocal) {
-        $this->solLocal = $solLocal;
+    public function setSolLocalDet($solLocalDet) {
+        $this->solLocalDet = $solLocalDet;
     }
 
     public function getInvDetId() {

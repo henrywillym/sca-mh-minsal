@@ -5,6 +5,7 @@ namespace MinSal\SCA\ProcesosBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
+use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,11 +17,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SolImportacionDet {
     
     public function __construct() {
-        $this->alcohol = new Alcohol();
-        $this->inventario = new Inventario();
-        $this->invDetAccion = '+';
-        $this->invDetComentario = 'Inventario Inicial';
-        $this->auditDeleted = false;
+        //$this->auditDateIns = new \DateTime();
+        $this->impDetLitrosLb = 0;
     }
     
     /**
@@ -28,12 +26,12 @@ class SolImportacionDet {
      */
     public function isValid(){
         $msg = array();
-        if($this->getInvGrado()){
-            if($this->getInvGrado()+0 <=0 || $this->getInvGrado()+0 >100 ){
-                $msg[]='- El grado ingresado "'.$this->getInvGrado().'" debe ser mayor a 0 y menor a 100';
+        if($this->getImpDetLitros()){
+            if($this->getImpDetLitros()+0 <=0 ){
+                $msg[]='- Los litros ingresdos"'.$this->getInvGrado().'" debe ser mayor a 0';
             }
         }else{
-            $msg[]='- El campo "Grados" se encuentra vacio';
+            $msg[]='- El campo "Litros" se encuentra vacio';
         }
         
         return $msg;
@@ -41,132 +39,96 @@ class SolImportacionDet {
     
     /**
      * Es Many-To-One, Unidirectional
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Alcohol")
-     * @ORM\JoinColumn(name="alc_id", referencedColumnName="alc_id")
-     */
-    protected $alcohol;
-    
-    /**
-     * Es Many-To-One, Unidirectional
      * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Cuota")
      * @ORM\JoinColumn(name="cuo_id", referencedColumnName="cuo_id")
      */
     protected $cuota;
-    
-    /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Inventario", inversedBy="inventariosDet", cascade={"persist"})
-     * @ORM\JoinColumn(name="inv_id", referencedColumnName="inv_id")
-     */
-    protected $inventario;
-    
-    /**
-     * Es One-to-One Self-Referencing
-     * @ORM\OneToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\InventarioDet")
-     * @ORM\JoinColumn(name="invdet_id_origen", referencedColumnName="invdet_id")
-     **/
-    protected $inventarioOrigen;
-    
+        
     /**
      * Es Many-To-One, Unidirectional
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad")
-     * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
-     */
-    protected $entidad;
-    
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Arancel")
+     * @ORM\JoinColumn(name="ara_id", referencedColumnName="ara_id")
+     **/
+    protected $arancel;
+        
     /**
-     * ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolicitudImportacion", inversedBy="inventariosDet")
-     * ORM\JoinColumn(name="alc_id", referencedColumnName="alc_id")
+     * ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolicitudImportacion", inversedBy="solImportacionesDet")
+     * ORM\JoinColumn(name="solimp_id", referencedColumnName="solimp_id")
      */
     protected $solImportacion;
     
     /**
-     * ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolicitudLocal", inversedBy="inventariosDet")
-     * ORM\JoinColumn(name="alc_id", referencedColumnName="alc_id")
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\InventarioDet", mappedBy="solImportacionDet")
      */
-    protected $solLocal;
-    
-    
+    protected $inventariosDet;
+        
     /**
-     * @var integer $invDetId
+     * @var integer $impDetId
      *
      * @ORM\Id
-     * @ORM\Column(name="invdet_id", type="integer")
+     * @ORM\Column(name="iimpdet_id", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $invDetId;
+    private $impDetId;
     
     
     /**
-     * @var string $invDetAccion
+     * @var string $impDetFactCom
      *
-     * @ORM\Column(name="invdet_accion", type="string", length=1, nullable=false)
-     * @Assert\Choice(choices= {"+","-","R"}, message="Tipo de Acción no valida --> {{value}}")
+     * @ORM\Column(name="impdet_fact_com", type="text", nullable=false)
      */
-    private $invDetAccion;
+    private $impDetFactCom;
     
     
     /**
-     * @var string $invDetFecha
+     * @var string $impDetProvNom
      *
-     * @ORM\Column(name="invdet_fecha", type="date", nullable=false)
+     * @ORM\Column(name="impdet_prov_nom", type="text", nullable=false)
      */
-    private $invDetFecha;
+    private $impDetProvNom;
     
     
     /**
-     * @var numeric $invDetLitros
+     * @var string $impDetPaisProc
      *
-     * @ORM\Column(name="invdet_litros", type="decimal", nullable=false)
+     * @ORM\Column(name="impdet_pais_proc", type="string", length=100, nullable=false)
+     */
+    private $impDetPaisProc;
+    
+    
+    /**
+     * @var string $impDetPaisOri
+     *
+     * @ORM\Column(name="impdet_pais_ori", type="string", length=100, nullable=false)
+     */
+    private $impDetPaisOri;
+    
+    
+    /**
+     * @var numeric $impDetLitros
+     *
+     * @ORM\Column(name="impdet_litros", type="decimal", nullable=false)
      * @Assert\Type(type="real", message="Los litros ingresados ->{{value}} no es un número valido"),
      * @Assert\Min(limit="0", message="Los litros ingresados {{value}} deben ser mayor a 0")
      */
-    private $invDetLitros;
+    private $impDetLitros;
     
     
     /**
-     * @var string $invDetComentario
+     * @var string $impDetUso
      *
-     * @ORM\Column(name="invdet_comentario", type="text", nullable=true)
+     * @ORM\Column(name="impdet_uso", type="text", nullable=false)
      */
-    private $invDetComentario;
-    
+    private $impDetUso;
     
     /**
-     * @var DateTime $auditDateIns
+     * @var numeric $impDetLitrosLb
      *
-     * @ORM\Column(name="audit_date_ins", type="datetime")
+     * @ORM\Column(name="impdet_litros_lb", type="decimal", nullable=false)
+     * @Assert\Type(type="real", message="Los litros ingresados ->{{value}} no es un número valido"),
+     * @Assert\Min(limit="0", message="Los litros ingresados {{value}} deben ser mayor a 0")
      */
-    private $auditDateIns;
-    
-    
-    /**
-     * @var string $auditUserIns
-     *
-     * @ORM\Column(name="audit_user_ins", type="string", length=50)
-     */
-    private $auditUserIns;
-    
-    /**
-     * @var DateTime $auditDateUpd
-     *
-     * @ORM\Column(name="audit_date_upd", type="datetime", nullable=true)
-     */
-    private $auditDateUpd;
-    
-    /**
-     * @var string $auditUserUpd
-     *
-     * @ORM\Column(name="audit_user_upd", type="string", length=50, nullable=true)
-     */
-    private $auditUserUpd;
-    
-    /**
-     * @var string $auditDeleted
-     *
-     * @ORM\Column(name="audit_deleted", type="boolean", nullable=false)
-     */
-    private $auditDeleted;
-    
+    private $impDetLitrosLb;
     
     
     public function getCuota() {
@@ -177,28 +139,12 @@ class SolImportacionDet {
         $this->cuota = $cuota;
     }
 
-    public function getInventario() {
-        return $this->inventario;
+    public function getArancel() {
+        return $this->arancel;
     }
 
-    public function setInventario($inventario) {
-        $this->inventario = $inventario;
-    }
-
-    public function getInventarioOrigen() {
-        return $this->inventarioOrigen;
-    }
-
-    public function setInventarioOrigen($inventarioOrigen) {
-        $this->inventarioOrigen = $inventarioOrigen;
-    }
-
-    public function getEntidad() {
-        return $this->entidad;
-    }
-
-    public function setEntidad($entidad) {
-        $this->entidad = $entidad;
+    public function setArancel($arancel) {
+        $this->arancel = $arancel;
     }
 
     public function getSolImportacion() {
@@ -209,150 +155,80 @@ class SolImportacionDet {
         $this->solImportacion = $solImportacion;
     }
 
-    public function getSolLocal() {
-        return $this->solLocal;
+    public function getImpDetId() {
+        return $this->impDetId;
     }
 
-    public function setSolLocal($solLocal) {
-        $this->solLocal = $solLocal;
+    public function setImpDetId($impDetId) {
+        $this->impDetId = $impDetId;
     }
 
-    public function getInvDetId() {
-        return $this->invDetId;
+    public function getImpDetFactCom() {
+        return $this->impDetFactCom;
     }
 
-    public function setInvDetId($invDetId) {
-        $this->invDetId = $invDetId;
+    public function setImpDetFactCom($impDetFactCom) {
+        $this->impDetFactCom = $impDetFactCom;
     }
 
-    public function getInvDetAccion() {
-        return $this->invDetAccion;
+    public function getImpDetProvNom() {
+        return $this->impDetProvNom;
     }
 
-    public function setInvDetAccion($invDetAccion) {
-        $this->invDetAccion = $invDetAccion;
+    public function setImpDetProvNom($impDetProvNom) {
+        $this->impDetProvNom = $impDetProvNom;
     }
 
-    public function getInvDetFecha() {
-        return $this->invDetFecha;
+    public function getImpDetPaisProc() {
+        return $this->impDetPaisProc;
     }
 
-    public function setInvDetFecha($invDetFecha) {
-        $this->invDetFecha = $invDetFecha;
+    public function setImpDetPaisProc($impDetPaisProc) {
+        $this->impDetPaisProc = $impDetPaisProc;
     }
 
-    public function getInvDetLitros() {
-        return $this->invDetLitros;
+    public function getImpDetPaisOri() {
+        return $this->impDetPaisOri;
     }
 
-    public function setInvDetLitros($invDetLitros) {
-        $this->invDetLitros = $invDetLitros;
+    public function setImpDetPaisOri($impDetPaisOri) {
+        $this->impDetPaisOri = $impDetPaisOri;
     }
 
-    public function getInvDetComentario() {
-        return $this->invDetComentario;
+    public function getImpDetLitros() {
+        return $this->impDetLitros;
     }
 
-    public function setInvDetComentario($invDetComentario) {
-        $this->invDetComentario = $invDetComentario;
+    public function setImpDetLitros($impDetLitros) {
+        $this->impDetLitros = $impDetLitros;
     }
 
-    public function getAuditDateIns() {
-        return $this->auditDateIns;
+    public function getImpDetUso() {
+        return $this->impDetUso;
     }
 
-    public function setAuditDateIns($auditDateIns) {
-        $this->auditDateIns = $auditDateIns;
+    public function setImpDetUso($impDetUso) {
+        $this->impDetUso = $impDetUso;
     }
 
-    public function getAuditUserIns() {
-        return $this->auditUserIns;
+    public function getImpDetLitrosLb() {
+        return $this->impDetLitrosLb;
     }
 
-    public function setAuditUserIns($auditUserIns) {
-        $this->auditUserIns = $auditUserIns;
+    public function setImpDetLitrosLb($impDetLitrosLb) {
+        $this->impDetLitrosLb = $impDetLitrosLb;
     }
 
-    public function getAuditDateUpd() {
-        return $this->auditDateUpd;
+    public function getInventariosDet() {
+        return $this->inventariosDet;
     }
 
-    public function setAuditDateUpd($auditDateUpd) {
-        $this->auditDateUpd = $auditDateUpd;
+    public function setInventariosDet($inventariosDet) {
+        $this->inventariosDet = $inventariosDet;
     }
 
-    public function getAuditUserUpd() {
-        return $this->auditUserUpd;
-    }
-
-    public function setAuditUserUpd($auditUserUpd) {
-        $this->auditUserUpd = $auditUserUpd;
-    }
-    
-    public function getAuditDeleted() {
-        return $this->auditDeleted;
-    }
-
-    public function setAuditDeleted($auditDeleted) {
-        $this->auditDeleted = $auditDeleted;
-    }
-    
     /******  CUSTOM SET/GET *******/
-    /*public function getAlcohol() {
-        if($this->inventario != null){
-            return $this->inventario->getAlcohol();
-        }else{
-            return null;
-        }
-    }
-    
-    public function setAlcohol($alcohol) {
-        if($this->inventario == null){
-            $this->inventario = new Inventario();
-        }
-        $this->inventario->setAlcohol($alcohol);
-    }/**/
-    
-    public function getAlcId() {
-        if($this->inventario != null){
-            return $this->inventario->getAlcohol()->getAlcId();
-        }else{
-            return null;
-        }
-    }
-    
-    public function setAlcId($alcId) {
-        if($this->inventario == null){
-            $this->inventario = new Inventario();
-        }
-        $this->inventario->getAlcohol()->setAlcId($alcId);
-    }
-    
-    public function getInvNombreEsp() {
-        if($this->inventario != null){
-            return $this->inventario->getInvNombreEsp();
-        }else{
-            return null;
-        }
-    }
-    
-    public function setInvNombreEsp($invNombreEsp) {
-        $this->inventario->setInvNombreEsp($invNombreEsp);
-    }
-    
-    public function getInvGrado() {
-        if($this->inventario != null){
-            return $this->inventario->getInvGrado();
-        }else{
-            return 0;
-        }
-    }
-    
-    public function setInvGrado($invGrado) {
-        if($this->inventario == null){
-            $this->inventario = new Inventario();
-        }
-        
-        $this->inventario->setInvGrado($invGrado);
+    public function addInventarioDet($inventarioDet) {
+        $this->inventariosDet[] = $inventarioDet;
     }
 }

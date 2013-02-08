@@ -1,0 +1,216 @@
+<?php
+
+namespace MinSal\SCA\ProcesosBundle\Entity;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="sca_transiciones")
+ */
+class Transicion {
+    
+    public function __construct() {
+        $this->auditDateIns = new \DateTime();
+        
+        $this->solImportaciones = new ArrayCollection();
+        //$this->solLocales = new ArrayCollection();
+    }
+    
+    /**
+     * @var integer $traId
+     *
+     * @ORM\Id
+     * @ORM\Column(name="tra_id", type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $traId;
+    
+    /**
+     * Es Many-To-One, Unidirectional
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Etapa")
+     * @ORM\JoinColumn(name="etpInicio_id", referencedColumnName="etp_id")
+     */
+    protected $etpInicio;
+    
+    /**
+     * Es Many-To-One, Unidirectional
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Etapa")
+     * @ORM\JoinColumn(name="etpFin_id", referencedColumnName="etp_id")
+     */
+    protected $etpFin;
+    
+    /**
+     * Es Many-To-One, Unidirectional
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Flujo")
+     * @ORM\JoinColumn(name="flu_id", referencedColumnName="flu_id")
+     */
+    protected $flujo;
+    
+    /**
+     * Es Many-To-One, Unidirectional
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Estado")
+     * @ORM\JoinColumn(name="est_id", referencedColumnName="est_id")
+     */
+    protected $estado;
+    
+    
+    /**
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacion", mappedBy="transicion")
+     */
+    protected $solImportaciones;
+    
+    /**
+     * ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", mappedBy="transicion")
+     */
+    //protected $solLocales;
+    
+    /**
+     * @var DateTime $auditDateIns
+     *
+     * @ORM\Column(name="audit_date_ins", type="datetime")
+     */
+    private $auditDateIns;
+    
+    
+    /**
+     * @var string $auditUserIns
+     *
+     * @ORM\Column(name="audit_user_ins", type="string", length=50)
+     */
+    private $auditUserIns;
+    
+    /**
+     * @var DateTime $auditDateUpd
+     *
+     * @ORM\Column(name="audit_date_upd", type="datetime", nullable=true)
+     */
+    private $auditDateUpd;
+    
+    /**
+     * @var string $auditUserUpd
+     *
+     * @ORM\Column(name="audit_user_upd", type="string", length=50, nullable=true)
+     */
+    private $auditUserUpd;
+    
+    /**
+     * @var string $auditDeleted
+     *
+     * @ORM\Column(name="audit_deleted", type="boolean", nullable=false)
+     */
+    private $auditDeleted;
+    
+    
+    public function getTraId() {
+        return $this->traId;
+    }
+
+    public function setTraId($traId) {
+        $this->traId = $traId;
+    }
+
+    public function getTraNombre() {
+        return $this->traNombre;
+    }
+
+    public function setTraNombre($traNombre) {
+        $this->traNombre = $traNombre;
+    }
+
+    public function getTraDesc() {
+        return $this->traDesc;
+    }
+
+    public function setTraDesc($traDesc) {
+        $this->traDesc = $traDesc;
+    }
+
+    public function getAuditDateIns() {
+        return $this->auditDateIns;
+    }
+
+    public function setAuditDateIns($auditDateIns) {
+        $this->auditDateIns = $auditDateIns;
+    }
+
+    public function getAuditUserIns() {
+        return $this->auditUserIns;
+    }
+
+    public function setAuditUserIns($auditUserIns) {
+        $this->auditUserIns = $auditUserIns;
+    }
+
+    public function getAuditDateUpd() {
+        return $this->auditDateUpd;
+    }
+
+    public function setAuditDateUpd($auditDateUpd) {
+        $this->auditDateUpd = $auditDateUpd;
+    }
+
+    public function getAuditUserUpd() {
+        return $this->auditUserUpd;
+    }
+
+    public function setAuditUserUpd($auditUserUpd) {
+        $this->auditUserUpd = $auditUserUpd;
+    }
+
+    public function getAuditDeleted() {
+        return $this->auditDeleted;
+    }
+
+    public function setAuditDeleted($auditDeleted) {
+        $this->auditDeleted = $auditDeleted;
+    }
+    
+    public function getEtpInicio() {
+        return $this->etpInicio;
+    }
+
+    public function setEtpInicio($etpInicio) {
+        $this->etpInicio = $etpInicio;
+    }
+
+    public function getEtpFin() {
+        return $this->etpFin;
+    }
+
+    public function setEtpFin($etpFin) {
+        $this->etpFin = $etpFin;
+    }
+
+    public function getFlujo() {
+        return $this->flujo;
+    }
+
+    public function setFlujo($flujo) {
+        $this->flujo = $flujo;
+    }
+
+    public function getEstado() {
+        return $this->estado;
+    }
+
+    public function setEstado($estado) {
+        $this->estado = $estado;
+    }
+    
+    public function getSolImportaciones() {
+        return $this->solImportaciones;
+    }
+
+    public function setSolImportaciones($solImportaciones) {
+        $this->solImportaciones = $solImportaciones;
+    }
+
+    
+    //*********** CUSTOM SET/GET ******************
+    public function addSolImportacion($solImportacion) {
+        $this->solImportaciones[] = $solImportacion;
+    }
+}

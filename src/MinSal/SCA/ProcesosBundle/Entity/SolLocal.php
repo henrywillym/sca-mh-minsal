@@ -10,14 +10,14 @@ use MinSal\SCA\AdminBundle\Entity\Entidad;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="sca_sol_imp")
+ * @ORM\Table(name="sca_sol_local")
  */
-class SolImportacion {
+class SolLocal {
     
     public function __construct() {
         $this->entidad = new Entidad();
-        $this->solImportacionesDet = new ArrayCollection();
-        $this->solImpFecha = new \DateTime();
+        $this->solLocalesDet = new ArrayCollection();
+        $this->solLocalFecha = new \DateTime();
         $this->auditDateIns = new \DateTime();
     }
     
@@ -28,41 +28,41 @@ class SolImportacion {
     protected $entidad;
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Transicion", inversedBy="solImportaciones")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Transicion", inversedBy="solLocales")
      * @ORM\JoinColumn(name="tra_id", referencedColumnName="tra_id")
      */
     protected $transicion;
     
     /**
-     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet", mappedBy="solImportacion", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocalDet", mappedBy="solLocal", cascade={"persist"})
      */
-    protected $solImportacionesDet;
+    protected $solLocalesDet;
     
     
     /**
-     * @var integer $solImpId
+     * @var integer $solLocalId
      *
      * @ORM\Id
-     * @ORM\Column(name="solimp_id", type="integer")
+     * @ORM\Column(name="sollocal_id", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $solImpId;
+    private $solLocalId;
     
     
     /**
-     * @var string $solImpComentario
+     * @var string $solLocalComentario
      *
-     * @ORM\Column(name="solimp_comentario", type="text", nullable=true)
+     * @ORM\Column(name="sollocal_comentario", type="text", nullable=true)
      */
-    private $solImpComentario;
+    private $solLocalComentario;
     
     
     /**
-     * @var DateTime $solImpFecha
+     * @var DateTime $solLocalFecha
      *
-     * @ORM\Column(name="solimp_fecha", type="datetime", nullable=false)
+     * @ORM\Column(name="sollocal_fecha", type="datetime", nullable=false)
      */
-    private $solImpFecha;
+    private $solLocalFecha;
     
     
     /**
@@ -95,6 +95,7 @@ class SolImportacion {
     private $auditUserUpd;
     
     
+    
     public function getEntidad() {
         return $this->entidad;
     }
@@ -111,28 +112,36 @@ class SolImportacion {
         $this->transicion = $transicion;
     }
 
-    public function getSolImportacionesDet() {
-        return $this->solImportacionesDet;
+    public function getSolLocalesDet() {
+        return $this->solLocalesDet;
     }
 
-    public function setSolImportacionesDet($solImportacionesDet) {
-        $this->solImportacionesDet = $solImportacionesDet;
+    public function setSolLocalesDet($solLocalesDet) {
+        $this->solLocalesDet = $solLocalesDet;
     }
 
-    public function getSolImpId() {
-        return $this->solImpId;
+    public function getSolLocalId() {
+        return $this->solLocalId;
     }
 
-    public function setSolImpId($solImpId) {
-        $this->solImpId = $solImpId;
+    public function setSolLocalId($solLocalId) {
+        $this->solLocalId = $solLocalId;
     }
 
-    public function getSolImpComentario() {
-        return $this->solImpComentario;
+    public function getSolLocalComentario() {
+        return $this->solLocalComentario;
     }
 
-    public function setSolImpComentario($solImpComentario) {
-        $this->solImpComentario = $solImpComentario;
+    public function setSolLocalComentario($solLocalComentario) {
+        $this->solLocalComentario = $solLocalComentario;
+    }
+
+    public function getSolLocalFecha() {
+        return $this->solLocalFecha;
+    }
+
+    public function setSolLocalFecha($solLocalFecha) {
+        $this->solLocalFecha = $solLocalFecha;
     }
 
     public function getAuditDateIns() {
@@ -167,16 +176,10 @@ class SolImportacion {
         $this->auditUserUpd = $auditUserUpd;
     }
 
-    public function getSolImpFecha() {
-        return $this->solImpFecha;
-    }
-
-    public function setSolImpFecha($solImpFecha) {
-        $this->solImpFecha = $solImpFecha;
-    }
+        
 
     //*********** CUSTOM SET/GET ******************
-    public function addSolImportacionDet($solImportacionDet) {
-        $this->solImportacionesDet[] = $solImportacionDet;
+    public function addSolLocalDet($solLocalDet) {
+        $this->solLocalesDet[] = $solLocalDet;
     }
 }
