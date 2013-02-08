@@ -1,25 +1,24 @@
 {
-	"name": "sca-mh-minsal/SCA",
-    "description": "Sistema de Control de Alcoholes de El Salvador",
-    "require":{
-		"symfony/symfony": "v2.0.22",
-		"doctrine/orm": "2.1.*@dev",
-		"kriswallsmith/assetic": "v1.0.3",
-		"symfony/assetic-bundle": "2.0.*@dev",
-		"twig/extensions": "v1.0.0-alpha" ,
-		"jms/metadata": "1.1.1",
-		"sensio/framework-extra-bundle": "2.0.*@dev",
-		"jms/security-extra-bundle": "1.0.*@dev",
-		"sensio/distribution-bundle": "v2.0.22",
-		"sensio/generator-bundle": "v2.0.22",
-		"friendsofsymfony/user-bundle": "1.1.0",
-		"symfony/doctrine-bridge": "2.0.*@dev"
-	}, 
-	"autoload": {
-        "psr-0": { 
-			"": "src/" ,
-			"Twig_Extensions_": "/../vendor/twig/extensions/lib",
-			"Twig_": "/../vendor/twig/twig/lib"
-		}
+    "require": {
+        "php":              ">=5.3.2",
+        "symfony/symfony":  ">=2.0.10,<2.1.0-dev",
+        "doctrine/orm":     ">=2.1.0,<2.2.0-dev",
+        "twig/extensions":  "*@dev",
+
+        "symfony/assetic-bundle":         "2.0.*@dev",
+        "sensio/generator-bundle":        "2.0.*",
+        "sensio/framework-extra-bundle":  "2.0.*",
+        "sensio/distribution-bundle":     "2.0.*",
+        "jms/security-extra-bundle":      "1.0.*@dev",
+		"friendsofsymfony/user-bundle": "1.1.*",
+		
+		"behat/behat-bundle":             "*",
+        "behat/mink-bundle": "dev-master"
+    },
+	
+    "autoload": {
+        "psr-0": {
+           "": "src/" 
+        }
     }
 }

@@ -1,6 +1,273 @@
 {
-    "hash": "3e7e0b6a7dc6d5a24bbec348c6f7447f",
+    "hash": "2af61d345b59f7307cef146f333347a7",
     "packages": [
+        {
+            "name": "behat/behat",
+            "version": "v2.4.5",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/Behat/Behat.git",
+                "reference": "v2.4.5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/Behat/Behat/archive/v2.4.5.zip",
+                "reference": "v2.4.5",
+                "shasum": ""
+            },
+            "require": {
+                "behat/gherkin": ">=2.2.4,<2.3-dev",
+                "php": ">=5.3.1",
+                "symfony/config": ">=2.0,<2.3-dev",
+                "symfony/console": ">=2.0,<2.3-dev",
+                "symfony/dependency-injection": ">=2.0,<2.3-dev",
+                "symfony/event-dispatcher": ">=2.0,<2.3-dev",
+                "symfony/finder": ">=2.0,<2.3-dev",
+                "symfony/translation": ">=2.0,<2.3-dev",
+                "symfony/yaml": ">=2.0,<2.3-dev"
+            },
+            "suggest": {
+                "behat/mink-extension": "for integration with Mink testing framework",
+                "behat/symfony2-extension": "for integration with Symfony2 web framework",
+                "behat/yii-extension": "for integration with Yii web framework"
+            },
+            "time": "2013-01-27 14:45:41",
+            "bin": [
+                "bin/behat"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "2.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Behat\\Behat": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Konstantin Kudryashov",
+                    "email": "ever.zet@gmail.com",
+                    "homepage": "http://everzet.com"
+                }
+            ],
+            "description": "Scenario-oriented BDD framework for PHP 5.3",
+            "homepage": "http://behat.org/",
+            "keywords": [
+                "BDD",
+                "Behat",
+                "Symfony2"
+            ]
+        },
+        {
+            "name": "behat/behat-bundle",
+            "version": "v1.0.0",
+            "target-dir": "Behat/BehatBundle",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/Behat/BehatBundle.git",
+                "reference": "v1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/Behat/BehatBundle/zipball/v1.0.0",
+                "reference": "v1.0.0",
+                "shasum": ""
+            },
+            "require": {
+                "behat/behat": ">=2.2.2",
+                "php": ">=5.3.2",
+                "symfony/framework-bundle": ">=2.0.0"
+            },
+            "suggest": {
+                "behat/mink-bundle": "*"
+            },
+            "time": "2012-01-01 12:33:00",
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-0": {
+                    "Behat\\BehatBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Konstantin Kudryashov",
+                    "email": "ever.zet@gmail.com",
+                    "homepage": "http://everzet.com"
+                }
+            ],
+            "description": "Behat bundle for Symfony2",
+            "homepage": "http://docs.behat.org/bundle/index.html",
+            "keywords": [
+                "BDD",
+                "Behat"
+            ]
+        },
+        {
+            "name": "behat/gherkin",
+            "version": "v2.2.7",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/Behat/Gherkin.git",
+                "reference": "v2.2.7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/Behat/Gherkin/archive/v2.2.7.zip",
+                "reference": "v2.2.7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.1",
+                "symfony/finder": ">=2.0,<2.3-dev"
+            },
+            "require-dev": {
+                "symfony/config": ">=2.0,<2.3-dev",
+                "symfony/translation": ">=2.0,<2.3-dev",
+                "symfony/yaml": ">=2.0,<2.3-dev"
+            },
+            "suggest": {
+                "symfony/config": "If you want to use Config component to manage resources",
+                "symfony/translation": "If you want to use Symfony2 translations adapter",
+                "symfony/yaml": "If you want to parse features, represented in YAML files"
+            },
+            "time": "2013-01-26 23:59:12",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "2.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Behat\\Gherkin": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Konstantin Kudryashov",
+                    "email": "ever.zet@gmail.com",
+                    "homepage": "http://everzet.com"
+                }
+            ],
+            "description": "Gherkin DSL parser for PHP 5.3",
+            "homepage": "http://behat.org/",
+            "keywords": [
+                "BDD",
+                "Behat",
+                "DSL",
+                "Symfony2",
+                "parser"
+            ]
+        },
+        {
+            "name": "behat/mink",
+            "version": "v1.3.3",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/Behat/Mink.git",
+                "reference": "v1.3.3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/Behat/Mink/zipball/v1.3.3",
+                "reference": "v1.3.3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.1",
+                "symfony/browser-kit": ">=2.0,<2.2-dev",
+                "symfony/css-selector": ">=2.0,<2.2-dev",
+                "symfony/dom-crawler": ">=2.0,<2.2-dev",
+                "symfony/finder": ">=2.0,<2.2-dev",
+                "symfony/process": ">=2.0,<2.2-dev"
+            },
+            "time": "2012-03-23 07:12:23",
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Behat\\Mink": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Konstantin Kudryashov",
+                    "email": "ever.zet@gmail.com",
+                    "homepage": "http://everzet.com"
+                }
+            ],
+            "description": "Web acceptance testing framework for PHP 5.3",
+            "homepage": "http://mink.behat.org/",
+            "keywords": [
+                "browser",
+                "testing",
+                "web"
+            ]
+        },
+        {
+            "name": "behat/mink-bundle",
+            "version": "dev-master",
+            "target-dir": "Behat/MinkBundle",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/Behat/MinkBundle.git",
+                "reference": "b44df60a8533824469591a8d3b8e2dbc916a1d59"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Behat/MinkBundle/zipball/b44df60a8533824469591a8d3b8e2dbc916a1d59",
+                "reference": "b44df60a8533824469591a8d3b8e2dbc916a1d59",
+                "shasum": ""
+            },
+            "require": {
+                "behat/mink": ">=1.3.2,<1.4.0-dev",
+                "php": ">=5.3.2",
+                "symfony/framework-bundle": ">=2.0.0"
+            },
+            "time": "2012-08-06 22:12:19",
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-0": {
+                    "Behat\\MinkBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Konstantin Kudryashov",
+                    "email": "ever.zet@gmail.com",
+                    "homepage": "http://everzet.com"
+                }
+            ],
+            "description": "Mink bundle for Symfony2",
+            "homepage": "http://mink.behat.org/bundle/index.html",
+            "keywords": [
+                "browser",
+                "test",
+                "web"
+            ]
+        },
         {
             "name": "doctrine/common",
             "version": "2.1.4",
@@ -125,16 +392,16 @@
         },
         {
             "name": "doctrine/orm",
-            "version": "2.1.5",
+            "version": "2.1.7",
             "source": {
                 "type": "git",
                 "url": "git://github.com/doctrine/doctrine2.git",
-                "reference": "2.1.5"
+                "reference": "2.1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/doctrine2/zipball/2.1.5",
-                "reference": "2.1.5",
+                "url": "https://github.com/doctrine/doctrine2/zipball/2.1.7",
+                "reference": "2.1.7",
                 "shasum": ""
             },
             "require": {
@@ -143,7 +410,7 @@
                 "ext-pdo": "*",
                 "php": ">=5.3.2"
             },
-            "time": "2011-12-19 10:27:12",
+            "time": "2012-05-27 15:01:53",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -329,22 +596,22 @@
         },
         {
             "name": "kriswallsmith/assetic",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "http://github.com/kriswallsmith/assetic.git",
-                "reference": "v1.0.3"
+                "reference": "v1.0.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/kriswallsmith/assetic/zipball/v1.0.3",
-                "reference": "v1.0.3",
+                "url": "https://github.com/kriswallsmith/assetic/zipball/v1.0.4",
+                "reference": "v1.0.4",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.3.1"
             },
-            "time": "2012-03-02 20:25:19",
+            "time": "2012-08-28 05:18:28",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -362,7 +629,7 @@
                     "homepage": "http://kriswallsmith.net/"
                 }
             ],
-            "description": "Asset Management for PHP 5.3",
+            "description": "Asset Management for PHP",
             "homepage": "https://github.com/kriswallsmith/assetic",
             "keywords": [
                 "assets",
@@ -469,7 +736,7 @@
         },
         {
             "name": "sensio/framework-extra-bundle",
-            "version": "2.0.x-dev",
+            "version": "v2.0.22",
             "target-dir": "Sensio/Bundle/FrameworkExtraBundle",
             "source": {
                 "type": "git",
@@ -478,7 +745,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensio/SensioFrameworkExtraBundle/zipball/v2.0.22",
+                "url": "https://github.com/sensio/SensioFrameworkExtraBundle/archive/v2.0.22.zip",
                 "reference": "v2.0.22",
                 "shasum": ""
             },
@@ -733,22 +1000,22 @@
         },
         {
             "name": "twig/extensions",
-            "version": "v1.0.0-alpha",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Twig-extensions",
-                "reference": "v1.0.0-alpha"
+                "reference": "5c2d515d4624bdd588226d688173cf0399a4d8cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig-extensions/zipball/v1.0.0-alpha",
-                "reference": "v1.0.0-alpha",
+                "url": "https://api.github.com/repos/fabpot/Twig-extensions/zipball/5c2d515d4624bdd588226d688173cf0399a4d8cf",
+                "reference": "5c2d515d4624bdd588226d688173cf0399a4d8cf",
                 "shasum": ""
             },
             "require": {
                 "twig/twig": "1.*"
             },
-            "time": "2012-08-28 08:04:23",
+            "time": "2013-01-04 16:55:05",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -834,11 +1101,9 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "doctrine/orm": 20,
+        "twig/extensions": 20,
         "symfony/assetic-bundle": 20,
-        "twig/extensions": 15,
-        "sensio/framework-extra-bundle": 20,
         "jms/security-extra-bundle": 20,
-        "symfony/doctrine-bridge": 20
+        "behat/mink-bundle": 20
     }
 }
