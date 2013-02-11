@@ -7,21 +7,21 @@ root:
         permanent: true
 
 #app/config/rounting.yml
-MinSalSidPlaDependenciaBundle:
-    resource: "@MinSalSidPlaDependenciaBundle/Resources/config/routing.yml"
-    prefix:   /SidPla/
+MinSalSCADependenciaBundle:
+    resource: "@MinSalSCADependenciaBundle/Resources/config/routing.yml"
+    prefix:   /SCA/
 
-MinSalSidPlaBundle:
-    resource: "@MinSalSidPlaBundle/Resources/config/routing.yml"
-    prefix:   /SidPla/
+MinSalSCABundle:
+    resource: "@MinSalSCABundle/Resources/config/routing.yml"
+    prefix:   /SCA/
 
-MinSalSidPlaAdminBundle:
-    resource: "@MinSalSidPlaAdminBundle/Resources/config/routing.yml"
-    prefix:   /SidPla/
+MinSalSCAAdminBundle:
+    resource: "@MinSalSCAAdminBundle/Resources/config/routing.yml"
+    prefix:   /SCA/
 
-MinSalSidPlaUsersBundle:
-    resource: "@MinSalSidPlaUsersBundle/Resources/config/routing.yml"
-    prefix:   /SidPla/users
+MinSalSCAUsersBundle:
+    resource: "@MinSalSCAUsersBundle/Resources/config/routing.yml"
+    prefix:   /SCA/users
 
 
 #Para seguridad
@@ -47,8 +47,15 @@ fos_user_change_password:
 
     
 #************************
-#***  Resset Clave  ****
+#***  Reset Clave  ****
 #************************
-MinSalSidPlaUsersBundle_reset:
+MinSalSCAUsersBundle_reset:
     pattern:  /resetting/resetPassword/{token}
-    defaults: { _controller: MinSalSidPlaUsersBundle:Resetting:reset } 
+    defaults: { _controller: MinSalSCAUsersBundle:Resetting:reset } 
+
+#************************************************
+#***     Solicitudes, Auditoria Externas     ****
+#************************************************
+MinSalSCAProcesosBundle:
+    resource: "@MinSalSCAProcesosBundle/Resources/config/routing.yml"
+    prefix:   /SCA/

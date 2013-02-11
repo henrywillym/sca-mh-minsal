@@ -1,0 +1,9 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{% block body %}
+
+<form action="{{ path('MinSalSCAAdminBundle_crearRol') }}" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+    <input type="submit" />
+</form>
+
+{% endblock %}

@@ -1,0 +1,290 @@
+{# Muestra todos las cuotas registradas (Importación y Locales)#}
+
+{% block body %}
+    <script type="text/javascript">
+        
+        function adecuarVentana(addEvent){
+            if($('[id="alcohol.alcNombre"]').children().length ==0){
+                setTimeout(function(){
+                    adecuarVentana(addEvent);
+                },1000);
+            }else{
+                $('[id="alcohol.alcNombre"]').attr('name','alcId');
+                
+                if(addEvent){
+                    $('#cuoNombreEsp').val($('[id="alcohol.alcNombre"]').children("option").filter(":selected").text());
+                    $('#cuoGrado').val($('[id="alcohol.alcNombre"]').children("option").filter(":selected").attr('grado'));
+                }
+            }
+        }
+        
+        
+        $(document).ready(function(){
+            var myGrid = $('#theGrid');
+            
+            myGrid.jqGrid({ 
+                url: '{{ url('MinSalSCAAdminBundle_consultarCuotasJSON',{'entId': entId, 'cuoTipo':cuoTipo})}}',
+                height: 200,
+                datatype:'json',
+                altRows:true,            
+                rowNum:10,
+                rowList:[10,20,30],
+                multiselect: false,
+                loadonce:true,
+                jsonReader: {
+                    root:'rows',
+                    page:'page',
+                    total:'total',
+                    records:'records',
+                    repeatitems: false,     /**/
+                    id:"0"                 /**/
+                },
+                pager: jQuery('#pager'),
+                viewrecords: true, 
+                {% if(cuoTipo=='I') %}
+                    caption: 'Cuotas de Importación Registradas',
+                {%else%}
+                    caption: 'Cuotas de Compras Locales Registradas',
+                {%endif%}
+                editurl: '{{ url('MinSalSCAAdminBundle_mantCuotaEdicion',{'entId':app.request.get('entId'), 'cuoTipo':cuoTipo})}}',
+                editCaption: "Editar Cuota",
+                addCaption: "Agregar Cuota",
+                colModel:[{
+                        key:true,
+                        label:'ID',
+                        name:'cuoId', 
+                        index: 'cuoId', 
+                        //width:20,
+                        hidden:true,
+                        editable:false,
+                        formoptions:{
+                            rowpos:10,
+                            label: ""
+                        }
+                    },{ 
+                        label:'Año',
+                        name:'cuoYear', 
+                        index: 'cuoYear',
+                        hidden:false,
+                        editable:true,
+                        edittype:"hidden",
+                        formoptions:{
+                            rowpos:8,
+                            label: ""
+                        }
+                    },{ 
+                        label:'Nombre Alcohol',
+                        name:'alcohol.alcNombre', 
+                        index: 'alcohol.alcNombre',
+                        //width:300,
+                        editable:true,
+                        edittype:"select",
+                        editoptions:{
+                            //size: 1,
+                            dataUrl: '{{ url('MinSalSCAAdminBundle_consultarAlcoholesJSONSelect')}}',
+                            dataEvents: [{  
+                                type: 'change',
+                                fn: function(e) {
+                                    if($('#cuoNombreEsp').val().trim() ==''){
+                                        $('#cuoNombreEsp').val($('[id="alcohol.alcNombre"]').children("option").filter(":selected").text());
+                                    }
+                                    if($('#cuoGrado').val().trim() ==''){
+                                        $('#cuoGrado').val($('[id="alcohol.alcNombre"]').children("option").filter(":selected").attr('grado'));
+                                    }
+                                }
+                            }]
+                        },
+                        formoptions:{
+                            rowpos:5,
+                            label: "Nombre Alcohol",
+                            elmsuffix:" (*)"
+                        },
+                        editrules:{
+                            //email:true,
+                            required:true
+                        }
+                    },{ 
+                        label:'Nombre Específico',
+                        name:'cuoNombreEsp', 
+                        index: 'cuoNombreEsp',
+                        //width:90,
+                        editable:true,
+                        editoptions:{
+                            size:50,
+                            maxlength: 255//,
+                            //dataInit:function(el){$(el).keyfilter(/[a-z0-9_\.\-@]/i);}
+                        }, 
+                        formoptions:{
+                            rowpos:1,
+                            label: "Nombre Específico",
+                            elmsuffix:" (*)"
+                        },
+                        editrules:{
+                            //email:true,
+                            required:true
+                        }
+                    },{ 
+                        label:'Grado',
+                        name:'cuoGrado', 
+                        index: 'cuoGrado',
+                        //width:90,
+                        editable:true,
+                        editoptions:{
+                            size:10,
+                            //maxlength: 255//,
+                            dataInit:function(el){
+                                $(el).keyfilter(/[0-9.}]/i);
+                            }
+                            //dataInit:function(el){$(el).keyfilter(/[a-z0-9_\.\-@]/i);}
+                        }, 
+                        formoptions:{
+                            rowpos:2,
+                            label: "Grado",
+                            elmsuffix:" (*)"
+                        },
+                        editrules:{
+                            //email:true,
+                            required:true
+                        }
+                    },{ 
+                        label:'Lts.',
+                        name:'cuoLitros', 
+                        index: 'cuoLitros',
+                        //width:90,
+                        editable:true,
+                        editoptions:{
+                            size:10,
+                            dataInit:function(el){
+                                $(el).keyfilter(/[0-9.}]/i);
+                            }
+                            //maxlength: 255//,
+                            //dataInit:function(el){$(el).keyfilter(/[a-z0-9_\.\-@]/i);}
+                        }, 
+                        formoptions:{
+                            rowpos:3,
+                            label: "Cuota (Ltr.)",
+                            elmsuffix:" (*)"
+                        },
+                        editrules:{
+                            //email:true,
+                            required:true
+                        }
+                    }
+                ],
+                ondblClickRow: function(){
+                    {%if(autorizadoDNM)%}
+                        $("#editarCuota").click();
+                    {%endif%}
+                }
+            });
+            
+            myGrid.jqGrid('navGrid','#pager',{
+                edit:false,
+                add:false,
+                del:false,
+                beforeRefresh: function() {
+                    $("#theGrid").jqGrid('setGridParam',{
+                            datatype:'json',
+                            loadonce:true
+                    }).trigger('reloadGrid');
+                }
+            }
+        );
+       
+        function despuesAgregarEditar(response, postdata) {
+            //alert("datos guardados con exito!");
+            
+            $("#theGrid").jqGrid('setGridParam',{
+                datatype:'json',
+                loadonce:true
+            }).trigger('reloadGrid');
+            
+            json   = response.responseText; // response text is returned from server.
+            
+            try{
+                var result = JSON.parse(json); // convert json object into javascript object
+                if(result.status){
+                    alert("Datos guardados con exito!");
+                }
+                return [result.status,result.msg,null];
+            }catch(e){
+                return [false,'Ocurrio un error interno en el servidor',null];
+            }
+            //return[response.responseText,response.statusText]; //no error
+        }
+        
+        $("#agregarCuota").click(function(){
+            jQuery('#theGrid').jqGrid('editGridRow',"new",{
+                //addCaption: "Agregar Cuota",
+                width:550,
+                height:220,
+                bottominfo:"Campos marcados con (*) son obligatorios",
+                afterSubmit: function(response, postdata){
+                    despuesAgregarEditar(response, postdata);
+                },
+                closeAfterAdd:true,
+                closeOnEscape: true,
+                align:'center'
+            });
+            
+            adecuarVentana(true);
+        });
+        
+    
+         //editar
+        $("#editarCuota").click(function(){
+            var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            
+            if( gr != null ){
+                jQuery('#theGrid').jqGrid('editGridRow',gr,{ 
+                    width:550, 
+                    height:220,
+                    closeAfterEdit : true,
+                    editCaption: "Editar Cuota",
+                    bottominfo:"Campos marcados con (*) son obligatorios",
+                    closeAfterEdit:true,
+                    afterSubmit: function(response, postdata){
+                        despuesAgregarEditar(response, postdata);
+                    },
+                    reloadAfterSubmit:true,
+                    closeOnEscape: true,
+                    align:'center'
+                });
+                
+                adecuarVentana(false);
+            }else{ 
+                alert("Por favor seleccione una fila para editar!"); 
+            }
+        });
+        
+        //eliminar
+        $("#eliminarCuota").click(function(){
+            var grs = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            
+            if( grs != null ){
+                jQuery('#theGrid').jqGrid('delGridRow',grs,{
+                    msg: "Desea eliminar esta cuota?",
+                    caption:"Eliminando Cuota",
+                    width:550,
+                    height:100,
+                    reloadAfterSubmit:true,
+                    align:'center',
+                    onclickSubmit: function(rp_ge, postdata) {
+                        alert("Cuota eliminada con exito!");
+                    }
+                });
+            }else{
+                alert("Por favor seleccione una fila para borrar!");
+            }
+        }); 
+  //fin
+       
+      });
+    </script>
+    
+    <table id="theGrid" class="scroll">
+    </table> 
+        
+    <div id="pager" class="scroll" style="text-align:center;">
+    </div> 
+{% endblock %}
