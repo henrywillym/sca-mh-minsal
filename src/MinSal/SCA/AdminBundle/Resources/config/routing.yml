@@ -1,0 +1,163 @@
+#ROUTING DEL ADMINBUNDLE
+MinSalSCAAdminBundle_homepage:
+    pattern:  /admin/
+    defaults: { _controller: MinSalSCAAdminBundle:Default:index }
+
+#**************#
+#**   ROLES  **#
+#**************#
+MinSalSCAAdminBundle_nuevoRol:
+    pattern:  /admin/nuevoRol
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:nuevoRol }
+        
+MinSalSCAAdminBundle_crearRol:
+    pattern:  /admin/crearRol
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:addRol }
+        
+MinSalSCAAdminBundle_consultarRoles:
+    pattern:  /admin/consultarRoles
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:consultarRoles }
+    
+MinSalSCAAdminBundle_manttRoles:
+    pattern:  /admin/manttRoles
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:mattRoles }
+    
+MinSalSCAAdminBundle_manttRolEdicion:
+    pattern:  /admin/manttRolEdicion
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:manttRolEdicion }
+    
+MinSalSCAAdminBundle_asignarOpcRoles:
+    pattern:  /admin/asignarOpcRoles
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:asignarOpcRoles }
+    
+MinSalSCAAdminBundle_opcionesAsignadas:
+    pattern:  /admin/opcionesAsignadas
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:opcionesAsignadas }
+    
+MinSalSCAAdminBundle_insertOpcSeleccRol:
+    pattern:  /admin/insertOpcSeleccRol    
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:insertOpcSeleccRol }
+
+MinSalSCAAdminBundle_deleteOpcSeleccRol:
+    pattern:  /admin/deleteOpcSeleccRol    
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:deleteOpcSeleccRol }
+    
+MinSalSCAAdminBundle_opcionesSinAsignar:
+    pattern:  /admin/opcionesSinAsignar    
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:opcionesSinAsignar }
+
+MinSalSCAAdminBundle_consultarTiposJSONSelect:
+    pattern:  /admin/consultarTiposJSONSelect
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:consultarTiposJSONSelect }
+
+MinSalSCAAdminBundle_consultarInternoTiposJSONSelect:
+    pattern:  /admin/consultarInternoTiposJSONSelect
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminRoles:consultarInternoTiposJSONSelect }
+
+#****************#
+#*** OPCIONES ***#
+#****************#
+MinSalSCAAdminBundle_crearOpc:
+    pattern:  /admin/crearOpc
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminOpciones:addOcp }
+    
+MinSalSCAAdminBundle_nuevaOpc:
+    pattern:  /admin/nuevaOpc
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminOpciones:nuevaOpc }
+
+MinSalSCAAdminBundle_consultarOpciones:
+    pattern:  /admin/consultarOpc
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminOpciones:consultarOpc, _format: json }
+    requirements: { _format: (xml|json), _method: GET }  
+
+MinSalSCAAdminBundle_mattOpciones:
+    pattern:  /admin/mattOpciones
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminOpciones:mattOpciones }
+    
+MinSalSCAAdminBundle_manttOpcEdicion:
+    pattern:  /admin/manttOpcEdicion
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminOpciones:manttOpcEdicion }
+
+
+
+MinSalSCAAdminBundle_consultarMenCorrtemp:
+    pattern:  /admin/consultarMenCorrtemp    
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminMenCorreTemp:consultarMenCorrtemp }
+
+MinSalSCAAdminBundle_consultarMenCorrtempJSON:
+    pattern:  /admin/consultarMenCorrtempJSON    
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminMenCorreTemp:consultarMenCorrtempJSON }   
+    
+MinSalSCAAdminBundle_manttMenCorrtempEdicion:
+    pattern:  /admin/manttMenCorrtempEdicion
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminMenCorreTemp:manttMenCorrtempEdicion }  
+    
+    
+         
+MinSalSCAAdminBundle_mantenimientoNotificacion:
+    pattern:  /admin/mantenimientoNotificacion   
+    defaults: { _controller: MinSalSCAAdminBundle:AccionNotificacionSistema:mantenimientoNotificacion }
+    
+MinSalSCAAdminBundle_consultarNotificacionJSON:
+    pattern:  /admin/consultarNotificacionJSON   
+    defaults: { _controller: MinSalSCAAdminBundle:AccionNotificacionSistema:consultarNotificacionJSON }
+    
+MinSalSCAAdminBundle_manttNotificacionEdicion:
+    pattern:  /admin/manttNotificacionEdicion
+    defaults: { _controller: MinSalSCAAdminBundle:AccionNotificacionSistema:manttNotificacionEdicion }   
+
+#****************************
+#*** Empresas o Entidades ***
+#****************************
+MinSalSCAAdminBundle_mantEntidades:
+    pattern:  /empresa/mantEntidades
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminEntidades:mantEntidades } 
+    
+MinSalSCAAdminBundle_consultarEntidadesJSON:
+    pattern:  /empresa/consultarEntidadesJSON
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminEntidades:consultarEntidadesJSON } 
+
+MinSalSCAAdminBundle_mantEntidadEdicion:
+    pattern:  /empresa/mantEntidadEdicion
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminEntidades:mantEntidadEdicion }
+
+MinSalSCAAdminBundle_mantCargarEntidad:
+    pattern:  /empresa/mantCargarEntidad/{entId}
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminEntidades:mantCargarEntidad } 
+
+#******************
+#****  Cuotas   ***
+#******************
+MinSalSCAAdminBundle_mantCargarCuotas:
+    pattern:  /empresa/mantCargarCuotas/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminCuotas:mantCuotas } 
+
+MinSalSCAAdminBundle_mantCuotaEdicion:
+    pattern:  /empresa/mantCuotaEdicion/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminCuotas:mantCuotaEdicion } 
+
+MinSalSCAAdminBundle_consultarCuotasJSON:
+    pattern:  /empresa/consultarCuotasJSON/{entId}/{cuoTipo}
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminCuotas:consultarCuotasJSON } 
+
+MinSalSCAAdminBundle_consultarAlcoholesJSONSelect:
+    pattern:  /empresa/consultarAlcoholesOrgJSONSelect
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminAlcoholes:consultarAlcoholesJSONSelect }
+
+#**********************
+#****  LISTADO DNM  ***
+#**********************
+#listado autorizado
+MinSalSCAAdminBundle_listadoDNM:
+    pattern:  /DNM/listadoDNM
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminListadoDNM:LoadListadoDNM } 
+#consulta listado
+MinSalSCAAdminBundle_ConsultarListadoDNM:
+    pattern:  /DNM/ConsultarListadoDNM
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminListadoDNM:ConsultarListadoDNM, _format: json }
+    requirements: { _format: (xml|json), _method: GET }  
+#manttlistado
+MinSalSCAAdminBundle_manttListadoDNMEdicion:
+    pattern:  /DNM/manttListadoDNMEdicion
+    defaults: { _controller: MinSalSCAAdminBundle:AccionAdminListadoDNM:manttListadoDNMedicion }
+    

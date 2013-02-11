@@ -1,0 +1,42 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+
+{% block body %}
+
+    <script type="text/javascript">
+       $(document).ready(function(){
+            $('input[type="button"]').button();
+       });
+    </script>
+    
+        <center>
+            <h1>
+                {% if(cuoTipo=='I') %}
+                    Listado de Cuotas de Importación Registradas de "{{entNombre}}"
+                {%else%}
+                    Listado de Cuotas de Compras Locales Registradas de "{{entNombre}}"
+                {%endif%}
+            </h1>
+            {% if app.session.hasFlash('notice') %}
+                <div class="flash-notice">
+                    {{ app.session.flash('notice') }}
+                </div><br/>
+            {% endif %}
+                
+                
+            {% include 'MinSalSCAAdminBundle:Cuota:showAllCuotas.html.twig'%}
+        
+            <br/>
+            
+            {%if(autorizadoDNM)%}
+                <input type="button" value="Agregar" id="agregarCuota" /> &nbsp;
+                <input type="button" value="Editar" id="editarCuota" /> &nbsp;
+                <input type="button" value="Eliminar" id="eliminarCuota"/> &nbsp;
+            {%else%}
+                <div class="flash-notice">
+                    No se pueden ingresar/modificar cuotas, debido a que la empresa no tiene vigente la autorización de la Dirección General de Medicamentos
+                </div>
+            {%endif%}
+            <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAAdminBundle_mantCargarEntidad',{'entId':entId})}}';"/>
+        </center>
+    
+{% endblock %}
