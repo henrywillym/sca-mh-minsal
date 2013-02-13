@@ -1,6 +1,11 @@
 <?php
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
+use MinSal\SCA\ProcesosBundle\Entity\Estado;
+use MinSal\SCA\ProcesosBundle\Entity\Flujo;
+use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
+use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
+
 /**
  * RepositoryClass de SolImportacion
  *
@@ -10,19 +15,27 @@ class SolImportacionDao {
     var $doctrine;
     var $repositorio;
     var $em;
+    
+    var $fluId;
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;
         $this->em = $this->doctrine->getEntityManager();
         $this->repositorio = $this->doctrine->getRepository('MinSalSCAProcesosBundle:SolImportacion');
+        
+        $this->fluId = Flujo::$IMPORTACION;
     }
 
     /**
-     * Obtiene todas las solicitudes de Importacion sin importar el estado o etapa que se encuentren
+     * Obtiene todas las solicitudes de Importacion de acuerdo a la etapa y flujo que se encuentren
      * 
+     * @param integer $entId
+     * @param integer $etpId
+     * @param integer $fluId
      * @return Array
      */
-    public function getSolImportaciones($entId) {
+    public function getSolImportacionesByEtapa($entId, $etpId) {
+        
         $registros = $this->em->createQuery("SELECT E, A, D, C, F
                                           FROM MinSalSCAProcesosBundle:SolImportacion E 
                                             JOIN E.entidad A
@@ -30,13 +43,26 @@ class SolImportacionDao {
                                             JOIN B.estado C
                                             JOIN B.etapa D
                                             JOIN E.solImportacionesDet F
+                                            JOIN B.flujo G
                                           WHERE A.entId = :entId
+                                            AND B.etpId = :etpId
+                                            AND G.fluId = :fluId
                                           order by E.auditDateUpd DESC, E.auditDateIns DESC")
-                ->setParameter('entId',$entId);
+                ->setParameter('entId',$entId)
+                ->setParameter('etpId',$etpId)
+                ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
     
-    public function getSolImportacionesByTransicion($entId, $traId) {
+    /**
+     * Devuelve las solicitudes de acuerdo al estado, etapa y flujo en el que se encuentren
+     * @param integer $entId
+     * @param integer $estId
+     * @param integer $etpId
+     * @param integer $fluId
+     * @return Array
+     */
+    public function getSolImportacionesByCriteria($entId, $estId, $etpId) {
         $registros = $this->em->createQuery("SELECT E, A, D, C, F
                                           FROM MinSalSCAProcesosBundle:SolImportacion E 
                                             JOIN E.entidad A
@@ -44,48 +70,93 @@ class SolImportacionDao {
                                             JOIN B.estado C
                                             JOIN B.etapa D
                                             JOIN E.solImportacionesDet F
+                                            JOIN B.flujo G
                                           WHERE A.entId = :entId
-                                            AND B.traId = :traId
+                                            AND C.estId = :estId
+                                            AND B.etpId = :etpId
+                                            AND G.fluId = :fluId
                                           order by E.auditDateUpd DESC, E.auditDateIns DESC")
                 ->setParameter('entId',$entId)
-                ->setParameter('traId',$traId);
+                ->setParameter('estId',$estId)
+                ->setParameter('etpId',$etpId)
+                ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
 
-    public function getSolImportacion($id) {
-        return $this->repositorio->find($id);
-        /*$registros = $this->em->createQuery("SELECT E
+    public function getSolImportacionDet($id) {
+        //return $this->repositorio->find($id);
+        $registros = $this->em->createQuery("SELECT E, A
                                           FROM MinSalSCAProcesosBundle:SolImportacion E
-                                          WHERE E.solImpId = :solImpId")
-                ->setParameter('solImpId',$id);
-        return $registros->getResult();/**/
+                                          JOIN E.solImportacionesDet A
+                                          WHERE A.impDetId = :impDetId
+                                          ")
+                ->setParameter('impDetId',$id); //WHERE E.solImpId = :solImpId
+        return $registros->getSingleResult();/**/
     }
     
     public function addSolImportacion(SolImportacion $solImportacion) {
         $this->em->persist($solImportacion);
         $this->em->flush();
-        $matrizMensajes = array('El proceso de almacenar el registro termino con éxito', 'SolImportacion ' . $solImportacion->getEntId());
+        $matrizMensajes = array('El proceso de almacenar el registro termino con éxito', 'SolImportacion ' . $solImportacion->getSolImpId());
 
         return $matrizMensajes;
     }
-
+    
+    /**
+     * Esta funcion se utiliza para persistir tanto objetos de tipo SolImportacion y SolImportacionDet
+     * @param type $solImportacion
+     * @return string
+     */
     public function editSolImportacion(SolImportacion $solImportacion) {
         $this->em->persist($solImportacion);
         $this->em->flush();
-        $matrizMensajes = array('Se actualizo con éxito', 'SolImportacion ' . $solImportacion->getEntId());
+        $matrizMensajes = array('Se actualizo con éxito', 'SolImportacionDet ' . $solImportacion->getSolImpId());
 
         return $matrizMensajes;
     }
     
     public function delSolImportacion(SolImportacion $solImportacion) {
         if (!$solImportacion) {
-            throw $this->createNotFoundException('No se encontro entidad con ese id ' . $solImportacion->getEntId());
+            throw $this->createNotFoundException('No se encontro entidad con ese id ' . $solImportacion->getSolImpId());
         }
         //$this->em->remove($entidad);
         $this->em->flush();
-        $matrizMensajes = array('El proceso de eliminar termino con exito', 'SolImportacion ' . $solImportacion->getEntId());
+        $matrizMensajes = array('El proceso de eliminar termino con exito', 'SolImportacion ' . $solImportacion->getSolImpId());
         
         return $matrizMensajes;
+    }
+    
+    /**
+     * Esta funcion, realiza un conteo de los litros asociados a una cuota que se encuentran en solicitudes en proceso.
+     * Se excluyen aquellas solicitudes que han sido rechazadas o Canceladas, pues significa que se ha restablecido 
+     * lo reservado para su cuota. Ademas se restan los valores de LItros LIberados por aduana, ya que esos se tomaran 
+     * en cuenta al momento de obtener los litros del inventario por cuota.
+     * 
+     * @param type $entId
+     * @param type $cuoId
+     * @return int
+     */
+    public function getLitrosSolicitudXCuota($entId, $cuoId){
+        $registros = $this->em->createQuery("SELECT sum(B.impDetLitros - B.impDetLitrosLib)
+                                          FROM MinSalSCAProcesosBundle:SolImportacion E 
+                                                JOIN E.solImportacionesDet B
+                                                JOIN B.cuota C
+                                                JOIN C.entidad D
+                                                JOIN E.transicion F
+                                                JOIN F.estado G
+                                          WHERE D.entId = :entId
+                                            AND C.cuoId = :cuoId
+                                            AND G.estId not in (".Estado::$CANCELADO.",".Estado::$RECHAZADO.")")
+                ->setParameter('entId', $entId)
+                ->setParameter('cuoId', $cuoId);
+        
+        $result= $registros->getSingleResult();
+        
+        if($result !=null && count($result)>0 && $result[1] != null){
+            return $result[1];
+        }else{
+            return 0;
+        }
     }
 }
 ?>

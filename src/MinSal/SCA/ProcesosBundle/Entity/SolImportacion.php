@@ -2,11 +2,12 @@
 
 namespace MinSal\SCA\ProcesosBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
+use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
+use MinSal\SCA\ProcesosBundle\Entity\Transicion;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -17,12 +18,13 @@ class SolImportacion {
     public function __construct() {
         $this->entidad = new Entidad();
         $this->solImportacionesDet = new ArrayCollection();
+        $this->transicion = new Transicion();
         $this->solImpFecha = new \DateTime();
         $this->auditDateIns = new \DateTime();
     }
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad", inversedBy="inventarios")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad")
      * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
      */
     protected $entidad;
@@ -34,7 +36,7 @@ class SolImportacion {
     protected $transicion;
     
     /**
-     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet", mappedBy="solImportacion", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet", mappedBy="solImportacion")
      */
     protected $solImportacionesDet;
     
@@ -58,7 +60,7 @@ class SolImportacion {
     
     
     /**
-     * @var DateTime $solImpFecha
+     * @var \DateTime $solImpFecha
      *
      * @ORM\Column(name="solimp_fecha", type="datetime", nullable=false)
      */
@@ -66,7 +68,7 @@ class SolImportacion {
     
     
     /**
-     * @var DateTime $auditDateIns
+     * @var \DateTime $auditDateIns
      *
      * @ORM\Column(name="audit_date_ins", type="datetime")
      */
@@ -81,7 +83,7 @@ class SolImportacion {
     private $auditUserIns;
     
     /**
-     * @var DateTime $auditDateUpd
+     * @var \DateTime $auditDateUpd
      *
      * @ORM\Column(name="audit_date_upd", type="datetime", nullable=true)
      */
@@ -93,7 +95,6 @@ class SolImportacion {
      * @ORM\Column(name="audit_user_upd", type="string", length=50, nullable=true)
      */
     private $auditUserUpd;
-    
     
     public function getEntidad() {
         return $this->entidad;
@@ -135,6 +136,14 @@ class SolImportacion {
         $this->solImpComentario = $solImpComentario;
     }
 
+    public function getSolImpFecha() {
+        return $this->solImpFecha;
+    }
+
+    public function setSolImpFecha($solImpFecha) {
+        $this->solImpFecha = $solImpFecha;
+    }
+
     public function getAuditDateIns() {
         return $this->auditDateIns;
     }
@@ -167,16 +176,9 @@ class SolImportacion {
         $this->auditUserUpd = $auditUserUpd;
     }
 
-    public function getSolImpFecha() {
-        return $this->solImpFecha;
-    }
-
-    public function setSolImpFecha($solImpFecha) {
-        $this->solImpFecha = $solImpFecha;
-    }
-
+    
     //*********** CUSTOM SET/GET ******************
-    public function addSolImportacionDet($solImportacionDet) {
+    public function addSolImportacionDet(SolImportacionDet $solImportacionDet) {
         $this->solImportacionesDet[] = $solImportacionDet;
     }
 }

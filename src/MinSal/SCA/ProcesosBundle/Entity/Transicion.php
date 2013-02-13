@@ -20,15 +20,6 @@ class Transicion {
     }
     
     /**
-     * @var integer $traId
-     *
-     * @ORM\Id
-     * @ORM\Column(name="tra_id", type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $traId;
-    
-    /**
      * Es Many-To-One, Unidirectional
      * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Etapa")
      * @ORM\JoinColumn(name="etpInicio_id", referencedColumnName="etp_id")
@@ -66,6 +57,16 @@ class Transicion {
      * ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", mappedBy="transicion")
      */
     //protected $solLocales;
+    
+    
+    /**
+     * @var integer $traId
+     *
+     * @ORM\Id
+     * @ORM\Column(name="tra_id", type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $traId;
     
     /**
      * @var DateTime $auditDateIns

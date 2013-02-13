@@ -11,7 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="sca_flujos")
  */
 class Flujo {
-    
+    public static $IMPORTACION = 1;
+    public static $LOCAL = 2;
+            
     public function __construct() {
         $this->auditDateIns = new \DateTime();
     }

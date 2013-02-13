@@ -16,6 +16,10 @@ class Arancel {
         
     }
     
+    public function __toString() {
+        return strval($this->araCodigo.' - '.$this->araDescripcion);
+    }
+    
     /**
      * @var integer $araId
      *

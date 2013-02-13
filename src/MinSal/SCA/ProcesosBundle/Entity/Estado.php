@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="sca_estados")
  */
 class Estado {
+    public static $RECHAZADO = 2;
+    public static $CANCELADO = 4;
     
     public function __construct() {
         $this->auditDateIns = new \DateTime();

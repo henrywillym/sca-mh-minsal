@@ -59,14 +59,14 @@ class InventarioDet {
     protected $entidad;
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacion", inversedBy="inventariosDet")
-     * @ORM\JoinColumn(name="solimp_id", referencedColumnName="solimp_id")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet", inversedBy="inventariosDet")
+     * @ORM\JoinColumn(name="impdet_id", referencedColumnName="impdet_id")
      */
     protected $solImportacionDet;
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", inversedBy="inventariosDet")
-     * @ORM\JoinColumn(name="sollocal_id", referencedColumnName="sollocal_id")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocalDet", inversedBy="inventariosDet")
+     * @ORM\JoinColumn(name="localdet_id", referencedColumnName="localdet_id")
      */
     protected $solLocalDet;
     
