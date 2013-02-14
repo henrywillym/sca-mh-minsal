@@ -3,9 +3,11 @@
 namespace MinSal\SCA\ProcesosBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use MinSal\SCA\AdminBundle\Entity\Cuota;
+use MinSal\SCA\ProcesosBundle\Entity\Arancel;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -18,6 +20,7 @@ class SolImportacionDet {
         //$this->auditDateIns = new \DateTime();
         $this->impDetLitrosLib = 0;
         $this->solImportacion = new SolImportacion();
+        $this->cuota = new Cuota();
     }
     
     /**

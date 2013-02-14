@@ -7,7 +7,6 @@
 namespace MinSal\SCA\ProcesosBundle\Controller;
 
 use MinSal\SCA\AdminBundle\Entity\Cuota;
-use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
@@ -32,7 +31,7 @@ class AccionSCASolImportacionController extends Controller {
      * Retorna la página de ingreso de solicitud de importacion
      * pendiente El redireccionamiento Dinamico.
      * 
-     * @return type HTML.twig
+     * @return HTML.twig
      */
     public function mantSolImportacionIngresoAction() {
         $opciones = $this->getRequest()->getSession()->get('opciones');
@@ -56,6 +55,31 @@ class AccionSCASolImportacionController extends Controller {
             );
         }
     }
+    
+    /**
+     * Redirecciona a la pagina para ver las solicitudes asociadas a la empresa del usuario
+     * 
+     * @return html.twig
+     */
+    public function mantSolImportacionVerSolicitudesAction() {
+        $opciones = $this->getRequest()->getSession()->get('opciones');
+        $user = $this->get('security.context')->getToken()->getUser();
+        
+        if($user->getEntidad()==null){
+            return $this->render('MinSalSCAProcesosBundle:Default:mantNoEntidad.html.twig', array(
+                        'opciones' => $opciones
+                    )
+            );
+        }else{
+            return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:verSolImportaciones.html.twig', array(
+                        'opciones' => $opciones,
+                        'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
+                    )
+            );
+        }
+    }
+    
+    
 
     /**
      * Devuelve el listado principal de registros del mantenimiento
@@ -91,10 +115,37 @@ class AccionSCASolImportacionController extends Controller {
     }
     
     /**
+     * Devuelve el listado de solicitudes asociadas a la empresa del usuario
+     * 
+     * @return Response
+     */
+    public function verSolImportacionesJSONAction() {
+        $user = $this->get('security.context')->getToken()->getUser();
+        
+        $solImportacionDetDao = new SolImportacionDetDao($this->getDoctrine());
+        $registros = $solImportacionDetDao->getSolImportacionesDetByEntidad($user->getEntidad()->getEntId());
+
+        $numfilas = count($registros);
+        
+        $datos = json_encode($registros);
+        $pages = floor($numfilas / 10) + 1;
+
+        $jsonresponse = '{
+               "page":"1",
+               "total":"' . $pages . '",
+               "records":"' . $numfilas . '", 
+               "rows":' . $datos . '}';
+
+        $response = new Response($jsonresponse);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
+    
+    /**
      * Devuelve el listado de cuotas asignadas a la entidad
      * @return Response
      */
-    public function getCuotasAction() {
+    public function getCuotasAction(Request $request) {
         $user = $this->get('security.context')->getToken()->getUser();
         $entId = $user->getEntidad()->getEntId();
         $year = new \DateTime();
@@ -102,6 +153,9 @@ class AccionSCASolImportacionController extends Controller {
         $cuotaDao = new CuotaDao($this->getDoctrine());
         $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
+        
+        $verSolicitud = $request->get('verSolicitud')  === 'true';
+        
         $registros = $cuotaDao->getCuotas($entId, Cuota::$cuoTipoImportacion, $year->format('Y'));
 
         $numfilas = count($registros);
@@ -117,7 +171,7 @@ class AccionSCASolImportacionController extends Controller {
                 
                 $disponible = $reg['cuoLitros'] - $litrosInventario - $litrosSolicitudesPendientes;
                 
-                if($disponible > 0){
+                if($disponible > 0 || $verSolicitud){
                     if($i ==0){
                         $selected = 'selected';
                     }else{
@@ -137,6 +191,74 @@ class AccionSCASolImportacionController extends Controller {
         }
         
         //$htmlResponse = $htmlResponse.'</select>';
+        
+        $response = new Response($htmlResponse);
+        return $response;
+    }
+    
+    public function getSearchEstadosAction(Request $request) {
+        $user = $this->get('security.context')->getToken()->getUser();
+        $entId = $user->getEntidad()->getEntId();
+        
+        $solImportacionDao = new SolImportacionDao($this->getDoctrine());
+        
+        $registros = $solImportacionDao->getSearchEstados($entId);
+
+        $numfilas = count($registros);
+        
+        $htmlResponse = '<select>';
+        if ($numfilas != 0) {
+            $i = 0;
+            foreach($registros as $reg){
+                if($i == 0){
+                    $htmlResponse = $htmlResponse. "<option value='' >Seleccione</option>";
+                }
+                $htmlResponse = $htmlResponse. "<option value='" . $reg['estNombre'] . "' >" . $reg['estNombre'] . "</option>";
+                $i++;
+            }
+            
+            if($i == 0){
+                $htmlResponse = $htmlResponse.'<option value="">No existen registros</option>';
+            }
+        } else {
+            $htmlResponse = $htmlResponse.'<option value="">No existen registros</option>';
+        }
+        
+        $htmlResponse = $htmlResponse.'</select>';
+        
+        $response = new Response($htmlResponse);
+        return $response;
+    }
+    
+    public function getSearchEtapasAction(Request $request) {
+        $user = $this->get('security.context')->getToken()->getUser();
+        $entId = $user->getEntidad()->getEntId();
+        
+        $solImportacionDao = new SolImportacionDao($this->getDoctrine());
+        
+        $registros = $solImportacionDao->getSearchEtapas($entId);
+
+        $numfilas = count($registros);
+        
+        $htmlResponse = '<select>';
+        if ($numfilas != 0) {
+            $i = 0;
+            foreach($registros as $reg){
+                if($i == 0){
+                    $htmlResponse = $htmlResponse. "<option value='' >Seleccione</option>";
+                }
+                $htmlResponse = $htmlResponse. "<option value='" . $reg['etpNombre'] . "' >" . $reg['etpNombre'] . "</option>";
+                $i++;
+            }
+            
+            if($i == 0){
+                $htmlResponse = $htmlResponse.'<option value="">No existen registros</option>';
+            }
+        } else {
+            $htmlResponse = $htmlResponse.'<option value="">No existen registros</option>';
+        }
+        
+        $htmlResponse = $htmlResponse.'</select>';
         
         $response = new Response($htmlResponse);
         return $response;
@@ -243,7 +365,7 @@ class AccionSCASolImportacionController extends Controller {
         
         $form = $this->createForm(new SolImportacionDetType($this->getDoctrine()), $solImportacionDet);
 
-        return $this->render('MinSalSCAProcesosBundle:SolImportacion:ingresarSolImportacionDet.html.twig', array(
+        return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:ingresarSolImportacionDet.html.twig', array(
             'form' => $form->createView(),
             'opciones' => $opciones,
             'impDetId' => $impDetId,

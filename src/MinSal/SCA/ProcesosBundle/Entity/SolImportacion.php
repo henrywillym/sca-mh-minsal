@@ -62,7 +62,7 @@ class SolImportacion {
     /**
      * @var \DateTime $solImpFecha
      *
-     * @ORM\Column(name="solimp_fecha", type="datetime", nullable=false)
+     * @ORM\Column(name="solimp_fecha", type="date", nullable=false)
      */
     private $solImpFecha;
     

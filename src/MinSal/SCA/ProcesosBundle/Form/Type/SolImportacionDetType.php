@@ -92,9 +92,10 @@ class SolImportacionDetType extends AbstractType {
             'label'=>'Nombre del Alcohol',
             //'em'=> 'doctrine.orm.entity_manager'
         ));/**/
-        /*
-        $builder->add('cuota', 'hidden', array(
-            'label'=>'Nombre del Alcohol'
+        
+        $builder->add('cuota.cuoId', 'hidden', array(
+            'label'=>'Nombre del Alcohol',
+            //'property_path'=>false
         ));/**/
             
         $builder->add('impDetFactCom', 'text', array('label' => 'No. Factura Comercial','required'=>true));

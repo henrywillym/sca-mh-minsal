@@ -1,6 +1,7 @@
 <?php
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
+use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
 
 /**
@@ -12,11 +13,15 @@ class SolImportacionDetDao {
     var $doctrine;
     var $repositorio;
     var $em;
+    
+    var $fluId;
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;
         $this->em = $this->doctrine->getEntityManager();
         $this->repositorio = $this->doctrine->getRepository('MinSalSCAProcesosBundle:SolImportacionDet');
+        
+        $this->fluId = Flujo::$IMPORTACION;
     }
 
     /**
@@ -33,6 +38,28 @@ class SolImportacionDetDao {
                                           WHERE C.solImpId = :solImpId
                                           order by E.auditDateUpd DESC, E.auditDateIns DESC")
                 ->setParameter('solImpId',$solImpId);
+        return $registros->getArrayResult();
+    }
+    
+    public function getSolImportacionesDetByEntidad($entId) {
+        //E, H, C, D, F
+        $registros = $this->em->createQuery("SELECT E.impDetId, E.impDetProvNom, E.impDetPaisProc, E.impDetPaisOri, E.impDetLitros, E.impDetLitrosLib, E.impDetFactCom, F.auditUserIns, F.auditDateIns,
+                                                C.estId, C.estNombre, 
+                                                D.etpId, D.etpNombre,
+                                                F.solImpFecha,
+                                                H.cuoNombreEsp, H.cuoGrado
+                                          FROM MinSalSCAProcesosBundle:SolImportacionDet E 
+                                            JOIN E.cuota H
+                                            JOIN E.solImportacion F
+                                            JOIN F.entidad A
+                                            JOIN F.transicion B
+                                            JOIN B.estado C
+                                            JOIN B.etpFin D
+                                            JOIN B.flujo G
+                                          WHERE A.entId = :entId
+                                            AND G.fluId = :fluId")
+                ->setParameter('entId',$entId)
+                ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
     

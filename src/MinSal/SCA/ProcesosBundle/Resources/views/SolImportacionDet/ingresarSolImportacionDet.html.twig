@@ -33,23 +33,35 @@
             $('#btnEliminar').button();
             $('#btnRegresar').button();
             
+            var impDetId = 'false';
+            
+            if($('[id="SolImportacionDet_impDetId"]').val() !='' ){
+                $('[name="verSolicitud"]').hide();
+                $('#btnGuardar').hide();
+                $('#btnRegresar').show();
+                $('#cuota,#SolImportacionDet_arancel').prop("disabled",true);
+                $('input[type="text"]').attr('readonly','readonly');
+                $('textarea').attr('readonly','readonly');
+                impDetId = 'true';
+            }
+            
             $.ajax({
-                url:'{{url('MinSalSCAProcesosBundle_getCuotas')}}',
+                url:'{{url('MinSalSCAProcesosBundle_getCuotas')}}?verSolicitud='+impDetId,
                 type: 'POST',
                 cache: false,
                 success: function(data, textStatus, jqXHR){
                     $('#cuota')[0].innerHTML = data;
                     //$('#cuota>select').attr('id','cuota');
                     
-                    if($('#SolImportacionDet_cuota').val() !='' ){
-                        $('#cuota').val($('#SolImportacionDet_cuota').val());
+                    if($('[id="SolImportacionDet_cuota.cuoId"]').val() !='' ){
+                        $('#cuota').val($('[id="SolImportacionDet_cuota.cuoId"]').val());
                     }
                     
                     $('#cuota').change(function(){
                         $('#grado').val($('#cuota').children("option").filter("[value='"+ $('#cuota').val() +"']").attr('grado'));
                         $('#disponible').val($('#cuota').children("option").filter("[value='"+ $('#cuota').val() +"']").attr('disponible'));
                         calcularSaldo();
-                        $('#SolImportacionDet_cuota').val($('#cuota').val());
+                        $('[id="SolImportacionDet_cuota.cuoId"]').val($('#cuota').val());
                     });
                     
                     $('#cuota').change();
@@ -120,8 +132,8 @@
                     </td>
                     <td>
                         <select id="cuota" name="cuota"></select>
-                        {#{ form_widget(form.cuota) }#}
-                        {#{ form_errors(form.cuota) }#}
+                        {#{ form_widget(form.cuota.cuoId) }#}
+                        {#{ form_errors(form.cuota['cuoId']) }#}
                     </td>
                 </tr>
                 <tr>
@@ -206,7 +218,7 @@
                     </td>
                 </tr>
                 
-                <tr>
+                <tr name="verSolicitud">
                     <td>
                         <label >
                             Cuota Disponible:
@@ -229,7 +241,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr>
+                <tr name="verSolicitud">
                     <td>
                         <label >
                             Saldo de Cuota:
@@ -240,7 +252,7 @@
                     </td>
                 </tr>
                 
-                <tr>
+                <tr name="verSolicitud">
                     <td>
                         <br/><br/>
                     </td>
@@ -287,7 +299,8 @@
                         
                         {#<input id="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>#}
 
-                        {#<input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantInventariosDet')}}';"/>#}
+                        <input id="btnRegresar" style="display:none" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudes')}}';"/>
+                        {#  #}
                     </td>
                 </tr>
             </table>    

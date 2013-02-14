@@ -1,0 +1,252 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{# Muestra todas las solicitudes de importacion asociadas a la empresa del usuario#}
+
+{% block body %}
+    <script type="text/javascript">
+        var searchOptionNumber = ['eq',
+                                'le','ge',
+                                'bw','bn','ew','en','cn','nc'];
+                            
+        var searchOptionText = ['eq',
+                                'bw','bn','ew','en','cn','nc'];
+                            
+        var searchOptionDate = ['eq',
+                                'le','ge'];
+        
+        $(document).ready(function(){
+            $('#agregarRegistro').button();
+            //$('#eliminarEntidad').button();
+            $('#editarRegistro').button();
+      
+            var myGrid = $('#theGrid');
+            
+            myGrid.jqGrid({ 
+                url: '{{ url('MinSalSCAProcesosBundle_verSolImportacionesJSON') }}',
+                width: 1000,
+                height: 300,
+                datatype:'json',
+                altRows:true,            
+                rowNum:10,
+                rowList:[10,20,30],
+                multiselect: false,
+                loadonce:true,
+                jsonReader: {
+                    root:'rows',
+                    page:'page',
+                    total:'total',
+                    records:'records',
+                    repeatitems: false,     /**/
+                    id:"0"                 /**/
+                },
+                pager: jQuery('#pager'),
+                viewrecords: true, 
+                caption: 'Solicitudes de Importación',
+                colModel:[{
+                        key:true,
+                        label:'ID',
+                        name:'impDetId', 
+                        index: 'impDetId', 
+                        //hidden: true,
+                        width:30,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{
+                        label:'Factura Comercial',
+                        name:'impDetFactCom', 
+                        index: 'impDetFactCom',
+                        width:140,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'Nombre Alcohol',
+                        name:'cuoNombreEsp', 
+                        index: 'cuoNombreEsp',
+                        width:120,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{ 
+                        label:'Grado',
+                        name:'cuoGrado', 
+                        index: 'cuoGrado', 
+                        width:60,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{ 
+                        label:'Cantidad (Ltr)',
+                        name:'impDetLitros', 
+                        index: 'impDetLitros', 
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{ 
+                        label:'Fecha Ingreso',
+                        name:'solImpFecha', 
+                        index: 'solImpFecha', 
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionDate,
+                            dataInit:  function (elem) {
+                                $(elem).datepicker();
+                            }
+                        }
+                    },{
+                        label:'Etapa',
+                        name: 'etpNombre', 
+                        index: 'etpNombre',
+                        stype:'select',
+                        //width:100,
+                        searchoptions:{
+                            dataUrl: '{{ url('MinSalSCAProcesosBundle_getSearchEtapas') }}',
+                            searchhidden: false,
+                            sopt: ['in','ni']
+                        }
+                    },{
+                        label:'Estado',
+                        name:'estNombre', 
+                        index: 'estNombre',
+                        width:70,
+                        search:true,
+                        stype:'select',
+                        searchoptions:{
+                            dataUrl: '{{ url('MinSalSCAProcesosBundle_getSearchEstados') }}',
+                            searchhidden: false,
+                            sopt: ['in','ni']
+                        }
+                    },{
+                        label:'Nombre Proveedor',
+                        name:'impDetProvNom', 
+                        index: 'impDetProvNom',
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'País Procedencia',
+                        name:'impDetPaisProc', 
+                        index: 'impDetPaisProc',
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'País Origen',
+                        name:'impDetPaisOri', 
+                        index: 'impDetPaisOri',
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'Ltr. Liberados',
+                        name:'impDetLitrosLib', 
+                        index: 'impDetLitrosLib',
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{
+                        label:'Auditoría',
+                        name:'auditUserIns', 
+                        index: 'auditUserIns',
+                        width:80,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'Hora Auditoría',
+                        name:'auditDateIns', 
+                        index: 'auditDateIns',
+                        //width:90,
+                        searchoptions:{
+                            sopt: searchOptionDate,
+                            dataInit:  function (elem) {
+                                $(elem).datepicker();
+                            }
+                        }
+                    }
+                ],
+                ondblClickRow: function(){$("#editarRegistro").click()},
+                ignoreCase: true,
+                shrinkToFit: false
+            });
+            
+            myGrid.jqGrid('navGrid','#pager',{
+                edit:false,
+                add:false,
+                del:false,
+                beforeRefresh: function() {
+                    $("#theGrid").jqGrid('setGridParam',{
+                            datatype:'json',
+                            loadonce:true
+                    }).trigger('reloadGrid');
+                }
+            }
+        );
+       
+        function despuesAgregarEditar() {
+            $("#theGrid").jqGrid('setGridParam',{
+                datatype:'json',
+                loadonce:true
+            }).trigger('reloadGrid');
+            
+            return[true,'']; //no error
+        }
+        
+        $("#agregarRegistro").click(function(){
+            location.href = '{{ url('MinSalSCAProcesosBundle_mantSolImportacionIngreso')}}';
+        });
+        
+    
+         //editar
+        $("#editarRegistro").click(function(){
+            var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            
+            if( gr != null ){
+                location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarSolImportacion', {'impDetId':'impDetId'})}}'.replace(/impDetId/g, gr);
+            }else{ 
+                alert("Por favor seleccione una fila para editar!"); 
+            }
+        });
+  //fin
+       
+      });
+    </script>
+      
+    <form action="" method="post">
+        <table align="center">
+            <tr><td align="center">
+                    <h1>Listado de Solicitudes de Importación de "{{entNombComercial}}"</h1>
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    {% if app.session.hasFlash('notice') %}
+                        <div class="flash-notice">
+                            {{ app.session.flash('notice') }}
+                        </div><br/>
+                    {% endif %}
+                    
+                    <table id="theGrid" class="scroll">
+                    </table> 
+
+                    <div id="pager" class="scroll" style="text-align:center;">
+                    </div> 
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <!--<input type="button" value="Agregar" id="agregarRegistro" />-->
+                    <input type="button" value="Ver" id="editarRegistro" />
+                </td>
+            </tr>
+        </table>        
+    </form>
+    <br></br>
+    <br></br>
+    
+{% endblock %}

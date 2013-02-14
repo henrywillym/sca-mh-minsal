@@ -82,13 +82,31 @@ class SolImportacionDao {
                 ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
+    
+    /*public function getSolImportacionesByEntidad($entId) {
+        
+        $registros = $this->em->createQuery("SELECT E, C, D, F, H
+                                          FROM MinSalSCAProcesosBundle:SolImportacion E 
+                                            JOIN E.entidad A
+                                            JOIN E.transicion B
+                                            JOIN B.estado C
+                                            JOIN B.etpFin D
+                                            JOIN E.solImportacionesDet F
+                                            JOIN B.flujo G
+                                            JOIN F.cuota H
+                                          WHERE A.entId = :entId
+                                            AND G.fluId = :fluId")
+                ->setParameter('entId',$entId)
+                ->setParameter('fluId',$this->fluId);
+        return $registros->getArrayResult();
+    }*/
 
     public function getSolImportacionDet($id) {
         //return $this->repositorio->find($id);
         $registros = $this->em->createQuery("SELECT E, A
-                                          FROM MinSalSCAProcesosBundle:SolImportacion E
-                                          JOIN E.solImportacionesDet A
-                                          WHERE A.impDetId = :impDetId
+                                          FROM MinSalSCAProcesosBundle:SolImportacionDet E
+                                          JOIN E.solImportacion A
+                                          WHERE E.impDetId = :impDetId
                                           ")
                 ->setParameter('impDetId',$id); //WHERE E.solImpId = :solImpId
         return $registros->getSingleResult();/**/
@@ -157,6 +175,36 @@ class SolImportacionDao {
         }else{
             return 0;
         }
+    }
+    
+    public function getSearchEstados($entId) {
+        $registros = $this->em->createQuery("SELECT DISTINCT C.estId, C.estNombre
+                                          FROM MinSalSCAProcesosBundle:SolImportacion E 
+                                            JOIN E.entidad A
+                                            JOIN E.transicion B
+                                            JOIN B.estado C
+                                            JOIN B.flujo G
+                                          WHERE A.entId = :entId
+                                            AND G.fluId = :fluId
+                                          order by C.estNombre ASC")
+                ->setParameter('entId',$entId)
+                ->setParameter('fluId',$this->fluId);
+        return $registros->getArrayResult();
+    }
+    
+    public function getSearchEtapas($entId) {
+        $registros = $this->em->createQuery("SELECT DISTINCT C.etpId, C.etpNombre
+                                          FROM MinSalSCAProcesosBundle:SolImportacion E 
+                                            JOIN E.entidad A
+                                            JOIN E.transicion B
+                                            JOIN B.etpFin C
+                                            JOIN B.flujo G
+                                          WHERE A.entId = :entId
+                                            AND G.fluId = :fluId
+                                          order by C.etpNombre ASC")
+                ->setParameter('entId',$entId)
+                ->setParameter('fluId',$this->fluId);
+        return $registros->getArrayResult();
     }
 }
 ?>
