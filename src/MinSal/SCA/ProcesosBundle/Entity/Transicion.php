@@ -17,6 +17,8 @@ class Transicion {
         
         $this->solImportaciones = new ArrayCollection();
         //$this->solLocales = new ArrayCollection();
+        $this->parentsTransicion = new ArrayCollection();
+        $this->childrenTransicion = new ArrayCollection();
     }
     
     /**
@@ -57,6 +59,22 @@ class Transicion {
      * ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", mappedBy="transicion")
      */
     //protected $solLocales;
+    
+    /**
+     * Many to Many Self-Reference
+     * @ManyToMany(targetEntity="Transicion", mappedBy="childrenTransicion")
+     **/
+    protected $parentsTransicion;
+
+    /**
+     * @ManyToMany(targetEntity="childrenTransicion", inversedBy="parentsTransicion")
+     * @JoinTable(name="sca_transiciones_mov",
+     *      joinColumns={@JoinColumn(name="traparent_id", referencedColumnName="tra_id")},
+     *      inverseJoinColumns={@JoinColumn(name="trachild_id", referencedColumnName="tra_id")}
+     * )
+     **/
+    protected $childrenTransicion;
+
     
     
     /**
@@ -209,9 +227,33 @@ class Transicion {
         $this->solImportaciones = $solImportaciones;
     }
 
-    
+    public function getParentsTransicion() {
+        return $this->parentsTransicion;
+    }
+
+    public function setParentsTransicion($parentsTransicion) {
+        $this->parentsTransicion = $parentsTransicion;
+    }
+
+    public function getChildrenTransicion() {
+        return $this->childrenTransicion;
+    }
+
+    public function setChildrenTransicion($childrenTransicion) {
+        $this->childrenTransicion = $childrenTransicion;
+    }
+
+        
     //*********** CUSTOM SET/GET ******************
     public function addSolImportacion($solImportacion) {
         $this->solImportaciones[] = $solImportacion;
+    }
+    
+    public function addParentTransicion($transicion) {
+        $this->parentsTransicion[] = $transicion;
+    }
+    
+    public function addChildTransicion($transicion) {
+        $this->childrenTransicion[] = $transicion;
     }
 }

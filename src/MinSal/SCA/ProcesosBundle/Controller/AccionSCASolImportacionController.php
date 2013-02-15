@@ -61,7 +61,7 @@ class AccionSCASolImportacionController extends Controller {
      * 
      * @return html.twig
      */
-    public function mantSolImportacionVerSolicitudesAction() {
+    public function mantSolImportacionVerSolicitudesAction($etpEntidad) {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
         
@@ -71,11 +71,20 @@ class AccionSCASolImportacionController extends Controller {
                     )
             );
         }else{
-            return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:verSolImportaciones.html.twig', array(
-                        'opciones' => $opciones,
-                        'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
-                    )
-            );
+            $paramArray = new ArrayCollection();
+            
+            if($etpEntidad == null){
+                $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolImportacionesJSON');
+            }else{
+                $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_consultarSolImportacionDetJSON', 
+                    array('traId' => 'traId') //Se coloca el mismo nombre para que con javascript se pueda substituir dinamicamente el parametro
+                );
+            }
+            
+            $paramArray['opciones']= $opciones;
+            $paramArray['entNombComercial']= $user->getEntidad()->getEntNombComercial();
+            
+            return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:verSolImportaciones.html.twig', $paramArray);
         }
     }
     
@@ -85,10 +94,11 @@ class AccionSCASolImportacionController extends Controller {
      * Devuelve el listado principal de registros del mantenimiento
      * @return Response
      */
-    public function consultarSolImportacionJSONAction($etpId) {
+    public function consultarSolImportacionJSONAction($traId) {
         $user = $this->get('security.context')->getToken()->getUser();
-        
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
+        
+        $etpId = '';
         $registros = $solImportacionDao->getSolImportacionesByEtapa($user->getEntidad()->getEntId(), $etpId);
 
         $numfilas = count($registros);

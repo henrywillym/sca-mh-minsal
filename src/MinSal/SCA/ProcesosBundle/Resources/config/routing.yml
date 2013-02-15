@@ -26,7 +26,7 @@ MinSalSCAProcesosBundle_mantSolImportacionIngreso:
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantSolImportacionIngreso } 
     
 MinSalSCAProcesosBundle_consultarSolImportacionDetJSON:
-    pattern:  /Solicitud/Importacion/Consultar/{etpId}
+    pattern:  /Solicitud/Importacion/Consultar/{etpEntidad}
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:consultarSolImportacionJSON } 
 
 MinSalSCAProcesosBundle_mantSolImportacionEdicion:

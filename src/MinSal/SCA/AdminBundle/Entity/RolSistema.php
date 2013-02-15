@@ -110,6 +110,14 @@ class RolSistema{
      *
     private $usuarios;*/
     
+    /**
+     * @ORM\ManyToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Transicion")
+     * @ORM\JoinTable(name="sca_rol_transicion",
+     *              joinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")},
+     *              inverseJoinColumns={@ORM\JoinColumn(name="tra_id", referencedColumnName="tra_id")})
+     */
+    protected $transiciones;
+    
     public function __construct()
     {
         $this->usuarios = new ArrayCollection();
@@ -118,8 +126,9 @@ class RolSistema{
         $this->rolProductor = false;
         $this->rolComprador = false;
         $this->rolCompVend = false;
-        $this->rolInterno = true; //No hay razon especial por la cual se le puso true
+        $this->rolInterno = true; //No hay razon especial por la cual se le puso true, es solo por dejar un valor por defecto
         $this->rolInternoTipo = null;
+        $this->transiciones = new ArrayCollection();
     }
 
     
@@ -246,6 +255,8 @@ class RolSistema{
     {
         $this->opcionesSistema[] = $opcionesSistema;
     }
+    
+    
     
     public function getRolImportador() {
         return $this->rolImportador;
