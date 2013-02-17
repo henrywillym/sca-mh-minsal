@@ -15,6 +15,12 @@ class SolImportacionDetDao {
     var $em;
     
     var $fluId;
+    
+    private $sqlSelect = " E.impDetId, E.impDetProvNom, E.impDetPaisProc, E.impDetPaisOri, E.impDetLitros, E.impDetLitrosLib, E.impDetFactCom, F.auditUserIns, F.auditDateIns,
+                        C.estId, C.estNombre, 
+                        D.etpId, D.etpNombre,
+                        F.solImpFecha,
+                        H.cuoNombreEsp, H.cuoGrado ";
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;
@@ -42,12 +48,7 @@ class SolImportacionDetDao {
     }
     
     public function getSolImportacionesDetByEntidad($entId) {
-        //E, H, C, D, F
-        $registros = $this->em->createQuery("SELECT E.impDetId, E.impDetProvNom, E.impDetPaisProc, E.impDetPaisOri, E.impDetLitros, E.impDetLitrosLib, E.impDetFactCom, F.auditUserIns, F.auditDateIns,
-                                                C.estId, C.estNombre, 
-                                                D.etpId, D.etpNombre,
-                                                F.solImpFecha,
-                                                H.cuoNombreEsp, H.cuoGrado
+        $registros = $this->em->createQuery("SELECT ".$this->sqlSelect."
                                           FROM MinSalSCAProcesosBundle:SolImportacionDet E 
                                             JOIN E.cuota H
                                             JOIN E.solImportacion F
@@ -62,6 +63,45 @@ class SolImportacionDetDao {
                 ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
+    
+    /**
+     * Obtiene todas las solicitudes de Importacion de acuerdo a la etapa y flujo que se encuentren
+     * 
+     * @param integer $entId
+     * @param integer $traId
+     * @param integer $fluId
+     * @return Array
+     */
+    public function getSolImportacionesDetByEtapa($traId, $entId = null) {
+        $sql = "SELECT  ".$this->sqlSelect."
+                FROM MinSalSCAProcesosBundle:SolImportacionDet E 
+                    JOIN E.cuota H
+                    JOIN E.solImportacion F
+                    JOIN F.entidad A
+                    JOIN F.transicion B
+                    JOIN B.estado C
+                    JOIN B.etpFin D
+                    JOIN B.flujo G
+                WHERE B.traId = :traId ";
+        
+        if($entId != null){
+            $sql = $sql." AND A.entId = :entId ";
+        }
+        
+        $sql = $sql." AND G.fluId = :fluId
+                order by F.solImpFecha Desc";
+        
+        $registros = $this->em->createQuery($sql);
+        
+        if($entId != null){
+            $registros->setParameter('entId',$entId);
+        }
+        
+        $registros->setParameter('traId',$traId)
+                ->setParameter('fluId',$this->fluId);
+        return $registros->getArrayResult();
+    }
+    
     
     public function getSolImportacionDet($id) {
         return $this->repositorio->find($id);

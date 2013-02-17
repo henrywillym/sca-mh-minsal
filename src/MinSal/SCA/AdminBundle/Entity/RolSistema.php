@@ -317,6 +317,15 @@ class RolSistema{
         $this->rolInternoTipo = $rolInternoTipo;
     }
     
+    public function getTransiciones() {
+        return $this->transiciones;
+    }
+
+    public function setTransiciones($transiciones) {
+        $this->transiciones = $transiciones;
+    }
+
+        
     /**
      * Aca se determina el texto que se presenta en el grid
      */

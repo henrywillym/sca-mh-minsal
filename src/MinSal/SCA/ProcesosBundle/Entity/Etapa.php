@@ -11,11 +11,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="sca_etapas")
  */
 class Etapa {
-    public static $MINSAL_001 = 1;
-    public static $DNM_001 = 2;
-    public static $IMP_ALCOHOL_001 = 3;
-    public static $RECEP_DGA_001 = 4;
-    public static $RECEP_DGA_001 = 4;
     
     public function __construct() {
         $this->auditDateIns = new \DateTime();

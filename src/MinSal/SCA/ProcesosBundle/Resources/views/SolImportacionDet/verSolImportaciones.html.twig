@@ -12,16 +12,36 @@
                             
         var searchOptionDate = ['eq',
                                 'le','ge'];
+        gridURL = '{{ urlJSON }}';
+        
+        function verSolxTransicion(traId){
+            $("#theGrid").jqGrid('setGridParam',{
+                    url: gridURL.replace(/traId/g, traId),
+                    datatype:'json',
+                    loadonce:true
+            }).trigger('reloadGrid');
+        }
         
         $(document).ready(function(){
+            {% if traIdSeries|length > 0 %}
+                $('#etapas').html('|| &nbsp;&nbsp;');
+                
+                {% for reg in traIdSeries %}
+                    $('#etapas').html($('#etapas').html()+
+                        '<span style="cursor: pointer; text-decoration:underline; color: blue;" onclick="verSolxTransicion({{ reg['id'] }});"> {{ reg['nombre'] }}</span> &nbsp;&nbsp;||&nbsp;&nbsp; '
+                    );
+                {% endfor %}
+            {% endif %}
+            
             $('#agregarRegistro').button();
             //$('#eliminarEntidad').button();
             $('#editarRegistro').button();
       
             var myGrid = $('#theGrid');
             
+            
             myGrid.jqGrid({ 
-                url: '{{ urlJSON }}',
+                url: gridURL.replace(/traId/g,'0'),
                 width: 1000,
                 height: 300,
                 datatype:'json',
@@ -220,7 +240,11 @@
     <form action="" method="post">
         <table align="center">
             <tr><td align="center">
-                    <h1>Listado de Solicitudes de Importación de "{{entNombComercial}}"</h1>
+                    {% if entNombComercial %}
+                        <h1>Listado de Solicitudes de Importación de "{{entNombComercial}}"</h1>
+                    {% else %}
+                        <h1>Listado de Solicitudes de Importación de Empresas</h1>
+                    {% endif %}
                 </td>
             </tr>
             <tr>
@@ -230,6 +254,10 @@
                             {{ app.session.flash('notice') }}
                         </div><br/>
                     {% endif %}
+                    
+                    <span id="etapas">
+                    </span>
+                    <hr/><br/>
                     
                     <table id="theGrid" class="scroll">
                     </table> 

@@ -8,9 +8,9 @@ namespace MinSal\SCA\ProcesosBundle\Controller;
 
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
+use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
-use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\SolImportacionDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\SolImportacionDetDao;
@@ -61,31 +61,44 @@ class AccionSCASolImportacionController extends Controller {
      * 
      * @return html.twig
      */
-    public function mantSolImportacionVerSolicitudesAction($etpEntidad) {
+    public function mantSolImportacionVerSolicitudesAction($etpEntidad =null) {
         $opciones = $this->getRequest()->getSession()->get('opciones');
+        //$user = new User();
         $user = $this->get('security.context')->getToken()->getUser();
         
-        if($user->getEntidad()==null){
-            return $this->render('MinSalSCAProcesosBundle:Default:mantNoEntidad.html.twig', array(
-                        'opciones' => $opciones
-                    )
-            );
+        $paramArray = array();
+        $traIdSeries = array();
+
+        if($etpEntidad == null){
+            $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolImportacionesJSON');
         }else{
-            $paramArray = new ArrayCollection();
-            
-            if($etpEntidad == null){
-                $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolImportacionesJSON');
-            }else{
-                $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_consultarSolImportacionDetJSON', 
-                    array('traId' => 'traId') //Se coloca el mismo nombre para que con javascript se pueda substituir dinamicamente el parametro
-                );
+            $roles = $user->getRols();
+
+            foreach($roles as $rol){
+                $transiciones = $rol->getTransiciones();
+
+                foreach($transiciones as $reg){
+                    $tmp['id'] = $reg->getTraId();
+                    $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
+
+                    $traIdSeries[] = $tmp;
+                }
             }
-            
-            $paramArray['opciones']= $opciones;
-            $paramArray['entNombComercial']= $user->getEntidad()->getEntNombComercial();
-            
-            return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:verSolImportaciones.html.twig', $paramArray);
+
+            $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_consultarSolImportacionDetJSON', 
+                array('traId' => 'traId')//Se coloca el mismo nombre para que con javascript se pueda substituir dinamicamente el parametro
+            );
         }
+        $paramArray['traIdSeries'] = $traIdSeries;
+        $paramArray['opciones']= $opciones;
+        
+        if($user->getEntidad()!=null){
+            $paramArray['entNombComercial']= $user->getEntidad()->getEntNombComercial();
+        }else{
+            $paramArray['entNombComercial']= null;
+        }
+
+        return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:verSolImportaciones.html.twig', $paramArray);
     }
     
     
@@ -96,10 +109,14 @@ class AccionSCASolImportacionController extends Controller {
      */
     public function consultarSolImportacionJSONAction($traId) {
         $user = $this->get('security.context')->getToken()->getUser();
-        $solImportacionDao = new SolImportacionDao($this->getDoctrine());
+        $solImportacionDetDao = new SolImportacionDetDao($this->getDoctrine());
         
         $etpId = '';
-        $registros = $solImportacionDao->getSolImportacionesByEtapa($user->getEntidad()->getEntId(), $etpId);
+        if($user->getEntidad() != null){
+            $registros = $solImportacionDetDao->getSolImportacionesDetByEtapa($traId, $user->getEntidad()->getEntId());
+        }else{
+            $registros = $solImportacionDetDao->getSolImportacionesDetByEtapa($traId);
+        }
 
         $numfilas = count($registros);
         

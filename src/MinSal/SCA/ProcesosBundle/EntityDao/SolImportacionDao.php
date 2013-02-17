@@ -26,33 +26,6 @@ class SolImportacionDao {
         $this->fluId = Flujo::$IMPORTACION;
     }
 
-    /**
-     * Obtiene todas las solicitudes de Importacion de acuerdo a la etapa y flujo que se encuentren
-     * 
-     * @param integer $entId
-     * @param integer $etpId
-     * @param integer $fluId
-     * @return Array
-     */
-    public function getSolImportacionesByEtapa($entId, $etpId) {
-        
-        $registros = $this->em->createQuery("SELECT E, A, D, C, F
-                                          FROM MinSalSCAProcesosBundle:SolImportacion E 
-                                            JOIN E.entidad A
-                                            JOIN E.transicion B
-                                            JOIN B.estado C
-                                            JOIN B.etapa D
-                                            JOIN E.solImportacionesDet F
-                                            JOIN B.flujo G
-                                          WHERE A.entId = :entId
-                                            AND B.etpId = :etpId
-                                            AND G.fluId = :fluId
-                                          order by E.auditDateUpd DESC, E.auditDateIns DESC")
-                ->setParameter('entId',$entId)
-                ->setParameter('etpId',$etpId)
-                ->setParameter('fluId',$this->fluId);
-        return $registros->getArrayResult();
-    }
     
     /**
      * Devuelve las solicitudes de acuerdo al estado, etapa y flujo en el que se encuentren

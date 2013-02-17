@@ -62,15 +62,15 @@ class Transicion {
     
     /**
      * Many to Many Self-Reference
-     * @ManyToMany(targetEntity="Transicion", mappedBy="childrenTransicion")
+     * @ORM\ManyToMany(targetEntity="Transicion", mappedBy="childrenTransicion")
      **/
     protected $parentsTransicion;
 
     /**
-     * @ManyToMany(targetEntity="childrenTransicion", inversedBy="parentsTransicion")
-     * @JoinTable(name="sca_transiciones_mov",
-     *      joinColumns={@JoinColumn(name="traparent_id", referencedColumnName="tra_id")},
-     *      inverseJoinColumns={@JoinColumn(name="trachild_id", referencedColumnName="tra_id")}
+     * @ORM\ManyToMany(targetEntity="Transicion", inversedBy="parentsTransicion")
+     * @ORM\JoinTable(name="sca_transiciones_mov",
+     *      joinColumns={@ORM\JoinColumn(name="traparent_id", referencedColumnName="tra_id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="trachild_id", referencedColumnName="tra_id")}
      * )
      **/
     protected $childrenTransicion;

@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="sca_estados")
  */
 class Estado {
+    
+    //La codificacion de estados se utiliza para filtrar las consultas de solicitudes y determinar cuota reservada o utilizada
     public static $RECHAZADO = 2;
     public static $CANCELADO = 4;
     

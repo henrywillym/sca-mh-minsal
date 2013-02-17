@@ -28,6 +28,7 @@ security:
         - { path: ^/SCA/empresa*, role: ROLE_USER }
         - { path: ^/SCA/DNM*, role: ROLE_USER }
         - { path: ^/SCA/inventario*, role: ROLE_USER }
+        - { path: ^/SCA/Solicitud*, role: ROLE_USER }
         - { path: ^/SCA/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: /admin/*, role: ROLE_ADMIN }
         - { path: /SCA/admin/*, role: ROLE_ADMIN }
