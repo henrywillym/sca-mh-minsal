@@ -1,0 +1,29 @@
+{
+    "name": "sca-mh-minsal/SCA",
+    "description": "Sistema de Control de Alcoholes de El Salvador",
+    "require":{
+		"php": ">=5.3.3",
+		"twig/extensions": "1.0.*@dev",
+		"doctrine/orm": "2.1.4",
+		"doctrine/dbal": "2.1.5",
+		"kriswallsmith/assetic": "v1.0.3",
+		"jms/metadata": "1.1.1",
+		"symfony/assetic-bundle": "2.0.*@dev",
+		"sensio/framework-extra-bundle": "2.0.*@dev",
+		"sensio/distribution-bundle": "2.0.*@dev",
+		"sensio/generator-bundle": "2.0.*@dev",
+		"swiftmailer/swiftmailer": "4.1.3",
+		"jms/di-extra-bundle": "1.0.1",
+		"jms/aop-bundle": "1.0.0",
+		"jms/security-extra-bundle": "1.0.*@dev",
+		"symfony/symfony": "2.0.7",
+		"friendsofsymfony/user-bundle": "1.2.0"
+	}, 
+	"autoload": {
+        "psr-0": { 
+			"": "src/" ,
+			"Twig_Extensions_": "/../vendor/twig/extensions/lib",
+			"Twig_": "/../vendor/twig/twig/lib"
+		}
+    }
+}

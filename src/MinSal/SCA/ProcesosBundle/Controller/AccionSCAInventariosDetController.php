@@ -77,6 +77,8 @@ class AccionSCAInventariosDetController extends Controller {
                "rows":' . $datos . '}';
 
         $response = new Response($jsonresponse);
+        
+        $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
 
