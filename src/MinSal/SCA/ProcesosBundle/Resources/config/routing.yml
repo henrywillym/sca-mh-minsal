@@ -16,3 +16,53 @@ MinSalSCAProcesosBundle_mantInventarioDetEdicion:
 MinSalSCAProcesosBundle_mantCargarInventarioDet:
     pattern:  /inventario/mantCargarInventarioDet/{invDetId}
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAInventariosDet:mantCargarInventarioDet } 
+    
+    
+#*****************************
+#*** Solicitud Importacion ***
+#*****************************
+MinSalSCAProcesosBundle_mantSolImportacionIngreso:
+    pattern:  /Solicitud/Importacion/Ingreso
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantSolImportacionIngreso } 
+    
+MinSalSCAProcesosBundle_consultarSolImportacionDetJSON:
+    pattern:  /Solicitud/Importacion/Consultar/{traId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:consultarSolImportacionJSON } 
+
+MinSalSCAProcesosBundle_mantSolImportacionEdicion:
+    pattern:  /Solicitud/Importacion/Edicion
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantSolImportacionEdicion }
+
+MinSalSCAProcesosBundle_mantCargarSolImportacion:
+    pattern:  /Solicitud/Importacion/Cargar/{impDetId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantCargarSolImportacion } 
+    
+MinSalSCAProcesosBundle_cambiarEstado:
+    pattern:  /Solicitud/Importacion/CambiarEstado/{solImpId}/{traId}/update
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:cambiarEstado }
+
+MinSalSCAProcesosBundle_getCuotas:
+    pattern:  /Solicitud/Importacion/getCuotas
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:getCuotas }
+
+#Visualizacion de solicitudes de importacion por empresa
+MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudes:
+    pattern:  /Solicitud/Importacion/VerSolicitudes
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantSolImportacionVerSolicitudes } 
+    
+MinSalSCAProcesosBundle_verSolImportacionesJSON:
+    pattern:  /Solicitud/Importacion/VerSolicitudes/Consultar
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:verSolImportacionesJSON } 
+
+MinSalSCAProcesosBundle_getSearchEstados:
+    pattern:  /Solicitud/Importacion/getSearchEstados 
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:getSearchEstados }
+
+MinSalSCAProcesosBundle_getSearchEtapas:
+    pattern:  /Solicitud/Importacion/getSearchEtapas
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:getSearchEtapas }
+    
+    
+MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL:
+    pattern:  /Solicitud/Importacion/VerSolicitudes/{etpEntidad}/
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantSolImportacionVerSolicitudes, etpEntidad: 'MINSAL'}

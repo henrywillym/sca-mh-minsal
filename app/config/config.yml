@@ -81,7 +81,7 @@ fos_user:
     change_password:
         form:
             type: sca_change_password
-            #handler:  sca_user.form.handler.changePassword
+            #handler:  sca_user.form.handler.changePassword #No es necesario
     resetting:
         email:
             template: MinSalSCAUsersBundle:Resetting\Email:resetting.email.twig

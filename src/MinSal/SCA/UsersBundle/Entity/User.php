@@ -44,6 +44,7 @@ class User extends BaseUser {
         $this->rols = new ArrayCollection();
         $this->auditDeleted = false;
         $this->userInternoTipo = null;
+        $this->auditDateIns = new \DateTime();
     }
     
     /**
