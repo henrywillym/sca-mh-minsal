@@ -73,7 +73,7 @@ fos_user:
             type: sca_user_registration
             handler: sca_user.form.handler.registration
         confirmation:
-            enabled: false
+            enabled: true
             from_email:
                 address: registration@sca.gob.sv
                 sender_name: SCA Registro Usuario
