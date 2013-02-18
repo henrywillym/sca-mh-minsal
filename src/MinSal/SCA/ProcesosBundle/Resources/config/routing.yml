@@ -38,7 +38,7 @@ MinSalSCAProcesosBundle_mantCargarSolImportacion:
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantCargarSolImportacion } 
     
 MinSalSCAProcesosBundle_cambiarEstado:
-    pattern:  /Solicitud/Importacion/CambiarEstado/{solImpId}/{traId}/update
+    pattern:  /Solicitud/Importacion/CambiarEstado/{impDetId}/{estId}/update
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:cambiarEstado }
 
 MinSalSCAProcesosBundle_getCuotas:

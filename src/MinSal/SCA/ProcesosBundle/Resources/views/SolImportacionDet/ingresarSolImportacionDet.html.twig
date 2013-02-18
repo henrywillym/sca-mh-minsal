@@ -3,6 +3,11 @@
 
 {% block body %}
     <script type="text/javascript">
+        function CambiarEstado(estId){
+            var url = '{{ url('MinSalSCAProcesosBundle_cambiarEstado',{'impDetId':'impDetId', 'estId':'estId'})}}';
+            location.href = url.replace(/estId/g, estId).replace(/impDetId/g,impDetId);
+        }
+        
         function calcularSaldo(){
             $('#saldo').val($('#disponible').val() - $('#SolImportacionDet_impDetLitros').val());
         }
@@ -28,13 +33,16 @@
             }
         }
         
+        var impDetId = '0';
+        
         $(document).ready(function(){
             $('#btnGuardar').button();
             $('#btnEliminar').button();
             $('#btnRegresar').button();
             
-            var impDetId = 'false';
             
+            //Si impDetId es vacio, quiere decir que es ingreso de solicitud
+            //Pero si tiene ya un ID asignado es debido a que se desea ver la solicitud y evaluarla si tiene los permisos
             if($('[id="SolImportacionDet_impDetId"]').val() !='' ){
                 $('[name="verSolicitud"]').hide();
                 $('#btnGuardar').hide();
@@ -42,11 +50,11 @@
                 $('#cuota,#SolImportacionDet_arancel').prop("disabled",true);
                 $('input[type="text"]').attr('readonly','readonly');
                 $('textarea').attr('readonly','readonly');
-                impDetId = 'true';
+                impDetId = $('[id="SolImportacionDet_impDetId"]').val();
             }
             
             $.ajax({
-                url:'{{url('MinSalSCAProcesosBundle_getCuotas')}}?verSolicitud='+impDetId,
+                url:'{{url('MinSalSCAProcesosBundle_getCuotas')}}?impDetId='+impDetId,
                 type: 'POST',
                 cache: false,
                 success: function(data, textStatus, jqXHR){
@@ -296,6 +304,16 @@
                         <br>
                         
                         <input id="btnGuardar" type="submit" value="Ingresar" />
+                        
+                        {% if transiciones|length > 0 %}
+                            {% for reg in transiciones %}
+                                <input id="tra{{ reg['nombre'] }}" name="transiciones" type="button" value="{{ reg['nombre'] }}" onclick="CambiarEstado({{ reg['id'] }});"/>
+                            {% endfor %}
+                                
+                                <script type="text/javascript">
+                                    $("[name='transiciones']").button();
+                                </script>
+                        {% endif %}
                         
                         {#<input id="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>#}
 

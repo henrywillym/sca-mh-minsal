@@ -41,5 +41,20 @@ class TransicionDao {
         return $registros->getSingleResult();
     }
     
+    /**
+     * Devuelve las transicion posibles a realizar, a partir de una transicion dada.
+     * 
+     * @param integer $traId
+     * @return Object[] Transicion
+     */
+    public function getTransicionesSiguientes($traId) {
+        $registros = $this->em->createQuery("SELECT E, A
+                                          FROM MinSalSCAProcesosBundle:Transicion E 
+                                            JOIN E.parentsTransicion B
+                                            LEFT JOIN E.childrenTransicion A
+                                          WHERE B.traId = :traId") //No se utiliza "AND E.auditDeleted = false" porque si se cambia el flujo, las solicitudes en proceso finalizan con el flujo que ya habian iniciado. Y las nuevas siguen con el que se configuro.
+                ->setParameter('traId',$traId);
+        return $registros->getResult();
+    }
 }
 ?>
