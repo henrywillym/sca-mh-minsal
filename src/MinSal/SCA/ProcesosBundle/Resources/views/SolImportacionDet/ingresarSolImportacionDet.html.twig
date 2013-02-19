@@ -3,9 +3,93 @@
 
 {% block body %}
     <script type="text/javascript">
-        function CambiarEstado(estId){
-            var url = '{{ url('MinSalSCAProcesosBundle_cambiarEstado',{'impDetId':'impDetId', 'estId':'estId'})}}';
-            location.href = url.replace(/estId/g, estId).replace(/impDetId/g,impDetId);
+        function CambiarEstado(traId, traComentario, traLitrosLibera, tmpVar){
+            var url = '';
+            
+            if(traComentario == true || traLitrosLibera==true){
+                var enviar = false;
+                
+                if(traComentario == true){
+                    $('#comentario').removeAttr('readonly');
+                    $("#msgDialogComentario").dialog({
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        position: 'center',
+                        dialogClass: "no-close",
+                        buttons:[
+                            {
+                                text: "Continuar",
+                                click: function() {
+                                    if($('#comentario').val()==''){
+                                        alert('Debe ingresar un comentario');
+                                    }else{
+                                        $('#solImpComentario').val($('#comentario').val());
+                                        $( this ).dialog( "close" );
+                                        CambiarEstado(traId, false, traLitrosLibera, 2);
+                                    }
+                                }
+                            },{
+                                text: "Cancelar",
+                                click: function() {
+                                    enviar = false;
+                                    $( this ).dialog( "close" );
+                                }
+                            }
+                        ]
+                    });
+                }else{
+                    if(!tmpVar){
+                        tmpVar = 2;
+                    }
+                }
+                
+                if(traLitrosLibera == true && tmpVar == 2){
+                    $('#litrosLibera').removeAttr('readonly');
+                    $("#msgDialogLitrosLibera").dialog({
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        position: 'center',
+                        dialogClass: "no-close",
+                        buttons:[
+                            {
+                                text: "Continuar",
+                                click: function() {
+                                    if(isNaN(Number($('#litrosLibera').val()))){
+                                        alert('Debe ingresar un número valido');
+                                    }else if($('#litrosLibera').val()==''){
+                                        alert('Debe ingresar los litros a liberar');
+                                    }else if( (Number($('#litrosLibera').val()) + Number($('#SolImportacionDet_impDetLitrosLib').val())) >= Number($('#SolImportacionDet_impDetLitros').val())){
+                                        alert('No puede liberar parcialmente una cantidad igual o mayor a la especificada en la solicitud. Debe ingresar una cantidad menor ');
+                                    }else if( Number($('#litrosLibera').val()) <= 0){
+                                        alert('Debe ingresar una cantidad mayor a 0');
+                                    }else{  
+                                        $('#impDetLitrosLib').val($('#litrosLibera').val());
+                                        $(this).dialog( "close" );
+                                        CambiarEstado(traId, false, false, 3);
+                                    }
+                                }
+                            },{
+                            text: "Cancelar",
+                            click: function() {
+                                enviar = false;
+                                $( this ).dialog( "close" );
+                            }
+                          }
+                        ]
+                    });
+                }
+            } else{
+                enviar = true;
+            }
+            
+            if(enviar){
+                url = '{{ path('MinSalSCAProcesosBundle_cambiarEstado',{'impDetId':'impDetId', 'traId':'traId'})}}';
+                url = url.replace(/traId/g, traId).replace(/impDetId/g,impDetId);
+                $('#formulario').attr('action',url);
+                $('#formulario').submit();
+            }
         }
         
         function calcularSaldo(){
@@ -15,7 +99,7 @@
         function validarFormulario(){
             var msg ='';
             
-            if($('#saldo').val() <0){
+            if(impDetId == '0' && $('#saldo').val() <0){
                 msg += '- La cantidad de litros ingresada, sobrepasa la cuota disponible\n';
             }
             
@@ -33,7 +117,7 @@
             }
         }
         
-        var impDetId = '0';
+        var impDetId = {{impDetId}};
         
         $(document).ready(function(){
             $('#btnGuardar').button();
@@ -51,6 +135,8 @@
                 $('input[type="text"]').attr('readonly','readonly');
                 $('textarea').attr('readonly','readonly');
                 impDetId = $('[id="SolImportacionDet_impDetId"]').val();
+            }else{
+                $('[name="ingresaSolicitud"]').hide();
             }
             
             $.ajax({
@@ -86,6 +172,7 @@
            $('td>label').parent().attr('align','right');
            $('#SolImportacionDet_arancel').css('width','250px');
            $('#SolImportacionDet_impDetLitros').keyfilter(/[0-9.}]/i);
+           $('#litrosLibera').keyfilter(/[0-9.}]/i);
            /*if($('#InventarioDet_invDetId').val()=='' || $('#InventarioDet_invDetId').val()==-1){
                $('#btnEliminar').hide();
            }/**/
@@ -107,10 +194,13 @@
     
     <form id="formulario" action="{{ path('MinSalSCAProcesosBundle_mantSolImportacionEdicion') }}" {{ form_enctype(form) }} 
            onsubmit="return enviarFormulario();" method="POST" class="SolImportacionDetTypeForm">
-        <input type="hidden" id="valido" value=false/>
-        <input type="hidden" id="eliminar" name="eliminar" value=false/>
         
-            <table align='center' style="border: 1px solid;" >
+        <input type="hidden" id="valido" value=false />
+        <input type="hidden" id="eliminar" name="eliminar" value=false />
+        <input type="hidden" id="solImpComentario" name="solImpComentario" />
+        <input type="hidden" id="impDetLitrosLib" name="impDetLitrosLib" />
+
+            <table align='center' style="border: 1px solid;">
                 <tr>
                     <td align='center' colspan="2">
                         <h1>
@@ -249,6 +339,20 @@
                         </div>
                     </td>
                 </tr>
+                
+                <tr name="ingresaSolicitud">
+                    <td>
+                        <label >
+                            {{ form_label(form.impDetLitrosLib) }}:
+                        </label>
+                    </td>
+                    <td>{{ form_widget(form.impDetLitrosLib) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.impDetLitrosLib) }}
+                        </div>
+                    </td>                
+                </tr>
+                
                 <tr name="verSolicitud">
                     <td>
                         <label >
@@ -286,20 +390,24 @@
                 </tr> 
                 
                 
-                {#
-                <tr>
+                
+                <tr name="ingresaSolicitud">
                     <td><label >Comentarios:</label></td>
-                    <td>{{ form_widget(form.solImpComentario) }}
-                        <div class="flash-notice">
-                            {{ form_errors(form.solImpComentario) }}
-                        </div>
+                    <td>
+                        <textarea rows="4" style="width:97%" readonly="readonly"> {{ comentario }} </textarea>
                     </td>                
-                </tr> #}
+                </tr>
                 
                 
                 <tr>
                     <td align='center' colspan=2 >
-                        <div id="msgDialog">
+                        <div id="msgDialogComentario" title="Comentarios" style="display:none">
+                            Es necesario detallar comentarios en la solicitud para pasar a la siguiente etapa<br/><br/>
+                            <textarea id="comentario" rows="4" style="width:97%"></textarea>
+                        </div>
+                        <div id="msgDialogLitrosLibera" title="Litros a liberar" style="display:none">
+                            Es necesario detallar la cantidad de litros a liberar en la solicitud para pasar a la siguiente etapa<br/><br/>
+                            <input id="litrosLibera" type="text" />
                         </div>
                         <br>
                         
@@ -307,7 +415,7 @@
                         
                         {% if transiciones|length > 0 %}
                             {% for reg in transiciones %}
-                                <input id="tra{{ reg['nombre'] }}" name="transiciones" type="button" value="{{ reg['nombre'] }}" onclick="CambiarEstado({{ reg['id'] }});"/>
+                                <input id="tra{{ reg['id'] }}" name="transiciones" type="button" value="{{ reg['nombre'] }}" onclick="CambiarEstado({{ reg['id'] }}, {{ reg['comentario'] }}, {{ reg['litrosLibera'] }} );"/>
                             {% endfor %}
                                 
                                 <script type="text/javascript">

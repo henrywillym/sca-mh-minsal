@@ -14,6 +14,8 @@ class Transicion {
     
     public function __construct() {
         $this->auditDateIns = new \DateTime();
+        $this->traComentario = false;
+        $this->traLitrosLibera = false;
         
         $this->solImportaciones = new ArrayCollection();
         //$this->solLocales = new ArrayCollection();
@@ -85,6 +87,20 @@ class Transicion {
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $traId;
+    
+    /**
+     * @var boolean $traComentario
+     *
+     * @ORM\Column(name="tra_comentario", type="boolean", nullable=false)
+     */
+    private $traComentario;
+    
+    /**
+     * @var boolean $traLitrosLibera
+     *
+     * @ORM\Column(name="tra_litros_libera", type="boolean", nullable=false)
+     */
+    private $traLitrosLibera;
     
     /**
      * @var DateTime $auditDateIns
@@ -242,8 +258,24 @@ class Transicion {
     public function setChildrenTransicion($childrenTransicion) {
         $this->childrenTransicion = $childrenTransicion;
     }
+    
+    public function getTraComentario() {
+        return $this->traComentario === 'true' || $this->traComentario === true;
+    }
 
-        
+    public function setTraComentario($traComentario) {
+        $this->traComentario = $traComentario;
+    }
+    
+    public function getTraLitrosLibera() {
+        return $this->traLitrosLibera === 'true' || $this->traLitrosLibera === true;
+    }
+
+    public function setTraLitrosLibera($traLitrosLibera) {
+        $this->traLitrosLibera = $traLitrosLibera;
+    }
+
+            
     //*********** CUSTOM SET/GET ******************
     public function addSolImportacion($solImportacion) {
         $this->solImportaciones[] = $solImportacion;

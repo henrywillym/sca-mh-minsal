@@ -52,7 +52,9 @@ class TransicionDao {
                                           FROM MinSalSCAProcesosBundle:Transicion E 
                                             JOIN E.parentsTransicion B
                                             LEFT JOIN E.childrenTransicion A
-                                          WHERE B.traId = :traId") //No se utiliza "AND E.auditDeleted = false" porque si se cambia el flujo, las solicitudes en proceso finalizan con el flujo que ya habian iniciado. Y las nuevas siguen con el que se configuro.
+                                            LEFT JOIN A.estado C
+                                          WHERE B.traId = :traId
+                                          ORDER BY C.estId ASC") //No se utiliza "AND E.auditDeleted = false" porque si se cambia el flujo, las solicitudes en proceso finalizan con el flujo que ya habian iniciado. Y las nuevas siguen con el que se configuro.
                 ->setParameter('traId',$traId);
         return $registros->getResult();
     }

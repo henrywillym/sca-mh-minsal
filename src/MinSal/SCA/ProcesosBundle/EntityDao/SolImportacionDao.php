@@ -179,5 +179,28 @@ class SolImportacionDao {
                 ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
+    
+    /**
+     * Devuelve la cantidad de solicitudes que se encuentran en cierta Transicion (Etapa/Estado). Este dato 
+     * es utilizado para presentarlo en el grid como resumen de cuantas solicitudes se encuentran en cada etapa
+     * 
+     * @param int $traId
+     * @return int
+     */
+    public function getCantidadSolicitudesXTransicion($traId){
+        $registros = $this->em->createQuery("SELECT count(E.solImpId)
+                                          FROM MinSalSCAProcesosBundle:SolImportacion E 
+                                                JOIN E.transicion F
+                                          WHERE F.traId = :traId")
+                ->setParameter('traId', $traId);
+        
+        $result= $registros->getSingleResult();
+        
+        if($result !=null && count($result)>0 && $result[1] != null){
+            return $result[1];
+        }else{
+            return 0;
+        }
+    }
 }
 ?>

@@ -63,7 +63,7 @@ class AccionSCASolImportacionController extends Controller {
      */
     public function mantSolImportacionVerSolicitudesAction($etpEntidad =null) {
         $opciones = $this->getRequest()->getSession()->get('opciones');
-        //$user = new User();
+        $user = new User();
         $user = $this->get('security.context')->getToken()->getUser();
         
         $paramArray = array();
@@ -72,19 +72,6 @@ class AccionSCASolImportacionController extends Controller {
         if($etpEntidad == null){
             $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolImportacionesJSON');
         }else{
-            $roles = $user->getRols();
-
-            foreach($roles as $rol){
-                $transiciones = $rol->getTransiciones();
-
-                foreach($transiciones as $reg){
-                    $tmp['id'] = $reg->getTraId();
-                    $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
-
-                    $traIdSeries[] = $tmp;
-                }
-            }
-
             $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_consultarSolImportacionDetJSON', 
                 array('traId' => 'traId')//Se coloca el mismo nombre para que con javascript se pueda substituir dinamicamente el parametro
             );
@@ -228,6 +215,35 @@ class AccionSCASolImportacionController extends Controller {
         //$htmlResponse = $htmlResponse.'</select>';
         
         $response = new Response($htmlResponse);
+        return $response;
+    }
+    
+    public function getTransicionesAction(Request $request) {
+        $user = $this->get('security.context')->getToken()->getUser();
+        $solImportacionDao = new SolImportacionDao($this->getDoctrine());
+        
+        $roles = $user->getRols();
+        $traIdSeries = array();
+        $registros= array();
+        
+        foreach($roles as $rol){
+            $transiciones = $rol->getTransiciones();
+
+            foreach($transiciones as $reg){
+                $tmp['id'] = $reg->getTraId();
+                $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
+                $tmp['cantidad'] = $solImportacionDao->getCantidadSolicitudesXTransicion($reg->getTraId());
+
+                $traIdSeries[] = $tmp;
+            }
+        }
+        
+        $registros['registros'] = $traIdSeries;
+        
+        $datos = json_encode($registros);
+        
+        $response = new Response($datos);
+        $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
     
@@ -401,25 +417,41 @@ class AccionSCASolImportacionController extends Controller {
         }else{
             $transicionDao = new TransicionDao($this->getDoctrine());
             $nextTransiciones = $transicionDao->getTransicionesSiguientes($solImportacionDet->getSolImportacion()->getTransicion()->getTraId());
+            $roles = $user->getRols();
             
-            foreach($nextTransiciones as $reg){
-                $arrayTrans = array();
-                
-                $arrayTrans['id'] = $reg->getEstado()->getEstId();
-                $arrayTrans['nombre'] = $reg->getEstado()->getEstNombre();
-                
-                $result[] = $arrayTrans;
+            //Validacion para asegurarse que el usuario que esta visualizando la solicitud tiene autorizacion para evaluarla y pasarla a la siguiente etapa
+            foreach($roles as $rol){
+                $transicionesRol = $rol->getTransiciones();
+
+                foreach($transicionesRol as $regTra){
+                    if($regTra->getTraId() == $solImportacionDet->getSolImportacion()->getTransicion()->getTraId()){
+                        if(count($result)==0){
+                            foreach($nextTransiciones as $reg){
+                                $arrayTrans = array();
+
+                                $arrayTrans['id'] = $reg->getTraId();
+                                $arrayTrans['nombre'] = $reg->getEstado()->getEstNombre();
+                                $arrayTrans['comentario'] = $reg->getTraComentario()?"true":"false";
+                                $arrayTrans['litrosLibera'] = $reg->getTraLitrosLibera()?"true":"false";
+
+                                $result[] = $arrayTrans;
+                            }
+                        }
+                    }
+                }
             }
         }
         
         $form = $this->createForm(new SolImportacionDetType($this->getDoctrine()), $solImportacionDet);
-
+        $comentario = $solImportacionDet->getSolImportacion()->getSolImpComentario();
+        
         return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:ingresarSolImportacionDet.html.twig', array(
             'form' => $form->createView(),
             'opciones' => $opciones,
             'impDetId' => $impDetId,
             'entNombComercial'=> $entNombComercial, 
-            'transiciones' => $result
+            'transiciones' => $result,
+            'comentario' => $comentario
         ));
     }
     
@@ -433,8 +465,9 @@ class AccionSCASolImportacionController extends Controller {
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function cambiarEstadoAction($impDetId, $estId){
+    public function cambiarEstadoAction(Request $request, $impDetId, $traId){
         $auditUser = $this->container->get('security.context')->getToken()->getUser();
+        $errorList = '';
         
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
         $solImportacionDetDao = new SolImportacionDetDao($this->getDoctrine());
@@ -444,26 +477,63 @@ class AccionSCASolImportacionController extends Controller {
         $solImportacionDet = new SolImportacionDet();
         $solImportacionDet = $solImportacionDao->getSolImportacionDet($impDetId);
         
+        $roles = $auditUser->getRols();
         $transiciones = $transicionDao->getTransicionesSiguientes($solImportacionDet->getSolImportacion()->getTransicion()->getTraId());
         
-        foreach($transiciones as $reg){
-            if($estId == $reg->getEstado()->getEstId()){
-                
-                $solImportacionDet->getSolImportacion()->setTransicion($reg);
-                
-                $solImportacionDet->getSolImportacion()->setAuditUserUpd($auditUser->getUsername());
-                $solImportacionDet->getSolImportacion()->setAuditDateUpd(new \DateTime());
+        //Validacion para asegurarse que el usuario que esta visualizando la solicitud tiene autorizacion para evaluarla y pasarla a la siguiente etapa
+        foreach($roles as $rol){
+            $transicionesRol = $rol->getTransiciones();
 
-                $solImportacionDetDao->editSolImportacionDet($solImportacionDet);
+            foreach($transicionesRol as $regTra){
+                if($regTra->getTraId() == $solImportacionDet->getSolImportacion()->getTransicion()->getTraId()){
+                    
+                    foreach($transiciones as $reg){
+                        if($traId == $reg->getTraId()){
+                            if($reg->getTraComentario()){
+                                $solImpComentario = $request->get('solImpComentario');
+                                if($solImpComentario==null || $solImpComentario==''){
+                                    $errorList = $errorList.'- Es necesario detallar un comentario para pasar a la siguiente etapa';
+                                }else{
+                                    $solImportacionDet->getSolImportacion()->setSolImpComentario();
+                                }
+                            }
+                            
+                            if($reg->getTraLitrosLibera()){
+                                $impDetLitrosLib = $solImportacionDet->getImpDetLitrosLib();
+                                $impDetLitros = $solImportacionDet->getImpDetLitros();
+                                $litrosLib = $request->get('impDetLitrosLib');
+                                
+                                if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
+                                    $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
+                                }else{
+                                    $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
+                                }
+                            }
+                            
+                            if($errorList == ''){
+                                $solImportacionDet->getSolImportacion()->setTransicion($reg);
 
-                $this->get('session')->setFlash('notice', '#### El registro fue: "'.$reg->getEstado()->getEstNombre().'" ####');
-                return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL'));
+                                $solImportacionDet->getSolImportacion()->setAuditUserUpd($auditUser->getUsername());
+                                $solImportacionDet->getSolImportacion()->setAuditDateUpd(new \DateTime());
+
+                                $solImportacionDetDao->editSolImportacionDet($solImportacionDet);
+
+                                $this->get('session')->setFlash('notice', '#### El registro paso a etapa "'. $reg->getEtpFin()->getEtpNombre() .'" con estado "'.$reg->getEstado()->getEstNombre().'" ####');
+                                return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL'));
+                            }
+                        }
+                    }
+                }
             }
         }
         
-        $this->get('session')->setFlash('notice', '#### Advertencia: el estado seleccionado no se encuentra configurado para la siguiente etapa. Intente nuevamente ####');
+        if($errorList == ''){
+            $this->get('session')->setFlash('notice', '#### AUDITORIA: Su usuario no tiene permisos para cambiar el estado en esta etapa "'.$solImportacionDet->getSolImportacion()->getTransicion()->getEtpFin()->getEtpNombre().'" ####');
+        }else{
+            $this->get('session')->setFlash('notice', $errorList);
+        }
         return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantCargarSolImportacion', 
-                array('impDetId' => $impDetId)
+                    array('impDetId' => $impDetId)
                 )
         );
     }

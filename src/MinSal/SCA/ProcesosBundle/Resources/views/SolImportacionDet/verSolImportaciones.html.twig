@@ -14,25 +14,58 @@
                                 'le','ge'];
         gridURL = '{{ urlJSON }}';
         
-        function verSolxTransicion(traId){
+        function verSolxTransicion(traId, traNombre){
             $("#theGrid").jqGrid('setGridParam',{
                     url: gridURL.replace(/traId/g, traId),
                     datatype:'json',
-                    loadonce:true
-            }).trigger('reloadGrid');
+                    caption: 'Solicitudes de Importación - ' + traNombre,
+                    loadonce: true
+            }).trigger('reloadGrid')
+            .jqGrid('setCaption', 'Solicitudes de Importación - Etapa: "' + traNombre+'"');
+            
+            $('[name=transiciones]').css('background-color','');
+            $('#tra'+traId).css('background-color','yellow');
+            
+            cargarTransiciones();
+        }
+        
+        var global_i = 0;
+        function cargarTransiciones(){
+            $.getJSON('{{ url('MinSalSCAProcesosBundle_getTransiciones') }}', function (json) {
+                // Falta programar que se llame recurrentemente cada cierto tiempo para mantener actualizado el contador
+                // y el grid con las solicitudes.
+                
+                var selecteTab = $('[name=transiciones]').filter(function(a, b){
+                    if(b.style.backgroundColor == 'yellow'){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }).attr('id');
+                
+                $('#etapas').html('<b>Etapas:</b> ');
+                
+                
+                $.each(json.registros, function (i, fb) {
+                    $('#etapas').html($('#etapas').html()+
+                        '<span id="tra'+fb.id+'" name="transiciones" style="cursor: pointer; text-decoration:underline; color: blue; padding-bottom: 3px; padding-top: 3px; padding-left: 15px; padding-right: 15px;" ' +
+                        ' onclick="verSolxTransicion('+ fb.id +', \''+ fb.nombre +'\');"> ' + (fb.cantidad>0?'<b>':'') + fb.nombre +' ('+ fb.cantidad +')' + (fb.cantidad>0?'</b>':'') +'</span>|| '
+                    );
+                    
+                    if(selecteTab == null && global_i == 0){
+                        global_i = 1;
+                        verSolxTransicion(fb.id, fb.nombre);
+                    }
+                });
+                
+                if(selecteTab != null){
+                    $('#'+selecteTab).css('background-color','yellow');
+                }
+
+            });
         }
         
         $(document).ready(function(){
-            {% if traIdSeries|length > 0 %}
-                $('#etapas').html('|| &nbsp;&nbsp;');
-                
-                {% for reg in traIdSeries %}
-                    $('#etapas').html($('#etapas').html()+
-                        '<span style="cursor: pointer; text-decoration:underline; color: blue;" onclick="verSolxTransicion({{ reg['id'] }});"> {{ reg['nombre'] }}</span> &nbsp;&nbsp;||&nbsp;&nbsp; '
-                    );
-                {% endfor %}
-            {% endif %}
-            
             $('#agregarRegistro').button();
             //$('#eliminarEntidad').button();
             $('#editarRegistro').button();
@@ -44,12 +77,12 @@
                 url: gridURL.replace(/traId/g,'0'),
                 width: 1000,
                 height: 300,
-                datatype:'json',
+                datatype:'local',
                 altRows:true,            
                 rowNum:10,
                 rowList:[10,20,30],
                 multiselect: false,
-                loadonce:true,
+                loadonce:false,
                 jsonReader: {
                     root:'rows',
                     page:'page',
@@ -203,36 +236,28 @@
                     $("#theGrid").jqGrid('setGridParam',{
                             datatype:'json',
                             loadonce:true
-                    }).trigger('reloadGrid');
+                    });//.trigger('reloadGrid');
                 }
-            }
-        );
-       
-        function despuesAgregarEditar() {
-            $("#theGrid").jqGrid('setGridParam',{
-                datatype:'json',
-                loadonce:true
-            }).trigger('reloadGrid');
+            });
             
-            return[true,'']; //no error
-        }
-        
-        $("#agregarRegistro").click(function(){
-            location.href = '{{ url('MinSalSCAProcesosBundle_mantSolImportacionIngreso')}}';
-        });
-        
-    
-         //editar
-        $("#editarRegistro").click(function(){
-            var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            cargarTransiciones();
             
-            if( gr != null ){
-                location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarSolImportacion', {'impDetId':'impDetId'})}}'.replace(/impDetId/g, gr);
-            }else{ 
-                alert("Por favor seleccione una fila para editar!"); 
-            }
-        });
-  //fin
+            $("#agregarRegistro").click(function(){
+                location.href = '{{ url('MinSalSCAProcesosBundle_mantSolImportacionIngreso')}}';
+            });
+
+
+             //editar
+            $("#editarRegistro").click(function(){
+                var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+
+                if( gr != null ){
+                    location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarSolImportacion', {'impDetId':'impDetId'})}}'.replace(/impDetId/g, gr);
+                }else{ 
+                    alert("Por favor seleccione una fila para editar!"); 
+                }
+            });
+      //fin
        
       });
     </script>
@@ -255,9 +280,11 @@
                         </div><br/>
                     {% endif %}
                     
-                    <span id="etapas">
-                    </span>
-                    <hr/><br/>
+                    <div style="width: 100%; text-align: left;">
+                        <span id="etapas">
+                        </span>
+                        <hr/>
+                    </div>
                     
                     <table id="theGrid" class="scroll">
                     </table> 

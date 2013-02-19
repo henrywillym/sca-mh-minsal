@@ -106,7 +106,11 @@ class SolImportacionDetType extends AbstractType {
         $builder->add('impDetLitros',  null, array('label' => 'Cantidad (Lts)'));
         $builder->add('impDetUso',  null, array('label' => 'Uso del Alcohol'));
         
-        //$builder->add('solImpComentario',  null, array('label' => 'Comentarios'));
+        //$builder->add('solImportacion.solImpComentario',  'hidden', array('label' => 'Comentarios'));
+        $builder->add('impDetLitrosLib',  null, array(
+            'label' => 'Litros Liberados',
+            'attr' => array('readonly' => 'readonly'),
+        ));
     }
 
     public function getName(){

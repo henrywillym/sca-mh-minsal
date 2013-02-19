@@ -38,7 +38,7 @@ MinSalSCAProcesosBundle_mantCargarSolImportacion:
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantCargarSolImportacion } 
     
 MinSalSCAProcesosBundle_cambiarEstado:
-    pattern:  /Solicitud/Importacion/CambiarEstado/{impDetId}/{estId}/update
+    pattern:  /Solicitud/Importacion/CambiarEstado/{impDetId}/{traId}/update
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:cambiarEstado }
 
 MinSalSCAProcesosBundle_getCuotas:
@@ -66,3 +66,7 @@ MinSalSCAProcesosBundle_getSearchEtapas:
 MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL:
     pattern:  /Solicitud/Importacion/VerSolicitudes/{etpEntidad}/
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantSolImportacionVerSolicitudes, etpEntidad: 'MINSAL'}
+    
+MinSalSCAProcesosBundle_getTransiciones:
+    pattern:  /Solicitud/Importacion/getTransiciones
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:getTransiciones }
