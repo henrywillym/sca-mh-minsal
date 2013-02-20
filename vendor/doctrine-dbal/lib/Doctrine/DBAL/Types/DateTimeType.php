@@ -49,9 +49,10 @@ class DateTimeType extends Type
         if ($value === null) {
             return null;
         }
-
+  $value=  substr($value,0,19);
         $val = \DateTime::createFromFormat($platform->getDateTimeFormatString(), $value);
         if (!$val) {
+          
             $val = \DateTime::createFromFormat($platform->getDateTimeFormatAltString(), $value);
             
             if (!$val) {
