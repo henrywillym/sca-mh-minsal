@@ -14,29 +14,29 @@
                                 'le','ge'];
         gridURL = '{{ urlJSON }}';
         
-        function verSolxTransicion(traId, traNombre){
+        function verSolxTransicion(etpId, etpNombre){
             $("#theGrid").jqGrid('setGridParam',{
-                    url: gridURL.replace(/traId/g, traId),
+                    url: gridURL.replace(/etpId/g, etpId),
                     datatype:'json',
-                    caption: 'Solicitudes de Importación - ' + traNombre,
                     loadonce: true
             }).trigger('reloadGrid')
-            .jqGrid('setCaption', 'Solicitudes de Importación - Etapa: "' + traNombre+'"');
+            .jqGrid('setCaption', 'Solicitudes de Importación - Etapa: "' + etpNombre+'"');
             
             $('[name=transiciones]').css('background-color','');
-            $('#tra'+traId).css('background-color','yellow');
+            $('#tra'+etpId).css('background-color','yellow');
             
             cargarTransiciones();
         }
         
         var global_i = 0;
+        var global_color = 'yellow';
         function cargarTransiciones(){
             $.getJSON('{{ url('MinSalSCAProcesosBundle_getTransiciones') }}', function (json) {
                 // Falta programar que se llame recurrentemente cada cierto tiempo para mantener actualizado el contador
                 // y el grid con las solicitudes.
                 
-                var selecteTab = $('[name=transiciones]').filter(function(a, b){
-                    if(b.style.backgroundColor == 'yellow'){
+                var selectedTab = $('[name=transiciones]').filter(function(a, b){
+                    if(b.style.backgroundColor == global_color){
                         return true;
                     }else{
                         return false;
@@ -52,14 +52,14 @@
                         ' onclick="verSolxTransicion('+ fb.id +', \''+ fb.nombre +'\');"> ' + (fb.cantidad>0?'<b>':'') + fb.nombre +' ('+ fb.cantidad +')' + (fb.cantidad>0?'</b>':'') +'</span>|| '
                     );
                     
-                    if(selecteTab == null && global_i == 0){
+                    if(selectedTab == null && global_i == 0){
                         global_i = 1;
                         verSolxTransicion(fb.id, fb.nombre);
                     }
                 });
                 
-                if(selecteTab != null){
-                    $('#'+selecteTab).css('background-color','yellow');
+                if(selectedTab != null){
+                    $('#'+selectedTab).css('background-color', global_color);
                 }
 
             });
@@ -74,7 +74,7 @@
             
             
             myGrid.jqGrid({ 
-                url: gridURL.replace(/traId/g,'0'),
+                url: gridURL.replace(/etpId/g,'0'),
                 width: 1000,
                 height: 300,
                 datatype:'local',

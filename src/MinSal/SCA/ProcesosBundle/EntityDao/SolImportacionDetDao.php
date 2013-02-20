@@ -68,11 +68,11 @@ class SolImportacionDetDao {
      * Obtiene todas las solicitudes de Importacion de acuerdo a la etapa y flujo que se encuentren
      * 
      * @param integer $entId
-     * @param integer $traId
+     * @param integer $etpId
      * @param integer $fluId
      * @return Array
      */
-    public function getSolImportacionesDetByEtapa($traId, $entId = null) {
+    public function getSolImportacionesDetByEtapa($etpId, $entId = null) {
         $sql = "SELECT  ".$this->sqlSelect."
                 FROM MinSalSCAProcesosBundle:SolImportacionDet E 
                     JOIN E.cuota H
@@ -82,7 +82,7 @@ class SolImportacionDetDao {
                     JOIN B.estado C
                     JOIN B.etpFin D
                     JOIN B.flujo G
-                WHERE B.traId = :traId ";
+                WHERE D.etpId = :etpId ";
         
         if($entId != null){
             $sql = $sql." AND A.entId = :entId ";
@@ -97,7 +97,7 @@ class SolImportacionDetDao {
             $registros->setParameter('entId',$entId);
         }
         
-        $registros->setParameter('traId',$traId)
+        $registros->setParameter('etpId',$etpId)
                 ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }

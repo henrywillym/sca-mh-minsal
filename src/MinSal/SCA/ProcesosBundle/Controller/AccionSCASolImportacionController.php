@@ -73,7 +73,7 @@ class AccionSCASolImportacionController extends Controller {
             $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolImportacionesJSON');
         }else{
             $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_consultarSolImportacionDetJSON', 
-                array('traId' => 'traId')//Se coloca el mismo nombre para que con javascript se pueda substituir dinamicamente el parametro
+                array('etpId' => 'etpId')//Se coloca el mismo nombre para que con javascript se pueda substituir dinamicamente el parametro
             );
         }
         $paramArray['traIdSeries'] = $traIdSeries;
@@ -94,15 +94,14 @@ class AccionSCASolImportacionController extends Controller {
      * Devuelve el listado principal de registros del mantenimiento
      * @return Response
      */
-    public function consultarSolImportacionJSONAction($traId) {
+    public function consultarSolImportacionJSONAction($etpId) {
         $user = $this->get('security.context')->getToken()->getUser();
         $solImportacionDetDao = new SolImportacionDetDao($this->getDoctrine());
         
-        $etpId = '';
         if($user->getEntidad() != null){
-            $registros = $solImportacionDetDao->getSolImportacionesDetByEtapa($traId, $user->getEntidad()->getEntId());
+            $registros = $solImportacionDetDao->getSolImportacionesDetByEtapa($etpId, $user->getEntidad()->getEntId());
         }else{
-            $registros = $solImportacionDetDao->getSolImportacionesDetByEtapa($traId);
+            $registros = $solImportacionDetDao->getSolImportacionesDetByEtapa($etpId);
         }
 
         $numfilas = count($registros);
@@ -225,16 +224,20 @@ class AccionSCASolImportacionController extends Controller {
         $roles = $user->getRols();
         $traIdSeries = array();
         $registros= array();
+        $tmpIndex = array();
         
         foreach($roles as $rol){
             $transiciones = $rol->getTransiciones();
 
             foreach($transiciones as $reg){
-                $tmp['id'] = $reg->getTraId();
-                $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
-                $tmp['cantidad'] = $solImportacionDao->getCantidadSolicitudesXTransicion($reg->getTraId());
+                if(!array_key_exists($reg->getEtpFin()->getEtpId(), $tmpIndex)){
+                    $tmp['id'] = $reg->getEtpFin()->getEtpId();
+                    $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
+                    $tmp['cantidad'] = $solImportacionDao->getCantidadSolicitudesXEtapa($reg->getEtpFin()->getEtpId());
+                    $tmpIndex[$reg->getEtpFin()->getEtpId()] = true;
 
-                $traIdSeries[] = $tmp;
+                    $traIdSeries[] = $tmp;
+                }
             }
         }
         
@@ -503,11 +506,24 @@ class AccionSCASolImportacionController extends Controller {
                                 $impDetLitros = $solImportacionDet->getImpDetLitros();
                                 $litrosLib = $request->get('impDetLitrosLib');
                                 
-                                if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
-                                    $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
-                                }else{
-                                    $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
+                                try{
+                                    $litrosLib = (float) $litrosLib;
+                                    $impDetLitrosLib = (float) $impDetLitrosLib;
+                                    $impDetLitros = (float) $impDetLitros;
+                                    
+                                    if($litrosLib ==null || $litrosLib ==''){
+                                        $errorList = $errorList.'- Debe ingresar los litros a liberar';
+                                    }else if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
+                                        $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
+                                    }else if($litrosLib <=0){
+                                        $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
+                                    }else{
+                                        $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
+                                    }
+                                }  catch (Exception $e){
+                                    $errorList = $errorList.'- Debe ingresar un número valido';
                                 }
+                                
                             }
                             
                             if($errorList == ''){
