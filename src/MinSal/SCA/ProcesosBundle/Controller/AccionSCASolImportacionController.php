@@ -7,10 +7,14 @@
 namespace MinSal\SCA\ProcesosBundle\Controller;
 
 use MinSal\SCA\AdminBundle\Entity\Cuota;
+use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
+use MinSal\SCA\ProcesosBundle\Entity\Inventario;
+use MinSal\SCA\ProcesosBundle\Entity\InventarioDet;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
+use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\SolImportacionDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\SolImportacionDetDao;
@@ -50,39 +54,50 @@ class AccionSCASolImportacionController extends Controller {
             return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:ingresarSolImportacionDet.html.twig', array(
                         'form' => $form->createView(),
                         'opciones' => $opciones,
-                        'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
+                        'entNombComercial'=> $user->getEntidad()->getEntNombComercial(),
+                        'comentario' => null,
+                        'transiciones' => null
                     )
             );
         }
     }
     
     /**
-     * Redirecciona a la pagina para ver las solicitudes asociadas a la empresa del usuario
+     * Redirecciona a la pagina para ver las solicitudes asociadas a la empresa del usuario o para evaluar solicitudes de acuerdo a su rol
      * 
      * @return html.twig
      */
     public function mantSolImportacionVerSolicitudesAction($etpEntidad =null) {
         $opciones = $this->getRequest()->getSession()->get('opciones');
-        $user = new User();
         $user = $this->get('security.context')->getToken()->getUser();
+        $roles = $user->getRols();
+        $tieneEtapas = false;
+        
+        foreach($roles as $rol){
+            $transiciones = $rol->getTransiciones();
+            
+            if(count($transiciones)>0){
+                $tieneEtapas = true;
+                break;
+            }
+        }
         
         $paramArray = array();
-        $traIdSeries = array();
-
-        if($etpEntidad == null){
-            $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolImportacionesJSON');
-        }else{
-            $paramArray['urlJSON'] = $this->generateUrl('MinSalSCAProcesosBundle_consultarSolImportacionDetJSON', 
+        
+        if($tieneEtapas == true){
+            $paramArray['urlJSONSolXEtapas'] = $this->generateUrl('MinSalSCAProcesosBundle_consultarSolImportacionDetJSON', 
                 array('etpId' => 'etpId')//Se coloca el mismo nombre para que con javascript se pueda substituir dinamicamente el parametro
             );
         }
-        $paramArray['traIdSeries'] = $traIdSeries;
+        
         $paramArray['opciones']= $opciones;
         
         if($user->getEntidad()!=null){
             $paramArray['entNombComercial']= $user->getEntidad()->getEntNombComercial();
+            $paramArray['urlJSONSolXEntidad'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolImportacionesJSON');
         }else{
             $paramArray['entNombComercial']= null;
+            $paramArray['urlJSONSolXEntidad'] = null;
         }
 
         return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:verSolImportaciones.html.twig', $paramArray);
@@ -180,7 +195,7 @@ class AccionSCASolImportacionController extends Controller {
         $registros = $cuotaDao->getCuotas($entId, Cuota::$cuoTipoImportacion, $year->format('Y'));
 
         $numfilas = count($registros);
-        
+        $debug = array();
         $htmlResponse = '';
         if ($numfilas != 0) {
             $i = 0;
@@ -191,6 +206,10 @@ class AccionSCASolImportacionController extends Controller {
                 $litrosSolicitudesPendientes = $solImportacionDao->getLitrosSolicitudXCuota($entId, $reg['cuoId']);
                 
                 $disponible = $reg['cuoLitros'] - $litrosInventario - $litrosSolicitudesPendientes;
+                
+                $debug[$i]['$litrosInventario']=$litrosInventario;
+                $debug[$i]['$litrosSolicitudesPendientes']=$litrosSolicitudesPendientes;
+                $debug[$i]['cuoLitros']=$reg['cuoLitros'];
                 
                 if($disponible > 0 || $verSolicitud){
                     if($i ==0){
@@ -203,7 +222,7 @@ class AccionSCASolImportacionController extends Controller {
                     $i++;
                 }
             }
-            
+            //var_dump($debug);die;
             if($i == 0){
                 $htmlResponse = $htmlResponse.'<option value="">No Existen cuotas asociadas</option>';
             }
@@ -217,7 +236,7 @@ class AccionSCASolImportacionController extends Controller {
         return $response;
     }
     
-    public function getTransicionesAction(Request $request) {
+    public function getEtapasAction(Request $request) {
         $user = $this->get('security.context')->getToken()->getUser();
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
         
@@ -332,13 +351,13 @@ class AccionSCASolImportacionController extends Controller {
         $form->bindRequest($request);
         
         $cuotaDao = new CuotaDao($this->getDoctrine());
-        //$solImportacionDetTmp->setCuota($cuotaDao->getCuota($request->get('cuota'))) ;
+        $solImportacionDetTmp->setCuota($cuotaDao->getCuota($request->get('cuota'))) ;
         
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
         $solImportacionDetDao = new SolImportacionDetDao($this->getDoctrine());
         $transicionDao = new TransicionDao($this->getDoctrine());
         
-        $errores = $solImportacionDetTmp->isValid();
+        $errores = $solImportacionDetTmp->isValid($this->getDoctrine(), $user->getEntidad());
         
         if(($form->isValid() && count($errores)==0)){
             if( $solImportacionDetTmp->getImpDetId() ){
@@ -501,27 +520,42 @@ class AccionSCASolImportacionController extends Controller {
                                 }
                             }
                             
-                            if($reg->getTraLitrosLibera()){
+                            if($reg->getTraLitrosLibera() || $reg->getTraLiberaTotal()){
                                 $impDetLitrosLib = $solImportacionDet->getImpDetLitrosLib();
                                 $impDetLitros = $solImportacionDet->getImpDetLitros();
                                 $litrosLib = $request->get('impDetLitrosLib');
                                 
-                                try{
-                                    $litrosLib = (float) $litrosLib;
-                                    $impDetLitrosLib = (float) $impDetLitrosLib;
-                                    $impDetLitros = (float) $impDetLitros;
+                                if($reg->getTraLiberaTotal()){
+                                    $solImportacionDet->setImpDetLitrosLib($impDetLitros);
+                                    $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $impDetLitros - $impDetLitrosLib);
                                     
-                                    if($litrosLib ==null || $litrosLib ==''){
-                                        $errorList = $errorList.'- Debe ingresar los litros a liberar';
-                                    }else if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
-                                        $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
-                                    }else if($litrosLib <=0){
-                                        $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
-                                    }else{
-                                        $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
+                                    $inventarioDet->setSolImportacionDet($solImportacionDet);
+                                    $solImportacionDet->addInventarioDet($inventarioDet);
+                                    
+                                }else if($reg->getTraLitrosLibera()){
+
+                                    try{
+                                        $litrosLib = (float) $litrosLib;
+                                        $impDetLitrosLib = (float) $impDetLitrosLib;
+                                        $impDetLitros = (float) $impDetLitros;
+
+                                        if($litrosLib ==null || $litrosLib ==''){
+                                            $errorList = $errorList.'- Debe ingresar los litros a liberar';
+                                        }else if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
+                                            $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
+                                        }else if($litrosLib <=0){
+                                            $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
+                                        }else{
+                                            $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
+                                            
+                                            $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $litrosLib);
+                                    
+                                            $inventarioDet->setSolImportacionDet($solImportacionDet);
+                                            $solImportacionDet->addInventarioDet($inventarioDet);
+                                        }
+                                    }  catch (Exception $e){
+                                        $errorList = $errorList.'- Debe ingresar un número valido';
                                     }
-                                }  catch (Exception $e){
-                                    $errorList = $errorList.'- Debe ingresar un número valido';
                                 }
                                 
                             }
@@ -552,6 +586,63 @@ class AccionSCASolImportacionController extends Controller {
                     array('impDetId' => $impDetId)
                 )
         );
+    }
+    
+    /**
+     * 
+     * @param \MinSal\SCA\AdminBundle\Entity\Cuota $cuota
+     * @param double $litros
+     * @return \MinSal\SCA\ProcesosBundle\Entity\InventarioDet
+     */
+    private function agregarInventario(Cuota $cuota, $litros){
+        $user = $this->get('security.context')->getToken()->getUser();
+        $inventarioDao = new InventarioDao($this->getDoctrine());
+        $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
+        $alcoholDao = new AlcoholDao($this->getDoctrine());
+        
+        $inventarioDet = new InventarioDet();
+
+        //Buscamos si el encabezado en la tabla de "Inventario" existe
+        $inventario = $inventarioDao->findInventario(
+                            $user->getEntidad()->getEntId(),
+                            $cuota->getAlcohol()->getAlcId(),
+                            $cuota->getCuoGrado(),
+                            $cuota->getCuoNombreEsp()
+                        );
+
+        if($inventario != null){
+            $invLitros = $inventario->getInvLitros();
+            $inventario->setInvLitros( $invLitros + $litros);
+            $inventario->setAuditUserUpd($user->getUsername());
+            $inventario->setAuditDateUpd(new \DateTime());
+            $inventarioDet->setInventario($inventario);
+        }else{
+            //#### Encabezado de Inventario
+            $inventarioDet->setInventario(new Inventario());
+            $inventarioDet->getInventario()->setEntidad($user->getEntidad());
+            $inventarioDet->getInventario()->setAlcohol($alcoholDao->getAlcohol($cuota->getAlcohol()->getAlcId()));
+            $inventarioDet->getInventario()->setInvLitros($litros);
+            $inventarioDet->getInventario()->setAuditUserIns($user->getUsername());
+            $inventarioDet->getInventario()->setAuditDateIns(new \DateTime());
+            $inventarioDet->getInventario()->setInvGrado($cuota->getCuoGrado());
+            $inventarioDet->getInventario()->setInvNombreEsp($cuota->getCuoNombreEsp());
+        }
+
+        //## Detalle de inventario
+        $inventarioDet->getInventario()->addInventarioDet($inventarioDet);
+        $inventarioDet->setInvDetFecha(new \DateTime());
+
+        //#### Auditoría 
+        $inventarioDet->setAuditUserIns($user->getUsername());
+        $inventarioDet->setAuditDateIns(new \DateTime());
+        
+        $inventarioDet->setInvDetAccion("+");
+        $inventarioDet->setInvDetLitros($litros);
+        
+        //$inventarioDetDao->editInventarioDet($inventarioDet);
+        //$this->getDoctrine()->getEntityManager()->persist($inventarioDet);
+        
+        return $inventarioDet;
     }
 }
 ?>

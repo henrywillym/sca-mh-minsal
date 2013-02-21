@@ -250,7 +250,7 @@ class AccionSCAInventariosDetController extends Controller {
         
         if( !$inventarioDet ){
             $inventarioDet = new InventarioDet();
-        }else{
+            $inventarioDet->setInvDetComentario('Inventario Inicial');
         }
         
         $form = $this->createForm(new InventarioDetType($this->getDoctrine()), $inventarioDet);

@@ -67,6 +67,6 @@ MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL:
     pattern:  /Solicitud/Importacion/VerSolicitudes/{etpEntidad}/
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:mantSolImportacionVerSolicitudes, etpEntidad: 'MINSAL'}
     
-MinSalSCAProcesosBundle_getTransiciones:
-    pattern:  /Solicitud/Importacion/getTransiciones
-    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:getTransiciones }
+MinSalSCAProcesosBundle_getEtapas:
+    pattern:  /Solicitud/Importacion/getEtapas
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:getEtapas }

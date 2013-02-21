@@ -117,7 +117,7 @@
             }
         }
         
-        var impDetId = {{impDetId}};
+        var impDetId = '0';
         
         $(document).ready(function(){
             $('#btnGuardar').button();
@@ -390,14 +390,14 @@
                 </tr> 
                 
                 
-                
+                {% if comentario %}
                 <tr name="ingresaSolicitud">
                     <td><label >Comentarios:</label></td>
                     <td>
                         <textarea rows="4" style="width:97%" readonly="readonly"> {{ comentario }} </textarea>
                     </td>                
                 </tr>
-                
+                {% endif %}
                 
                 <tr>
                     <td align='center' colspan=2 >

@@ -85,11 +85,15 @@
                         <span class="preload2"></span>                            
                         <ul id="nav"></ul>
                             {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
-                        <h3 align="right">Bienvenid@ {{ app.user.userPrimerNombre }}&nbsp;{{ app.user.userApellidos }}!!</h3>                            
+                        <h3 align="right" style="margin:0px;">Bienvenid@ {{ app.user.userPrimerNombre }}&nbsp;{{ app.user.userApellidos }}!!</h3>
+                        <h3 align="right" style="margin:0px;">
+                            {{ app.user.username}}&nbsp;-&nbsp;
                             {% if app.user.entidad %}
-                        <h3 align="right">{{ app.user.entidad.entNombComercial }}</h3>
+                                {{ app.user.entidad.entNombComercial }}
+                            {% else %}
+                                {{ app.user.userInternoTipo }}
                             {% endif %}
-                        
+                        </h3>
                             {% endif %}    
                     </div>
 

@@ -103,6 +103,13 @@ class Transicion {
     private $traLitrosLibera;
     
     /**
+     * @var boolean $traLiberaTotal
+     *
+     * @ORM\Column(name="tra_libera_total", type="boolean", nullable=false)
+     */
+    private $traLiberaTotal;
+    
+    /**
      * @var DateTime $auditDateIns
      *
      * @ORM\Column(name="audit_date_ins", type="datetime")
@@ -274,8 +281,16 @@ class Transicion {
     public function setTraLitrosLibera($traLitrosLibera) {
         $this->traLitrosLibera = $traLitrosLibera;
     }
+    
+    public function getTraLiberaTotal() {
+        return $this->traLiberaTotal=== 'true' || $this->traLiberaTotal === true;
+    }
 
-            
+    public function setTraLiberaTotal($traLiberaTotal) {
+        $this->traLiberaTotal = $traLiberaTotal;
+    }
+
+                
     //*********** CUSTOM SET/GET ******************
     public function addSolImportacion($solImportacion) {
         $this->solImportaciones[] = $solImportacion;

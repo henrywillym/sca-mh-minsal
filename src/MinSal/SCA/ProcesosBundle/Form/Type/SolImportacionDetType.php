@@ -98,12 +98,12 @@ class SolImportacionDetType extends AbstractType {
             //'property_path'=>false
         ));/**/
             
-        $builder->add('impDetFactCom', 'text', array('label' => 'No. Factura Comercial','required'=>true));
+        $builder->add('impDetFactCom', 'text', array('label' => 'No. Factura Comercial','required'=>true, 'attr' => array('autocomplete' => 'off'),));
         $builder->add('impDetProvNom', 'text', array('label' => 'Nombre Empresa Proveedora','required'=>true));
         $builder->add('impDetPaisProc',  null, array('label' => 'País de Procedencia'));
         $builder->add('impDetPaisOri',  null, array('label' => 'País de Origen'));
-        $builder->add('impDetProvDirec',  null, array('label' => 'Dirección Proveedor (Exterior)'));
-        $builder->add('impDetLitros',  null, array('label' => 'Cantidad (Lts)'));
+        $builder->add('impDetProvDirec',  'text', array('label' => 'Dirección Proveedor (Exterior)','required'=>true));
+        $builder->add('impDetLitros',  null, array('label' => 'Cantidad (Lts)', 'attr' => array('autocomplete' => 'off'),));
         $builder->add('impDetUso',  null, array('label' => 'Uso del Alcohol'));
         
         //$builder->add('solImportacion.solImpComentario',  'hidden', array('label' => 'Comentarios'));

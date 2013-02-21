@@ -12,26 +12,36 @@
                             
         var searchOptionDate = ['eq',
                                 'le','ge'];
-        gridURL = '{{ urlJSON }}';
+        gridURLSolXEtapas = '{{ urlJSONSolXEtapas }}';
+        gridURLSolXEntidad ='{{ urlJSONSolXEntidad }}';
         
-        function verSolxTransicion(etpId, etpNombre){
-            $("#theGrid").jqGrid('setGridParam',{
-                    url: gridURL.replace(/etpId/g, etpId),
-                    datatype:'json',
-                    loadonce: true
-            }).trigger('reloadGrid')
-            .jqGrid('setCaption', 'Solicitudes de Importación - Etapa: "' + etpNombre+'"');
+        function verSolxEtapa(etpId, etpNombre){
+            if(etpId==0){
+                $("#theGrid").jqGrid('setGridParam',{
+                        url: gridURLSolXEntidad,
+                        datatype:'json',
+                        loadonce: true
+                }).trigger('reloadGrid')
+                .jqGrid('setCaption', etpNombre);
+            }else{
+                $("#theGrid").jqGrid('setGridParam',{
+                        url: gridURLSolXEtapas.replace(/etpId/g, etpId),
+                        datatype:'json',
+                        loadonce: true
+                }).trigger('reloadGrid')
+                .jqGrid('setCaption', 'Solicitudes de Importación - Etapa: "' + etpNombre+'"');
+            }
             
             $('[name=transiciones]').css('background-color','');
             $('#tra'+etpId).css('background-color','yellow');
             
-            cargarTransiciones();
+            cargarEtapas();
         }
         
         var global_i = 0;
         var global_color = 'yellow';
-        function cargarTransiciones(){
-            $.getJSON('{{ url('MinSalSCAProcesosBundle_getTransiciones') }}', function (json) {
+        function cargarEtapas(){
+            $.getJSON('{{ url('MinSalSCAProcesosBundle_getEtapas') }}', function (json) {
                 // Falta programar que se llame recurrentemente cada cierto tiempo para mantener actualizado el contador
                 // y el grid con las solicitudes.
                 
@@ -48,13 +58,13 @@
                 
                 $.each(json.registros, function (i, fb) {
                     $('#etapas').html($('#etapas').html()+
-                        '<span id="tra'+fb.id+'" name="transiciones" style="cursor: pointer; text-decoration:underline; color: blue; padding-bottom: 3px; padding-top: 3px; padding-left: 15px; padding-right: 15px;" ' +
-                        ' onclick="verSolxTransicion('+ fb.id +', \''+ fb.nombre +'\');"> ' + (fb.cantidad>0?'<b>':'') + fb.nombre +' ('+ fb.cantidad +')' + (fb.cantidad>0?'</b>':'') +'</span>|| '
+                        '<span id="tra'+fb.id+'" name="transiciones" style="cursor: pointer; text-decoration:underline; color: blue; padding: 5px 15px; border: #000000 1px solid; margin-right: -1px;" ' +
+                        ' onclick="verSolxEtapa('+ fb.id +', \''+ fb.nombre +'\');"> ' + (fb.cantidad>0?'<b>':'') + fb.nombre +' ('+ fb.cantidad +')' + (fb.cantidad>0?'</b>':'') +'</span>'
                     );
                     
                     if(selectedTab == null && global_i == 0){
                         global_i = 1;
-                        verSolxTransicion(fb.id, fb.nombre);
+                        verSolxEtapa(fb.id, fb.nombre);
                     }
                 });
                 
@@ -74,7 +84,7 @@
             
             
             myGrid.jqGrid({ 
-                url: gridURL.replace(/etpId/g,'0'),
+                url: gridURLSolXEtapas.replace(/etpId/g,'0'),
                 width: 1000,
                 height: 300,
                 datatype:'local',
@@ -240,7 +250,7 @@
                 }
             });
             
-            cargarTransiciones();
+            cargarEtapas();
             
             $("#agregarRegistro").click(function(){
                 location.href = '{{ url('MinSalSCAProcesosBundle_mantSolImportacionIngreso')}}';
@@ -266,9 +276,9 @@
         <table align="center">
             <tr><td align="center">
                     {% if entNombComercial %}
-                        <h1>Listado de Solicitudes de Importación de "{{entNombComercial}}"</h1>
+                        <h1>Solicitudes de Importación de "{{entNombComercial}}"</h1>
                     {% else %}
-                        <h1>Listado de Solicitudes de Importación de Empresas</h1>
+                        <h1>Evaluacion de Solicitudes de Importación</h1>
                     {% endif %}
                 </td>
             </tr>
@@ -280,10 +290,21 @@
                         </div><br/>
                     {% endif %}
                     
-                    <div style="width: 100%; text-align: left;">
+                    <div style="width: 100%; text-align: left; margin-bottom: 7px;">
+                        
+                        {% if entNombComercial %}
+                        <span id="solicitudesIngresadas">
+                            <span id="tra0" name="transiciones" style="cursor: pointer; text-decoration:underline; color: blue; padding: 5px 15px; border: #000000 1px solid; "
+                                  onclick="verSolxEtapa(0, 'Solicitudes de Importación Ingresadas');">
+                                Ver Solicitudes Ingresadas
+                            </span>
+                        </span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        
                         <span id="etapas">
                         </span>
-                        <hr/>
+                        <br/>
                     </div>
                     
                     <table id="theGrid" class="scroll">

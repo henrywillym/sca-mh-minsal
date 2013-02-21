@@ -2,6 +2,7 @@
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
 use MinSal\SCA\ProcesosBundle\Entity\Estado;
+use MinSal\SCA\ProcesosBundle\Entity\Etapa;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
@@ -82,7 +83,13 @@ class SolImportacionDao {
                                           WHERE E.impDetId = :impDetId
                                           ")
                 ->setParameter('impDetId',$id); //WHERE E.solImpId = :solImpId
-        return $registros->getSingleResult();/**/
+        $result = $registros->getResult();/**/
+        
+        if($result !=null && count($result)>0 && $result[0] != null){
+            return $result[0];
+        }else{
+            return 0;
+        }
     }
     
     public function addSolImportacion(SolImportacion $solImportacion) {
@@ -134,10 +141,10 @@ class SolImportacionDao {
                                                 JOIN B.cuota C
                                                 JOIN C.entidad D
                                                 JOIN E.transicion F
-                                                JOIN F.estado G
+                                                JOIN F.etpFin G
                                           WHERE D.entId = :entId
                                             AND C.cuoId = :cuoId
-                                            AND G.estId not in (".Estado::$CANCELADO.",".Estado::$RECHAZADO.")")
+                                            AND G.etpId not in (".Etapa::$FINALIZADA_OBS.",".Etapa::$RECEPCION_TOTAL_INV.")")
                 ->setParameter('entId', $entId)
                 ->setParameter('cuoId', $cuoId);
         

@@ -2,10 +2,13 @@
 
 namespace MinSal\SCA\ProcesosBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\ProcesosBundle\Entity\Arancel;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
+use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
+use MinSal\SCA\ProcesosBundle\EntityDao\SolImportacionDao;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,16 +24,29 @@ class SolImportacionDet {
         $this->impDetLitrosLib = 0;
         $this->solImportacion = new SolImportacion();
         $this->cuota = new Cuota();
+        $this->inventariosDet = new ArrayCollection();
     }
     
     /**
      * Se encarga de validar que el valor de los grados se encuentre dentro del rango
      */
-    public function isValid(){
+    public function isValid($doctrine, $entidad){
         $msg = array();
         if($this->getImpDetLitros()){
             if($this->getImpDetLitros()+0 <=0 ){
-                $msg[]='- La cantidad en litros ingresados "'.$this->getInvGrado().'" debe ser mayor a 0';
+                $msg[]='- La cantidad en litros ingresados "'.$this->getImpDetLitros().'" debe ser mayor a 0';
+            }else{
+                $solImportacionDao = new SolImportacionDao($doctrine);
+                $inventarioDetDao = new InventarioDetDao($doctrine);
+
+                $litrosInventario = $inventarioDetDao->getLitrosInventarioXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
+                $litrosSolicitudesPendientes = $solImportacionDao->getLitrosSolicitudXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
+                
+                $disponible = $this->getCuota()->getCuoLitros() - $litrosInventario - $litrosSolicitudesPendientes;
+                
+                if( $this->getImpDetLitros() > $disponible ){
+                    $msg[]='- La cantidad en litros ingresados "'.$this->getImpDetLitros().'" es mayor al saldo disponible de la cuota "'.$disponible.'"';
+                }
             }
         }else{
             $msg[]='- El campo "Cantidad" se encuentra vacio';
@@ -60,7 +76,7 @@ class SolImportacionDet {
     protected $solImportacion;
     
     /**
-     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\InventarioDet", mappedBy="solImportacionDet")
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\InventarioDet", mappedBy="solImportacionDet", cascade={"persist"})
      */
     protected $inventariosDet;
     

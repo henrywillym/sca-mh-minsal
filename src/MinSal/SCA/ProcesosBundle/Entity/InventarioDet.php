@@ -18,7 +18,6 @@ class InventarioDet {
     public function __construct() {
         $this->inventario = new Inventario();
         $this->invDetAccion = '+';
-        $this->invDetComentario = 'Inventario Inicial';
         $this->auditDeleted = false;
     }
     
@@ -179,11 +178,11 @@ class InventarioDet {
     }
 
     public function getSolImportacionDet() {
-        return $this->solImportacion;
+        return $this->solImportacionDet;
     }
 
     public function setSolImportacionDet($solImportacionDet) {
-        $this->solImportacion = $solImportacionDet;
+        $this->solImportacionDet = $solImportacionDet;
     }
 
     public function getSolLocalDet() {
