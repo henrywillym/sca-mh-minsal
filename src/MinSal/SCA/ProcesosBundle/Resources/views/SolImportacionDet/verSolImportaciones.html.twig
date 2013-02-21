@@ -32,14 +32,14 @@
                 .jqGrid('setCaption', 'Solicitudes de Importación - Etapa: "' + etpNombre+'"');
             }
             
-            $('[name=transiciones]').css('background-color','');
-            $('#tra'+etpId).css('background-color','yellow');
+            $('[name=transiciones]').css({'background-color':'', 'color':''});
+            $('#tra'+etpId).css({'background-color': global_color, 'color':'white'});
             
             cargarEtapas();
         }
         
         var global_i = 0;
-        var global_color = 'yellow';
+        var global_color = 'navy';
         function cargarEtapas(){
             $.getJSON('{{ url('MinSalSCAProcesosBundle_getEtapas') }}', function (json) {
                 // Falta programar que se llame recurrentemente cada cierto tiempo para mantener actualizado el contador
@@ -58,7 +58,7 @@
                 
                 $.each(json.registros, function (i, fb) {
                     $('#etapas').html($('#etapas').html()+
-                        '<span id="tra'+fb.id+'" name="transiciones" style="cursor: pointer; text-decoration:underline; color: blue; padding: 5px 15px; border: #000000 1px solid; margin-right: -1px;" ' +
+                        '<span id="tra'+fb.id+'" name="transiciones" class="etapa" ' +
                         ' onclick="verSolxEtapa('+ fb.id +', \''+ fb.nombre +'\');"> ' + (fb.cantidad>0?'<b>':'') + fb.nombre +' ('+ fb.cantidad +')' + (fb.cantidad>0?'</b>':'') +'</span>'
                     );
                     
@@ -69,7 +69,7 @@
                 });
                 
                 if(selectedTab != null){
-                    $('#'+selectedTab).css('background-color', global_color);
+                    $('#'+selectedTab).css({'background-color': global_color, 'color':'white'});
                 }
 
             });
@@ -271,6 +271,18 @@
        
       });
     </script>
+    
+    <style>
+            .etapa{
+                cursor: pointer; 
+                text-decoration:underline; 
+                color: navy; 
+                padding: 5px 10px; 
+                border: #000000 1px solid; 
+                background: #d0e5f5 url(images/ui-bg_glass_75_d0e5f5_1x400.png) 50% 50% repeat-x;
+                margin-right: -1px;
+            }
+    </style>
       
     <form action="" method="post">
         <table align="center">
@@ -290,11 +302,11 @@
                         </div><br/>
                     {% endif %}
                     
-                    <div style="width: 100%; text-align: left; margin-bottom: 7px;">
+                    <div style="width: 100%; text-align: left; margin-bottom: 7px; font-family:'Lucida Sans Unicode'; font-size: 11px;">
                         
                         {% if entNombComercial %}
                         <span id="solicitudesIngresadas">
-                            <span id="tra0" name="transiciones" style="cursor: pointer; text-decoration:underline; color: blue; padding: 5px 15px; border: #000000 1px solid; "
+                            <span id="tra0" name="transiciones" class="etapa"
                                   onclick="verSolxEtapa(0, 'Solicitudes de Importación Ingresadas');">
                                 Ver Solicitudes Ingresadas
                             </span>

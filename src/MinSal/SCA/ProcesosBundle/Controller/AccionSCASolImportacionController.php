@@ -67,7 +67,7 @@ class AccionSCASolImportacionController extends Controller {
      * 
      * @return html.twig
      */
-    public function mantSolImportacionVerSolicitudesAction($etpEntidad =null) {
+    public function mantSolImportacionVerSolicitudesAction() {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
         $roles = $user->getRols();
@@ -106,7 +106,7 @@ class AccionSCASolImportacionController extends Controller {
     
 
     /**
-     * Devuelve el listado principal de registros del mantenimiento
+     * Devuelve el listado solicitudes que se encuentran en una etapa especifica
      * @return Response
      */
     public function consultarSolImportacionJSONAction($etpId) {
@@ -151,8 +151,11 @@ class AccionSCASolImportacionController extends Controller {
         $user = $this->get('security.context')->getToken()->getUser();
         
         $solImportacionDetDao = new SolImportacionDetDao($this->getDoctrine());
-        $registros = $solImportacionDetDao->getSolImportacionesDetByEntidad($user->getEntidad()->getEntId());
-
+        $registros = array();
+        
+        if($user->getEntidad() != null){
+            $registros = $solImportacionDetDao->getSolImportacionesDetByEntidad($user->getEntidad()->getEntId());
+        }
         $numfilas = count($registros);
         
         $datos = json_encode($registros);
@@ -414,8 +417,9 @@ class AccionSCASolImportacionController extends Controller {
             return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:ingresarSolImportacionDet.html.twig', array(
                     'opciones' => $opciones, 
                     'form' => $form->createView(), 
-                    'impDetId'=>$solImportacionDet->getImpDetId(),
-                    'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
+                    'entNombComercial'=> $user->getEntidad()->getEntNombComercial(),
+                    'comentario' => null,
+                    'transiciones' => null
                 )
             );
         }
@@ -573,7 +577,7 @@ class AccionSCASolImportacionController extends Controller {
                             $solImportacionDetDao->editSolImportacionDet($solImportacionDet);
 
                             $this->get('session')->setFlash('notice', '#### El registro paso a etapa "'. $reg->getEtpFin()->getEtpNombre() .'" con estado "'.$reg->getEstado()->getEstNombre().'" ####');
-                            return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL'));
+                            return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudes'));
                         }
                     }
                 }

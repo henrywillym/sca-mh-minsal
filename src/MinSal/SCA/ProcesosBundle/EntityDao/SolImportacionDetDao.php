@@ -58,7 +58,8 @@ class SolImportacionDetDao {
                                             JOIN B.etpFin D
                                             JOIN B.flujo G
                                           WHERE A.entId = :entId
-                                            AND G.fluId = :fluId")
+                                            AND G.fluId = :fluId
+                                            ORDER BY F.solImpId DESC")
                 ->setParameter('entId',$entId)
                 ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
