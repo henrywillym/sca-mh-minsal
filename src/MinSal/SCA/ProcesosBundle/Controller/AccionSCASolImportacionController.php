@@ -243,19 +243,21 @@ class AccionSCASolImportacionController extends Controller {
         $roles = $user->getRols();
         $traIdSeries = array();
         $registros= array();
-        $tmpIndex = array();
+        //$tmpIndex = array();
         
         foreach($roles as $rol){
             $transiciones = $rol->getTransiciones();
 
-            foreach($transiciones as $reg){
-                if(!array_key_exists($reg->getEtpFin()->getEtpId(), $tmpIndex)){
-                    $tmp['id'] = $reg->getEtpFin()->getEtpId();
-                    $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
-                    $tmp['cantidad'] = $solImportacionDao->getCantidadSolicitudesXEtapa($reg->getEtpFin()->getEtpId());
-                    $tmpIndex[$reg->getEtpFin()->getEtpId()] = true;
+            foreach($transiciones as $transicion){
+                foreach($transicion->getParentsTransicion() as $reg){
+                    if(!array_key_exists($reg->getEtpFin()->getEtpId(), $traIdSeries)){//$tmpIndex)){
+                        $tmp['id'] = $reg->getEtpFin()->getEtpId();
+                        $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
+                        $tmp['cantidad'] = $solImportacionDao->getCantidadSolicitudesXEtapa($reg->getEtpFin()->getEtpId());
+                        //$tmpIndex[$reg->getEtpFin()->getEtpId()] = true;
 
-                    $traIdSeries[] = $tmp;
+                        $traIdSeries[$tmp['id']] = $tmp;
+                    }
                 }
             }
         }
@@ -429,6 +431,7 @@ class AccionSCASolImportacionController extends Controller {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
         $result = array();
+        $tmpIndex = array();
         
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
         $solImportacionDet = $solImportacionDao->getSolImportacionDet($impDetId);
@@ -445,16 +448,19 @@ class AccionSCASolImportacionController extends Controller {
             foreach($roles as $rol){
                 $transicionesRol = $rol->getTransiciones();
 
-                foreach($transicionesRol as $regTra){
-                    if($regTra->getTraId() == $solImportacionDet->getSolImportacion()->getTransicion()->getTraId()){
-                        if(count($result)==0){
-                            foreach($nextTransiciones as $reg){
+                foreach($transicionesRol as $transicionRol){
+                    foreach($nextTransiciones as $reg){
+                        if($transicionRol->getTraId() == $reg->getTraId()){
+                            if(!array_key_exists($reg->getTraId(), $tmpIndex)){
+                            //if(count($result)==0){
                                 $arrayTrans = array();
 
                                 $arrayTrans['id'] = $reg->getTraId();
                                 $arrayTrans['nombre'] = $reg->getEstado()->getEstNombre();
                                 $arrayTrans['comentario'] = $reg->getTraComentario()?"true":"false";
                                 $arrayTrans['litrosLibera'] = $reg->getTraLitrosLibera()?"true":"false";
+                                
+                                $tmpIndex[$reg->getTraId()]=true;
 
                                 $result[] = $arrayTrans;
                             }
@@ -500,77 +506,74 @@ class AccionSCASolImportacionController extends Controller {
         $solImportacionDet = $solImportacionDao->getSolImportacionDet($impDetId);
         
         $roles = $auditUser->getRols();
-        $transiciones = $transicionDao->getTransicionesSiguientes($solImportacionDet->getSolImportacion()->getTransicion()->getTraId());
+        $nextTransiciones = $transicionDao->getTransicionesSiguientes($solImportacionDet->getSolImportacion()->getTransicion()->getTraId());
         
         //Validacion para asegurarse que el usuario que esta visualizando la solicitud tiene autorizacion para evaluarla y pasarla a la siguiente etapa
         foreach($roles as $rol){
             $transicionesRol = $rol->getTransiciones();
 
-            foreach($transicionesRol as $regTra){
-                if($regTra->getTraId() == $solImportacionDet->getSolImportacion()->getTransicion()->getTraId()){
-                    
-                    foreach($transiciones as $reg){
-                        if($traId == $reg->getTraId()){
-                            if($reg->getTraComentario()){
-                                $solImpComentario = $request->get('solImpComentario');
-                                if($solImpComentario==null || $solImpComentario==''){
-                                    $errorList = $errorList.'- Es necesario detallar un comentario para pasar a la siguiente etapa';
-                                }else{
-                                    $solImportacionDet->getSolImportacion()->setSolImpComentario();
-                                }
+            foreach($transicionesRol as $transicionRol){
+                foreach($nextTransiciones as $reg){
+                    if($transicionRol->getTraId() == $reg->getTraId() && $traId == $reg->getTraId()){
+                        if($reg->getTraComentario()){
+                            $solImpComentario = $request->get('solImpComentario');
+                            if($solImpComentario==null || $solImpComentario==''){
+                                $errorList = $errorList.'- Es necesario detallar un comentario para pasar a la siguiente etapa';
+                            }else{
+                                $solImportacionDet->getSolImportacion()->setSolImpComentario($solImpComentario);
                             }
-                            
-                            if($reg->getTraLitrosLibera() || $reg->getTraLiberaTotal()){
-                                $impDetLitrosLib = $solImportacionDet->getImpDetLitrosLib();
-                                $impDetLitros = $solImportacionDet->getImpDetLitros();
-                                $litrosLib = $request->get('impDetLitrosLib');
-                                
-                                if($reg->getTraLiberaTotal()){
-                                    $solImportacionDet->setImpDetLitrosLib($impDetLitros);
-                                    $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $impDetLitros - $impDetLitrosLib);
-                                    
-                                    $inventarioDet->setSolImportacionDet($solImportacionDet);
-                                    $solImportacionDet->addInventarioDet($inventarioDet);
-                                    
-                                }else if($reg->getTraLitrosLibera()){
+                        }
 
-                                    try{
-                                        $litrosLib = (float) $litrosLib;
-                                        $impDetLitrosLib = (float) $impDetLitrosLib;
-                                        $impDetLitros = (float) $impDetLitros;
+                        if($reg->getTraLitrosLibera() || $reg->getTraLiberaTotal()){
+                            $impDetLitrosLib = $solImportacionDet->getImpDetLitrosLib();
+                            $impDetLitros = $solImportacionDet->getImpDetLitros();
+                            $litrosLib = $request->get('impDetLitrosLib');
 
-                                        if($litrosLib ==null || $litrosLib ==''){
-                                            $errorList = $errorList.'- Debe ingresar los litros a liberar';
-                                        }else if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
-                                            $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
-                                        }else if($litrosLib <=0){
-                                            $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
-                                        }else{
-                                            $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
-                                            
-                                            $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $litrosLib);
-                                    
-                                            $inventarioDet->setSolImportacionDet($solImportacionDet);
-                                            $solImportacionDet->addInventarioDet($inventarioDet);
-                                        }
-                                    }  catch (Exception $e){
-                                        $errorList = $errorList.'- Debe ingresar un número valido';
+                            if($reg->getTraLiberaTotal()){
+                                $solImportacionDet->setImpDetLitrosLib($impDetLitros);
+                                $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $impDetLitros - $impDetLitrosLib);
+
+                                $inventarioDet->setSolImportacionDet($solImportacionDet);
+                                $solImportacionDet->addInventarioDet($inventarioDet);
+
+                            }else if($reg->getTraLitrosLibera()){
+
+                                try{
+                                    $litrosLib = (float) $litrosLib;
+                                    $impDetLitrosLib = (float) $impDetLitrosLib;
+                                    $impDetLitros = (float) $impDetLitros;
+
+                                    if($litrosLib ==null || $litrosLib ==''){
+                                        $errorList = $errorList.'- Debe ingresar los litros a liberar';
+                                    }else if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
+                                        $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
+                                    }else if($litrosLib <=0){
+                                        $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
+                                    }else{
+                                        $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
+
+                                        $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $litrosLib);
+
+                                        $inventarioDet->setSolImportacionDet($solImportacionDet);
+                                        $solImportacionDet->addInventarioDet($inventarioDet);
                                     }
+                                }  catch (Exception $e){
+                                    $errorList = $errorList.'- Debe ingresar un número valido';
                                 }
-                                
                             }
-                            
-                            if($errorList == ''){
-                                $solImportacionDet->getSolImportacion()->setTransicion($reg);
 
-                                $solImportacionDet->getSolImportacion()->setAuditUserUpd($auditUser->getUsername());
-                                $solImportacionDet->getSolImportacion()->setAuditDateUpd(new \DateTime());
+                        }
 
-                                $solImportacionDetDao->editSolImportacionDet($solImportacionDet);
+                        if($errorList == ''){
+                            $solImportacionDet->getSolImportacion()->setTransicion($reg);
 
-                                $this->get('session')->setFlash('notice', '#### El registro paso a etapa "'. $reg->getEtpFin()->getEtpNombre() .'" con estado "'.$reg->getEstado()->getEstNombre().'" ####');
-                                return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL'));
-                            }
+                            $solImportacionDet->getSolImportacion()->setAuditUserUpd($auditUser->getUsername());
+                            $solImportacionDet->getSolImportacion()->setAuditDateUpd(new \DateTime());
+
+                            $solImportacionDetDao->editSolImportacionDet($solImportacionDet);
+
+                            $this->get('session')->setFlash('notice', '#### El registro paso a etapa "'. $reg->getEtpFin()->getEtpNombre() .'" con estado "'.$reg->getEstado()->getEstNombre().'" ####');
+                            return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL'));
                         }
                     }
                 }
@@ -597,7 +600,7 @@ class AccionSCASolImportacionController extends Controller {
     private function agregarInventario(Cuota $cuota, $litros){
         $user = $this->get('security.context')->getToken()->getUser();
         $inventarioDao = new InventarioDao($this->getDoctrine());
-        $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
+        //$inventarioDetDao = new InventarioDetDao($this->getDoctrine());
         $alcoholDao = new AlcoholDao($this->getDoctrine());
         
         $inventarioDet = new InventarioDet();
