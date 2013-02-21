@@ -18,6 +18,28 @@ MinSalSCAProcesosBundle_mantCargarInventarioDet:
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAInventariosDet:mantCargarInventarioDet } 
     
     
+#****************************
+#*** Registro Ventas ***
+#****************************
+MinSalSCAProcesosBundle_mantRegVenta:
+    pattern:  /RegVenta/mantRegVenta
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:mantRegVenta } 
+    
+MinSalSCAProcesosBundle_consultarRegVentaJSON:
+    pattern:  /RegVenta/consultarRegVentaJSON
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:consultarRegVentaJSON } 
+
+MinSalSCAProcesosBundle_mantRegVentaEdicion:
+    pattern:  /RegVenta/mantRegVentaEdicion
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:mantRegVentaEdicion }
+
+MinSalSCAProcesosBundle_mantCargarRegVenta:
+    pattern:  /RegVenta/mantCargarRegVenta/{RegVentaId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:mantCargarRegVenta } 
+    
+        
+    
+    
 #*****************************
 #*** Solicitud Importacion ***
 #*****************************

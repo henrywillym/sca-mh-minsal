@@ -12,9 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Estructura para formulario de Ingreso a Inventario de alcoholes
  *
- * @author Henry Willy Melara
+ * @author Daniel E. Diaz
  */
-class InventarioDetType extends AbstractType {
+class RegVentaType extends AbstractType {
     private $doctrine;
     
     public function __construct($doctrine){
@@ -29,7 +29,7 @@ class InventarioDetType extends AbstractType {
      */
     public function setDefaultOptions1(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
-            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\InventarioDet'
+            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\RegVenta'
         ));
     }
     
@@ -40,12 +40,12 @@ class InventarioDetType extends AbstractType {
      */
     public function getDefaultOptions(array $options){
         return array(
-            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\InventarioDet'
+            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\RegVenta'
         );
     }
     
     public function buildForm(FormBuilder $builder, array $opciones){
-        $builder->add('invDetId', 'hidden');
+        $builder->add('RegVentaId', 'hidden');
         
         /*$builder->add('alcohol', 'entity', array(
             'class'=>'MinSalSCAAdminBundle:Alcohol',
@@ -65,15 +65,17 @@ class InventarioDetType extends AbstractType {
             'multiple' => false,
             'empty_value' => 'Debe Seleccionar un Alcohol'
         ));
-            
-        $builder->add('invNombreEsp', null, array('label' => 'Nombre Específico'));
-        $builder->add('invGrado', null, array('label' => 'Grado'));
-        $builder->add('invDetLitros',  null, array('label' => 'Cuota (Lts)'));
-        $builder->add('invDetComentario',  null, array('label' => 'Comentarios'));
+        $builder->add('nit', null, array('label' => 'NIT'));
+        $builder->add('nombcliente', null, array('label' => 'Nombre Específico'));
+        $builder->add('reg_user', null, array('label' => 'Registro Usuario (MINSAL)'));
+        $builder->add('n_res', null, array('label' => 'Numero Registro DGII'));
+        $builder->add('RegVentaGrado', null, array('label' => 'Grado'));
+        $builder->add('RegVentaLitros',  null, array('label' => 'Cuota (Lts)'));
+        
     }
 
     public function getName(){
-        return 'InventarioDet';
+        return 'RegVenta';
     }
     
     private function getAlcoholes(){

@@ -24,23 +24,13 @@ class RegVentaDao {
      * 
      * @return Array
      */
-    public function getRegVentas($entId) {
-        $registros = $this->em->createQuery("SELECT E
-                                          FROM MinSalSCAProcesosBundle:RegVenta E JOIN E.entidad A
-                                          WHERE A.entId = :entId
-                                          order by E.auditDateUpd DESC, E.auditDateIns DESC")
-                ->setParameter('entId',$entId);
-        return $registros->getArrayResult();
-    }
 
     public function getRegVenta($id) {
-        //return $this->repositorio->find($id);
+     
          $registros = $this->em->createQuery("SELECT E
                                           FROM MinSalSCAProcesosBundle:RegVenta E
-                                          WHERE E.invId = :invId
-                                          order by E.auditDateUpd DESC, E.auditDateIns DESC")
-                //->setParameter('entId',$entId)
-                ->setParameter('invId',$id);
+                                          WHERE E.RegVentaId = :RegVentaId")
+                ->setParameter('RegVentaId',$id);
         return $registros->getArrayResult();
     }
     

@@ -45,7 +45,7 @@ class RegVenta {
     }
         
    /**
-     * @var integer $RegVentaId
+     * @var numeric $RegVentaId
      *
      * @ORM\Column(name="regve_id", type="integer")
      * @ORM\Id
@@ -126,6 +126,96 @@ class RegVenta {
     private $auditDeleted;
     
     
+    
+    public function getRegVentaId() {
+        return $this->RegVentaId;
+    }
+
+    public function setRegVentaId($RegVentaId) {
+        $this->RegVentaId = $RegVentaId;
+    }
+
+    public function getEntidad() {
+        return $this->entidad;
+    }
+
+    public function setEntidad($entidad) {
+        $this->entidad = $entidad;
+    }
+
+    public function getAlcohol() {
+        return $this->alcohol;
+    }
+
+    public function setAlcohol($alcohol) {
+        $this->alcohol = $alcohol;
+    }
+
+    public function getRegveFecha() {
+        return $this->regveFecha;
+    }
+
+    public function setRegveFecha($regveFecha) {
+        $this->regveFecha = $regveFecha;
+    }
+
+    public function getRegveNIT() {
+        return $this->regveNIT;
+    }
+
+    public function setRegveNIT($regveNIT) {
+        $this->regveNIT = $regveNIT;
+    }
+
+    public function getRegveNombre() {
+        return $this->regveNombre;
+    }
+
+    public function setRegveNombre($regveNombre) {
+        $this->regveNombre = $regveNombre;
+    }
+
+    public function getRegveMinsal() {
+        return $this->regveMinsal;
+    }
+
+    public function setRegveMinsal($regveMinsal) {
+        $this->regveMinsal = $regveMinsal;
+    }
+
+    public function getRegvedgii() {
+        return $this->regvedgii;
+    }
+
+    public function setRegvedgii($regvedgii) {
+        $this->regvedgii = $regvedgii;
+    }
+
+    public function getRegveLitros() {
+        return $this->regveLitros;
+    }
+
+    public function setRegveLitros($regveLitros) {
+        $this->regveLitros = $regveLitros;
+    }
+
+    public function getRegveGrado() {
+        return $this->regveGrado;
+    }
+
+    public function setRegveGrado($regveGrado) {
+        $this->regveGrado = $regveGrado;
+    }
+
+    public function getAuditDeleted() {
+        return $this->auditDeleted;
+    }
+
+    public function setAuditDeleted($auditDeleted) {
+        $this->auditDeleted = $auditDeleted;
+    }
+
+
     
 
 }
