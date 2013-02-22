@@ -12,6 +12,8 @@
            if($('#RegVenta_RegVentaId').val()=='' || $('#RegVenta_RegVentaId').val()==-1){
                $('#btnEliminar').hide();
            }
+           $('#RegVenta_fecha').datepicker();
+           
         });
 
 
@@ -45,6 +47,16 @@
                         {% endif %}
                     </td>
                 </tr>
+                  <tr>
+                    <td><label id="fecha" >Fecha:</label></td>
+                    <td>
+                       {{ form_widget(form.fecha) }}
+                        <div class="flash-notice">
+                            {{form_errors(form.fecha)}}
+                        </div>
+                    </td>
+                </tr>
+                    <tr><td>&nbsp;</td></tr>
                 <tr>
                     <td><label id="nit" >NIT Cliente:</label></td>
                     <td>
@@ -83,14 +95,14 @@
                   <tr><td>&nbsp;</td></tr>
                 
                  <tr>
-                    <td><label id="alc_id" >Nombre Alcohol:</label></td>
+                    <td><label id="AlcId" >Nombre Alcohol:</label></td>
                     <td>
                         {{ form_widget(form.alcId) }}
                         {{ form_errors(form.alcId) }}
                     </td>
                 </tr>
                 <tr>
-                    <td><label id="cantidadltr" >Cantidad (Ltr) :</label></td>
+                    <td><label id="RegVentaLitros" >Cantidad (Ltr) :</label></td>
                     <td>
                         {{ form_widget(form.RegVentaLitros) }}
                         <div class="flash-notice">
@@ -100,7 +112,7 @@
                 </tr>      
                 
                 <tr>
-                    <td><label id="grado" >Grado:</label></td>
+                    <td><label id="RegVentaGrado" >Grado:</label></td>
                     <td>{{ form_widget(form.RegVentaGrado) }}</td>                
                 </tr> 
                 

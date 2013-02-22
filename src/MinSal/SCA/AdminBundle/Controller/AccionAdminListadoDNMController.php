@@ -123,15 +123,15 @@ class AccionAdminListadoDNMController extends Controller {
     public function manttListadoDNMedicionAction() {
         $request = $this->getRequest();
 		
- 		$id = $request->get('id');//aunque tenga ldnm_id siempre tomara lo que retornara del jqgrid id
+ 	$id = $request->get('id');//aunque tenga ldnm_id siempre tomara lo que retornara del jqgrid id
         $nombres = $request->get('ldnm_nombres');
-		$apellidos = $request->get('ldnm_apellidos');
+	$apellidos = $request->get('ldnm_apellidos');
         $year = $request->get('ldnm_year');
         $nit= $request->get('ldnm_nit');       
         $nrc = $request->get('ldnm_nrc');
         $tipo_persona = $request->get('ldnm_tipo_persona');
-		$razon = $request->get('ldnm_razon');
-		$operacion = $request->get('oper');
+	$razon = $request->get('ldnm_razon');
+	$operacion = $request->get('oper');
 
         $dnmDao = new ListadoDNMDao($this->getDoctrine());
 

@@ -65,6 +65,7 @@ class RegVentaType extends AbstractType {
             'multiple' => false,
             'empty_value' => 'Debe Seleccionar un Alcohol'
         ));
+        $builder->add('fecha', null, array('label' => 'Fecha'));
         $builder->add('nit', null, array('label' => 'NIT'));
         $builder->add('nombcliente', null, array('label' => 'Nombre Específico'));
         $builder->add('reg_user', null, array('label' => 'Registro Usuario (MINSAL)'));

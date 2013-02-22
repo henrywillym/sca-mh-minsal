@@ -82,7 +82,6 @@ class AccionSCARegVentaController extends Controller {
         $form->bindRequest($request);
         
         $RegVentaDao = new RegVentaDao($this->getDoctrine());
-        $RegVentaDao = new RegVentaDao($this->getDoctrine());
         $alcoholDao = new AlcoholDao($this->getDoctrine());
         
         $user = $this->get('security.context')->getToken()->getUser();
@@ -90,67 +89,60 @@ class AccionSCARegVentaController extends Controller {
         
         $eliminar = $request->get("eliminar");
         if($eliminar === 'true'){
-            $RegVenta = $RegVentaDao->getRegVenta($RegVentaTmp->getInvDetId());
+            $RegVenta = $RegVentaDao->getRegVenta($RegVentaTmp->getRegVentaId());
             return $this->eliminarAction($RegVenta);
         }
         
         if(($form->isValid() && count($errores)==0)){
-            if( $RegVentaTmp->getInvDetId() ){
-                $RegVenta = $RegVentaDao->getRegVenta($RegVentaTmp->getInvDetId());
+            if( $RegVentaTmp->getRegVentaId() ){
+                $RegVenta = $RegVentaDao->getRegVenta($RegVentaTmp->getRegVentaId());
 
                 //Primero es de revisar si ha cambiado la información de la tabla encabezado.
                 if( $RegVentaTmp->getAlcId() != $RegVenta->getAlcId() ||
-                    $RegVentaTmp->getInvGrado() != $RegVenta->getInvGrado() ||
-                    $RegVentaTmp->getInvNombreEsp() != $RegVenta->getInvNombreEsp()
+                    $RegVentaTmp->getRegVentaGrado() != $RegVenta->getRegVentaGrado() ||
+                    $RegVentaTmp->getRegVentaNombreEsp() != $RegVenta->getRegVentaNombreEsp()
                         ){
                     //Si alguno de los campos es diferente, se debe actualizar los registros encabezados antiguos
                     $RegVentaOld = $RegVentaDao->findRegVenta(
                                         $user->getEntidad()->getEntId(), 
                                         $RegVenta->getAlcId(), 
-                                        $RegVenta->getInvGrado(), 
-                                        $RegVenta->getInvNombreEsp()
+                                        $RegVenta->getRegVentaGrado(), 
+                                        $RegVenta->getRegVentaNombreEsp()
                                     );
-                    $invLitros = $RegVentaOld->getInvLitros();
-                    $RegVentaOld->setInvLitros($invLitros - $RegVenta->getInvDetLitros());
-                    $RegVentaOld->setAuditUserUpd($user->getUsername());
-                    $RegVentaOld->setAuditDateUpd(new \DateTime());
+                    $RegVentaLitros = $RegVentaOld->getRegVentaLitros();
+                    $RegVentaOld->setRegVentaLitros($RegVentaLitros - $RegVenta->getRegVentaDetLitros());
+                    
                     //$RegVentaDao->editRegVenta($RegVentaOld);
 
                     //Buscamos si existe el NUEVO encabezado en la tabla de "RegVenta"
                     $RegVenta = $RegVentaDao->findRegVenta(
                                         $user->getEntidad()->getEntId(), 
                                         $RegVentaTmp->getAlcId(), 
-                                        $RegVentaTmp->getInvGrado(), 
-                                        $RegVentaTmp->getInvNombreEsp()
+                                        $RegVentaTmp->getRegVentaGrado(), 
+                                        $RegVentaTmp->getRegVentaNombreEsp()
                                     );
 
                     if($RegVenta != null){
-                        $invLitros = $RegVenta->getInvLitros();
-                        $RegVenta->setInvLitros( $invLitros + $RegVentaTmp->getInvDetLitros() );
-                        $RegVenta->setAuditUserUpd($user->getUsername());
-                        $RegVenta->setAuditDateUpd(new \DateTime());
+                        $RegVentaLitros = $RegVenta->getRegVentaLitros();
+                        $RegVenta->setRegVentaLitros( $RegVentaLitros + $RegVentaTmp->getRegVentaDetLitros() );
                         $RegVenta->setRegVenta($RegVenta);
                     }else{
                         //#### Encabezado de RegVenta
                         $RegVenta->setRegVenta(new RegVenta());
                         $RegVenta->getRegVenta()->setEntidad($user->getEntidad());
                         $RegVenta->getRegVenta()->setAlcohol($alcoholDao->getAlcohol($RegVentaTmp->getAlcId()));
-                        $RegVenta->getRegVenta()->setInvLitros($RegVentaTmp->getInvDetLitros());
-                        $RegVenta->getRegVenta()->setAuditUserIns($user->getUsername());
-                        $RegVenta->getRegVenta()->setAuditDateIns(new \DateTime());
-                        $RegVenta->getRegVenta()->setInvGrado($RegVentaTmp->getInvGrado());
-                        $RegVenta->getRegVenta()->setInvNombreEsp($RegVentaTmp->getInvNombreEsp());
+                        $RegVenta->getRegVenta()->setRegVentaLitros($RegVentaTmp->getRegVentaDetLitros());                
+                        $RegVenta->getRegVenta()->setRegVentaGrado($RegVentaTmp->getRegVentaGrado());
+                        $RegVenta->getRegVenta()->setRegVentaNombreEsp($RegVentaTmp->getRegVentaNombreEsp());
                     }
 
                     //## Detalle de RegVenta
                     $RegVenta->getRegVenta()->addRegVenta($RegVenta);
-                    $RegVenta->setInvDetFecha(new \DateTime());
+                    $RegVenta->setRegVentaDetFecha(new \DateTime());
                 }else{
                     //Si el encabezado no cambia
-                    $invLitros = $RegVenta->getRegVenta()->getInvLitros();
-                    $RegVenta->getRegVenta()->setInvLitros($invLitros + $RegVentaTmp->getInvDetLitros() - $RegVenta->getInvDetLitros());
-                    $RegVenta->getRegVenta()->setAuditUserUpd($user->getUsername());
-                    $RegVenta->getRegVenta()->setAuditDateUpd(new \DateTime());
+                    $RegVentaLitros = $RegVenta->getRegVenta()->getRegVentaLitros();
+                    $RegVenta->getRegVenta()->setRegVentaLitros($RegVentaLitros + $RegVentaTmp->getRegVentaDetLitros() - $RegVenta->getRegVentaDetLitros());
                 }
                 
                 //#### Auditoría 
@@ -161,35 +153,27 @@ class AccionSCARegVentaController extends Controller {
                 $RegVenta = $RegVentaDao->findRegVenta(
                                     $user->getEntidad()->getEntId(),
                                     $RegVentaTmp->getAlcId(),
-                                    $RegVentaTmp->getInvGrado(),
-                                    $RegVentaTmp->getInvNombreEsp()
+                                    $RegVentaTmp->getRegVentaGrado(),
+                                    $RegVentaTmp->getRegVentaNombreEsp()
                                 );
                 
                 if($RegVenta != null){
-                    $invLitros = $RegVenta->getInvLitros();
-                    $RegVenta->setInvLitros( $invLitros + $RegVentaTmp->getInvDetLitros());
-                    $RegVenta->setAuditUserUpd($user->getUsername());
-                    $RegVenta->setAuditDateUpd(new \DateTime());
+                    $RegVentaLitros = $RegVenta->getRegVentaLitros();
+                    $RegVenta->setRegVentaLitros( $RegVentaLitros + $RegVentaTmp->getRegVentaDetLitros());
                     $RegVenta->setRegVenta($RegVenta);
                 }else{
                     //#### Encabezado de RegVenta
                     $RegVenta->setRegVenta(new RegVenta());
                     $RegVenta->getRegVenta()->setEntidad($user->getEntidad());
                     $RegVenta->getRegVenta()->setAlcohol($alcoholDao->getAlcohol($RegVentaTmp->getAlcId()));
-                    $RegVenta->getRegVenta()->setInvLitros($RegVentaTmp->getInvDetLitros());
-                    $RegVenta->getRegVenta()->setAuditUserIns($user->getUsername());
-                    $RegVenta->getRegVenta()->setAuditDateIns(new \DateTime());
-                    $RegVenta->getRegVenta()->setInvGrado($RegVentaTmp->getInvGrado());
-                    $RegVenta->getRegVenta()->setInvNombreEsp($RegVentaTmp->getInvNombreEsp());
+                    $RegVenta->getRegVenta()->setRegVentaLitros($RegVentaTmp->getRegVentaDetLitros());
+                    $RegVenta->getRegVenta()->setRegVentaGrado($RegVentaTmp->getRegVentaGrado());
+                    $RegVenta->getRegVenta()->setRegVentaNombreEsp($RegVentaTmp->getRegVentaNombreEsp());
                 }
 
                 //## Detalle de RegVenta
                 $RegVenta->getRegVenta()->addRegVenta($RegVenta);
-                $RegVenta->setInvDetFecha(new \DateTime());
-
-                //#### Auditoría 
-                $RegVenta->setAuditUserIns($user->getUsername());
-                $RegVenta->setAuditDateIns(new \DateTime());
+                $RegVenta->setRegVentaFecha(new \DateTime());
             }
 
             //##################################################################################################
@@ -219,7 +203,7 @@ class AccionSCARegVentaController extends Controller {
             return $this->render('MinSalSCAProcesosBundle:RegVenta:showRegVenta.html.twig', array(
                     'opciones' => $opciones, 
                     'form' => $form->createView(), 
-                    'invDetId'=>$RegVenta->getInvDetId(),
+                    'RegVentaId'=>$RegVenta->getRegVentaId(),
                     'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
                 )
             );
@@ -237,12 +221,12 @@ class AccionSCARegVentaController extends Controller {
         $RegVentaDao = new RegVentaDao($this->getDoctrine());
         $RegVenta = $RegVentaDao->getRegVenta($RegVentaId);
         
-        //Si el registro de venta no existe se crea uno nuevo
+        
 //        if( !$RegVenta ){
 //            $RegVenta = new RegVenta();
 //        }else{
 //        }
-        
+//        
         $form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
 
         return $this->render('MinSalSCAProcesosBundle:RegVenta:showRegVenta.html.twig', array(
@@ -269,16 +253,16 @@ class AccionSCARegVentaController extends Controller {
         $RegVentaOld = $RegVentaDao->findRegVenta(
                             $auditUser->getEntidad()->getEntId(), 
                             $RegVenta->getAlcId(), 
-                            $RegVenta->getInvGrado(), 
-                            $RegVenta->getInvNombreEsp()
+                            $RegVenta->getRegVentaGrado(), 
+                            $RegVenta->getRegVentaNombreEsp()
                         );
         //$RegVentaOld = $RegVenta->getRegVenta();
-        $invLitros = $RegVentaOld->getInvLitros();
-        $RegVentaOld->setInvLitros($invLitros - $RegVenta->getInvDetLitros());
+        $RegVentaLitros = $RegVentaOld->getRegVentaLitros();
+        $RegVentaOld->setRegVentaLitros($RegVentaLitros - $RegVenta->getRegVentaDetLitros());
         $RegVentaOld->setAuditUserUpd($auditUser->getUsername());
         $RegVentaOld->setAuditDateUpd(new \DateTime());
         
-        $RegVentaDao->delRegVenta($RegVenta->getInvDetId(), $auditUser->getUsername());
+        $RegVentaDao->delRegVenta($RegVenta->getRegVentaId(), $auditUser->getUsername());
         
         $this->get('session')->setFlash('notice', '#### El registro ha sido eliminado ####');
 

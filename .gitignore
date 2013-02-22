@@ -2,3 +2,6 @@
 /app/logs/
 /nbproject/
 /app/config/
+/web/
+/vendor/
+/bin/
