@@ -90,3 +90,6 @@ fos_user:
                 sender_name: SCA Restauración Clave
     service: 
         mailer: fos_user.mailer.default    #twig_swift
+        
+parameters:
+    contact_email: noreply@sca.gob.sv

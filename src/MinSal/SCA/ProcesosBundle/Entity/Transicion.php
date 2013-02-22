@@ -76,6 +76,11 @@ class Transicion {
      * )
      **/
     protected $childrenTransicion;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="MinSal\SCA\AdminBundle\Entity\RolSistema", mappedBy="transiciones")
+     */
+    protected $rols;
 
     
     
@@ -289,7 +294,16 @@ class Transicion {
     public function setTraLiberaTotal($traLiberaTotal) {
         $this->traLiberaTotal = $traLiberaTotal;
     }
+    
+    public function getRoles() {
+        return $this->roles;
+    }
 
+    public function setRoles($roles) {
+        $this->roles = $roles;
+    }
+
+    
                 
     //*********** CUSTOM SET/GET ******************
     public function addSolImportacion($solImportacion) {
@@ -302,5 +316,10 @@ class Transicion {
     
     public function addChildTransicion($transicion) {
         $this->childrenTransicion[] = $transicion;
+    }
+    
+    public function addRol(\MinSal\SCA\AdminBundle\Entity\RolSistema $rol)
+    {
+        $this->rols[] = $rol;
     }
 }

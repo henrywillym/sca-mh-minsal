@@ -61,10 +61,13 @@ class User extends BaseUser {
     protected $entidad;
 
     /**
-     * @ORM\ManyToMany(targetEntity="MinSal\SCA\AdminBundle\Entity\RolSistema")
+     * Bidireccional - Ver comentario abajo para saber porque se dejo especificado joincolumns
+     * @ORM\ManyToMany(targetEntity="MinSal\SCA\AdminBundle\Entity\RolSistema", inversedBy="usuarios")
      * @ORM\JoinTable(name="sca_usuario_rol", 
      *              joinColumns={@ORM\JoinColumn(name="usuario_codigo", referencedColumnName="usuario_codigo")},
      *              inverseJoinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")})
+     * 
+     * A mapped superclass cannot be an entity, it is not query-able and persistent relationships defined by a mapped superclass must be unidirectional (with an owning side only). This means that One-To-Many assocations are not possible on a mapped superclass at all. Furthermore Many-To-Many associations are only possible if the mapped superclass is only used in exactly one entity at the moment. For further support of inheritance, the single or joined table inheritance features have to be used.
      */
     protected $rols;
         
@@ -442,5 +445,10 @@ class User extends BaseUser {
         }else if($this->userTipo == User::$DIGITADOR){
             return User::$DIGITADOR_TEXT;
         }
+    }
+    
+    public function addRol(\MinSal\SCA\AdminBundle\Entity\RolSistema $rol)
+    {
+        $this->rols[] = $rol;
     }
 }

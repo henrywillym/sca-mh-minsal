@@ -1,6 +1,7 @@
 <?php
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
+use Doctrine\ORM\Query;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
@@ -57,6 +58,24 @@ class TransicionDao {
                                           ORDER BY C.estId ASC") //No se utiliza "AND E.auditDeleted = false" porque si se cambia el flujo, las solicitudes en proceso finalizan con el flujo que ya habian iniciado. Y las nuevas siguen con el que se configuro.
                 ->setParameter('traId',$traId);
         return $registros->getResult();
+    }
+    
+    
+    
+    public function getEmailsXTransicion($traId){
+        $registros = $this->em->createQuery("SELECT distinct C.email
+                                          FROM MinSalSCAProcesosBundle:Transicion E 
+                                            JOIN E.childrenTransicion A
+                                            JOIN A.rols B
+                                            JOIN B.usuarios C
+                                          WHERE E.traId = :traId
+                                            AND C.auditDeleted = false")
+                ->setParameter('traId',$traId);
+        $result = array();
+        foreach($registros->getResult() as $reg){
+            $result[] = $reg['email'];
+        }
+        return $result;
     }
 }
 ?>

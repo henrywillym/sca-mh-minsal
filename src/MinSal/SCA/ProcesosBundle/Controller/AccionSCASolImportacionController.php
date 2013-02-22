@@ -573,9 +573,36 @@ class AccionSCASolImportacionController extends Controller {
 
                             $solImportacionDet->getSolImportacion()->setAuditUserUpd($auditUser->getUsername());
                             $solImportacionDet->getSolImportacion()->setAuditDateUpd(new \DateTime());
+                            //var_dump($transicionDao->getEmailsXTransicion($reg->getTraId()));die;
+                            
+                            $url = $this->generateUrl('MinSalSCAProcesosBundle_mantCargarSolImportacion', array('impDetId' => $solImportacionDet->getImpDetId()));
+                            $subject = 'Ingreso de Solicitud #'.$solImportacionDet->getImpDetId()." a etapa de \"".$reg->getEtpFin()->getEtpNombre()."\"";
+                            $nombreComercial = $solImportacionDet->getSolImportacion()->getEntidad()->getEntNombComercial();
+                            $etpNombre = $reg->getEtpFin()->getEtpNombre();
+
+                            $message = \Swift_Message::newInstance($subject)
+                                ->setFrom(array($this->container->getParameter('contact_email') => 'SCA'))
+                                ->setTo($transicionDao->getEmailsXTransicion($reg->getTraId())) 
+                                ->setBody($this->renderView('MinSalSCAProcesosBundle:SolImportacionDet\Email:newSolicitud.html.twig', array(
+                                            'solImpId' => $solImportacionDet->getImpDetId(),
+                                            'entNombComercial' => $nombreComercial,
+                                            'etpNombre' => $etpNombre,
+                                            'url' => $url
+                                        )
+                                    ), 'text/html'
+                                )->addPart($this->renderView('MinSalSCAProcesosBundle:SolImportacionDet\Email:newSolicitud.txt.twig', array(
+                                            'solImpId' => $solImportacionDet->getImpDetId(),
+                                            'entNombComercial' => $nombreComercial,
+                                            'etpNombre' => $etpNombre,
+                                            'url' => $url
+                                        )
+                                    ), 'text/plain'
+                                );
+                            
+                            $this->get('mailer')->send($message);
 
                             $solImportacionDetDao->editSolImportacionDet($solImportacionDet);
-
+                            
                             $this->get('session')->setFlash('notice', '#### El registro paso a etapa "'. $reg->getEtpFin()->getEtpNombre() .'" con estado "'.$reg->getEstado()->getEstNombre().'" ####');
                             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudes'));
                         }
