@@ -9,11 +9,13 @@ namespace MinSal\SCA\ProcesosBundle\Controller;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
+use MinSal\SCA\ProcesosBundle\Entity\Etapa;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
 use MinSal\SCA\ProcesosBundle\Entity\InventarioDet;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
+use MinSal\SCA\ProcesosBundle\Entity\Transicion;
 use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\SolImportacionDao;
@@ -247,6 +249,11 @@ class AccionSCASolImportacionController extends Controller {
         $traIdSeries = array();
         $registros= array();
         //$tmpIndex = array();
+        $entId = 0;
+        
+        if($user->getEntidad()){
+            $entId = $user->getEntidad()->getEntId();
+        }
         
         foreach($roles as $rol){
             $transiciones = $rol->getTransiciones();
@@ -256,7 +263,7 @@ class AccionSCASolImportacionController extends Controller {
                     if(!array_key_exists($reg->getEtpFin()->getEtpId(), $traIdSeries)){//$tmpIndex)){
                         $tmp['id'] = $reg->getEtpFin()->getEtpId();
                         $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
-                        $tmp['cantidad'] = $solImportacionDao->getCantidadSolicitudesXEtapa($reg->getEtpFin()->getEtpId());
+                        $tmp['cantidad'] = $solImportacionDao->getCantidadSolicitudesXEtapa($entId, $reg->getEtpFin()->getEtpId());
                         //$tmpIndex[$reg->getEtpFin()->getEtpId()] = true;
 
                         $traIdSeries[$tmp['id']] = $tmp;
@@ -362,6 +369,8 @@ class AccionSCASolImportacionController extends Controller {
         $solImportacionDetDao = new SolImportacionDetDao($this->getDoctrine());
         $transicionDao = new TransicionDao($this->getDoctrine());
         
+        $transicion = null;
+        
         $errores = $solImportacionDetTmp->isValid($this->getDoctrine(), $user->getEntidad());
         
         if(($form->isValid() && count($errores)==0)){
@@ -373,15 +382,17 @@ class AccionSCASolImportacionController extends Controller {
                 //$solImportacionDet->setAuditDateUpd(new \DateTime());
             }else{
                 //#### Encabezado de Solicitud
+                $transicion = $transicionDao->getTransicionInicial(Flujo::$IMPORTACION); 
+                
                 $solImportacion = new SolImportacion();
                 $solImportacionDet->setSolImportacion($solImportacion);
                 $solImportacionDet->getSolImportacion()->setEntidad($user->getEntidad());
-                $solImportacionDet->getSolImportacion()->setTransicion($transicionDao->getTransicionInicial(Flujo::$IMPORTACION));
+                $solImportacionDet->getSolImportacion()->setTransicion($transicion);
                 $solImportacionDet->getSolImportacion()->setSolImpFecha(new \DateTime());
                 $solImportacionDet->getSolImportacion()->setAuditUserIns($user->getUsername());
                 $solImportacionDet->getSolImportacion()->setAuditDateIns(new \DateTime());
                 
-                $solImportacionDao->addSolImportacion($solImportacion);
+                //$solImportacionDao->addSolImportacion($solImportacion);
             
                 //## Detalle de solicitud
                 //$solImportacionDet->getSolImportacion()->addSolImportacionDet($solImportacionDet);
@@ -397,6 +408,7 @@ class AccionSCASolImportacionController extends Controller {
             $form->bindRequest($request);
             
             $solImportacionDetDao->addSolImportacionDet($solImportacionDet);
+            $this->generarEmailEtapaNotificacion($solImportacionDet, $transicion);
             $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
             
             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionIngreso'));
@@ -573,35 +585,11 @@ class AccionSCASolImportacionController extends Controller {
 
                             $solImportacionDet->getSolImportacion()->setAuditUserUpd($auditUser->getUsername());
                             $solImportacionDet->getSolImportacion()->setAuditDateUpd(new \DateTime());
-                            //var_dump($transicionDao->getEmailsXTransicion($reg->getTraId()));die;
                             
-                            $url = $this->generateUrl('MinSalSCAProcesosBundle_mantCargarSolImportacion', array('impDetId' => $solImportacionDet->getImpDetId()));
-                            $subject = 'Ingreso de Solicitud #'.$solImportacionDet->getImpDetId()." a etapa de \"".$reg->getEtpFin()->getEtpNombre()."\"";
-                            $nombreComercial = $solImportacionDet->getSolImportacion()->getEntidad()->getEntNombComercial();
-                            $etpNombre = $reg->getEtpFin()->getEtpNombre();
-
-                            $message = \Swift_Message::newInstance($subject)
-                                ->setFrom(array($this->container->getParameter('contact_email') => 'SCA'))
-                                ->setTo($transicionDao->getEmailsXTransicion($reg->getTraId())) 
-                                ->setBody($this->renderView('MinSalSCAProcesosBundle:SolImportacionDet\Email:newSolicitud.html.twig', array(
-                                            'solImpId' => $solImportacionDet->getImpDetId(),
-                                            'entNombComercial' => $nombreComercial,
-                                            'etpNombre' => $etpNombre,
-                                            'url' => $url
-                                        )
-                                    ), 'text/html'
-                                )->addPart($this->renderView('MinSalSCAProcesosBundle:SolImportacionDet\Email:newSolicitud.txt.twig', array(
-                                            'solImpId' => $solImportacionDet->getImpDetId(),
-                                            'entNombComercial' => $nombreComercial,
-                                            'etpNombre' => $etpNombre,
-                                            'url' => $url
-                                        )
-                                    ), 'text/plain'
-                                );
-                            
-                            $this->get('mailer')->send($message);
-
                             $solImportacionDetDao->editSolImportacionDet($solImportacionDet);
+
+                            $this->generarEmailEtapaNotificacion($solImportacionDet,$reg);
+                            //var_dump(urlencode($url));die;
                             
                             $this->get('session')->setFlash('notice', '#### El registro paso a etapa "'. $reg->getEtpFin()->getEtpNombre() .'" con estado "'.$reg->getEstado()->getEstNombre().'" ####');
                             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudes'));
@@ -624,9 +612,9 @@ class AccionSCASolImportacionController extends Controller {
     
     /**
      * 
-     * @param \MinSal\SCA\AdminBundle\Entity\Cuota $cuota
+     * @param Cuota $cuota
      * @param double $litros
-     * @return \MinSal\SCA\ProcesosBundle\Entity\InventarioDet
+     * @return InventarioDet
      */
     private function agregarInventario(Cuota $cuota, $litros){
         $user = $this->get('security.context')->getToken()->getUser();
@@ -677,6 +665,44 @@ class AccionSCASolImportacionController extends Controller {
         //$this->getDoctrine()->getEntityManager()->persist($inventarioDet);
         
         return $inventarioDet;
+    }
+    
+    private function generarEmailEtapaNotificacion(SolImportacionDet $solImportacionDet, Transicion $transicion){
+        $transicionDao = new TransicionDao($this->getDoctrine());
+        
+        $impDetId = $solImportacionDet->getImpDetId();
+        $etpNombre = $transicion->getEtpFin()->getEtpNombre();
+        $entNombComercial = $solImportacionDet->getSolImportacion()->getEntidad()->getEntNombComercial();
+        $traId = $transicion->getTraId();
+        $entId = $solImportacionDet->getSolImportacion()->getEntidad()->getEntId();
+        
+        $url = $this->generateUrl('MinSalSCAProcesosBundle_mantCargarSolImportacion', array('impDetId' => $impDetId), true);
+
+        $subject = 'Ingreso de Solicitud #'.$impDetId." a etapa de \"".$etpNombre."\"";
+        $emails = $transicionDao->getEmailsXTransicion($entId, $traId);
+        
+        foreach($emails as $email){
+            $message = \Swift_Message::newInstance($subject)
+                ->setFrom(array($this->container->getParameter('contact_email') => 'SCA'))
+                ->setTo($email) 
+                ->setBody($this->renderView('MinSalSCAProcesosBundle:SolImportacionDet\Email:newSolicitud.html.twig', array(
+                            'solImpId' => $impDetId,
+                            'entNombComercial' => $entNombComercial,
+                            'etpNombre' => $etpNombre,
+                            'url' => $url
+                        )
+                    ), 'text/html'
+                )->addPart($this->renderView('MinSalSCAProcesosBundle:SolImportacionDet\Email:newSolicitud.txt.twig', array(
+                            'solImpId' => $impDetId,
+                            'entNombComercial' => $entNombComercial,
+                            'etpNombre' => $etpNombre,
+                            'url' => $url
+                        )
+                    ), 'text/plain'
+                );
+
+            $this->get('mailer')->send($message);
+        }
     }
 }
 ?>

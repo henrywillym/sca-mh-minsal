@@ -70,7 +70,7 @@ class SolImportacionDet {
     protected $arancel;
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacion", inversedBy="solImportacionesDet")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolImportacion", inversedBy="solImportacionesDet", cascade={"persist"})
      * @ORM\JoinColumn(name="solimp_id", referencedColumnName="solimp_id")
      */
     protected $solImportacion;

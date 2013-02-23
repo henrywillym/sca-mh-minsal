@@ -194,13 +194,16 @@ class SolImportacionDao {
      * @param int $etpId
      * @return int
      */
-    public function getCantidadSolicitudesXEtapa($etpId){
-        $registros = $this->em->createQuery("SELECT count(E.solImpId)
+    public function getCantidadSolicitudesXEtapa($entId, $etpId){
+        $registros = $this->em->createQuery("SELECT count( E.solImpId)
                                           FROM MinSalSCAProcesosBundle:SolImportacion E 
+                                                JOIN E.entidad A
                                                 JOIN E.transicion F
                                                 JOIN F.etpFin G
-                                          WHERE G.etpId = :etpId")
-                ->setParameter('etpId', $etpId);
+                                          WHERE G.etpId = :etpId
+                                            AND (A.entId = :entId or :entId =0)")
+                ->setParameter('etpId', $etpId)
+                ->setParameter('entId', $entId);
         
         $result= $registros->getSingleResult();
         

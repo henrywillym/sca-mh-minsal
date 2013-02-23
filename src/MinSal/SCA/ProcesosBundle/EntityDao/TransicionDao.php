@@ -62,15 +62,19 @@ class TransicionDao {
     
     
     
-    public function getEmailsXTransicion($traId){
+    public function getEmailsXTransicion($entId, $traId){
         $registros = $this->em->createQuery("SELECT distinct C.email
                                           FROM MinSalSCAProcesosBundle:Transicion E 
-                                            JOIN E.childrenTransicion A
-                                            JOIN A.rols B
-                                            JOIN B.usuarios C
-                                          WHERE E.traId = :traId
+                                            LEFT JOIN E.childrenTransicion A
+                                            LEFT JOIN A.parentsTransicion AA
+                                            LEFT JOIN A.rols B
+                                            LEFT JOIN B.usuarios C
+                                            LEFT JOIN C.entidad D
+                                          WHERE AA.traId = :traId
+                                            AND (D.entId = :entId OR C.userInterno = true)
                                             AND C.auditDeleted = false")
-                ->setParameter('traId',$traId);
+                ->setParameter('traId',$traId)
+                ->setParameter('entId',$entId);
         $result = array();
         foreach($registros->getResult() as $reg){
             $result[] = $reg['email'];
