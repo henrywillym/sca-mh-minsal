@@ -58,20 +58,20 @@ class RegVentaType extends AbstractType {
             'multiple'=>false,
             //'em'=> 'doctrine.orm.entity_manager'
         ));/**/
-        $builder->add('alcId', 'choice', array(
+        $builder->add('alcohol', 'choice', array(
             'choices' => $this->getAlcoholes(),
             'required' => true,
             'expanded' => false,
             'multiple' => false,
             'empty_value' => 'Debe Seleccionar un Alcohol'
         ));
-        $builder->add('fecha', null, array('label' => 'Fecha'));
-        $builder->add('nit', null, array('label' => 'NIT'));
-        $builder->add('nombcliente', null, array('label' => 'Nombre Específico'));
-        $builder->add('reg_user', null, array('label' => 'Registro Usuario (MINSAL)'));
-        $builder->add('n_res', null, array('label' => 'Numero Registro DGII'));
-        $builder->add('RegVentaGrado', null, array('label' => 'Grado'));
-        $builder->add('RegVentaLitros',  null, array('label' => 'Cuota (Lts)'));
+        $builder->add('regveFecha', null, array('label' => 'Fecha'));
+        $builder->add('regveNIT', null, array('label' => 'NIT'));
+        $builder->add('regveNombre', null, array('label' => 'Nombre Específico'));
+        $builder->add('regveMinsal', null, array('label' => 'Registro Usuario (MINSAL)'));
+        $builder->add('regvedgii', null, array('label' => 'Numero Registro DGII'));
+        $builder->add('regveLitros', null, array('label' => 'Grado'));
+        $builder->add('regveGrado',  null, array('label' => 'Cuota (Lts)'));
         
     }
 

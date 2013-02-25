@@ -51,7 +51,7 @@ class AccionSCARegVentaController extends Controller {
         $user = $this->get('security.context')->getToken()->getUser();
         
         $RegVentaDao = new RegVentaDao($this->getDoctrine());
-        $registros = $RegVentaDao->getRegVenta($user->getEntidad()->getEntId());
+        $registros = $RegVentaDao->getJasonRegVenta($user->getEntidad()->getEntId());
 
         $numfilas = count($registros);
         
@@ -74,140 +74,52 @@ class AccionSCARegVentaController extends Controller {
      * Se encarga de ejecutar las acciones de Eliminar, agregar y editar
      * del mantenimiento
      */
-    public function mantRegVentaEdicionAction(Request $request) {
-        $RegVentaTmp = new RegVenta();
-        $RegVenta = new RegVenta();
-        
-        $form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVentaTmp);
+    public function mantRegVentaEdicionAction(request $request) {
+        $RegVenta=new RegVenta();
+        $RegVentaDao = new RegVentaDao($this->getDoctrine());
+	$form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
         $form->bindRequest($request);
         
-        $RegVentaDao = new RegVentaDao($this->getDoctrine());
-        $alcoholDao = new AlcoholDao($this->getDoctrine());
+         $user = $this->get('security.context')->getToken()->getUser();
+         $idEnt=$user->getEntidad()->getEntId();
         
-        $user = $this->get('security.context')->getToken()->getUser();
-        $errores = $RegVentaTmp->isValid();
         
-        $eliminar = $request->get("eliminar");
-        if($eliminar === 'true'){
-            $RegVenta = $RegVentaDao->getRegVenta($RegVentaTmp->getRegVentaId());
-            return $this->eliminarAction($RegVenta);
+        $id = $request->get('RegVenta_RegVentaId');
+        $eliminar = $request->get('eliminar');
+        //Verifica si se esta seleccionando la opcion de eliminar
+        if ($eliminar == 'true/') {
+             /**
+         * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
+         */
+           $RegVentaDao->delRegVenta($id);
+  
+             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
+        } else {
+           
+         //SINO SE SELECCIONO LA OPCION DE ELIMINAR SE ACTUALIZARA O SE AGREGARA UN NUEVO REGISTRO   
+          $operacion = $request->get('btnGuardar');
+        
+          $nit=$RegVenta->getregveNIT("nit");
+          $nombcliente=  $RegVenta->getregveNombre("nombcliente");
+          $reg_user=$RegVenta->getregveMinsal("reg_user");
+          $fecha=$RegVenta->getregveFecha("fecha");
+          $n_res = $RegVenta->getregvedgii("n_res");                
+          $AlcId =$RegVenta->getAlcohol("AlcId");
+          $RegVentaLitros =$RegVenta->getregveLitros("RegVentaLitros");
+          $RegVentaGrado =$RegVenta->getregveGrado("RegVentaGrado");
+     
+
+        if ($operacion == 'Actualizar') {
+            $RegVentaDao->editRegVenta($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado);
+        }
+
+        if ($operacion == 'Guardar') {
+            $RegVentaDao->addRegVenta($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado);
         }
         
-        if(($form->isValid() && count($errores)==0)){
-            if( $RegVentaTmp->getRegVentaId() ){
-                $RegVenta = $RegVentaDao->getRegVenta($RegVentaTmp->getRegVentaId());
-
-                //Primero es de revisar si ha cambiado la información de la tabla encabezado.
-                if( $RegVentaTmp->getAlcId() != $RegVenta->getAlcId() ||
-                    $RegVentaTmp->getRegVentaGrado() != $RegVenta->getRegVentaGrado() ||
-                    $RegVentaTmp->getRegVentaNombreEsp() != $RegVenta->getRegVentaNombreEsp()
-                        ){
-                    //Si alguno de los campos es diferente, se debe actualizar los registros encabezados antiguos
-                    $RegVentaOld = $RegVentaDao->findRegVenta(
-                                        $user->getEntidad()->getEntId(), 
-                                        $RegVenta->getAlcId(), 
-                                        $RegVenta->getRegVentaGrado(), 
-                                        $RegVenta->getRegVentaNombreEsp()
-                                    );
-                    $RegVentaLitros = $RegVentaOld->getRegVentaLitros();
-                    $RegVentaOld->setRegVentaLitros($RegVentaLitros - $RegVenta->getRegVentaDetLitros());
-                    
-                    //$RegVentaDao->editRegVenta($RegVentaOld);
-
-                    //Buscamos si existe el NUEVO encabezado en la tabla de "RegVenta"
-                    $RegVenta = $RegVentaDao->findRegVenta(
-                                        $user->getEntidad()->getEntId(), 
-                                        $RegVentaTmp->getAlcId(), 
-                                        $RegVentaTmp->getRegVentaGrado(), 
-                                        $RegVentaTmp->getRegVentaNombreEsp()
-                                    );
-
-                    if($RegVenta != null){
-                        $RegVentaLitros = $RegVenta->getRegVentaLitros();
-                        $RegVenta->setRegVentaLitros( $RegVentaLitros + $RegVentaTmp->getRegVentaDetLitros() );
-                        $RegVenta->setRegVenta($RegVenta);
-                    }else{
-                        //#### Encabezado de RegVenta
-                        $RegVenta->setRegVenta(new RegVenta());
-                        $RegVenta->getRegVenta()->setEntidad($user->getEntidad());
-                        $RegVenta->getRegVenta()->setAlcohol($alcoholDao->getAlcohol($RegVentaTmp->getAlcId()));
-                        $RegVenta->getRegVenta()->setRegVentaLitros($RegVentaTmp->getRegVentaDetLitros());                
-                        $RegVenta->getRegVenta()->setRegVentaGrado($RegVentaTmp->getRegVentaGrado());
-                        $RegVenta->getRegVenta()->setRegVentaNombreEsp($RegVentaTmp->getRegVentaNombreEsp());
-                    }
-
-                    //## Detalle de RegVenta
-                    $RegVenta->getRegVenta()->addRegVenta($RegVenta);
-                    $RegVenta->setRegVentaDetFecha(new \DateTime());
-                }else{
-                    //Si el encabezado no cambia
-                    $RegVentaLitros = $RegVenta->getRegVenta()->getRegVentaLitros();
-                    $RegVenta->getRegVenta()->setRegVentaLitros($RegVentaLitros + $RegVentaTmp->getRegVentaDetLitros() - $RegVenta->getRegVentaDetLitros());
-                }
-                
-                //#### Auditoría 
-                $RegVenta->setAuditUserUpd($user->getUsername());
-                $RegVenta->setAuditDateUpd(new \DateTime());
-            }else{
-                //Buscamos si el encabezado en la tabla de "RegVenta" existe
-                $RegVenta = $RegVentaDao->findRegVenta(
-                                    $user->getEntidad()->getEntId(),
-                                    $RegVentaTmp->getAlcId(),
-                                    $RegVentaTmp->getRegVentaGrado(),
-                                    $RegVentaTmp->getRegVentaNombreEsp()
-                                );
-                
-                if($RegVenta != null){
-                    $RegVentaLitros = $RegVenta->getRegVentaLitros();
-                    $RegVenta->setRegVentaLitros( $RegVentaLitros + $RegVentaTmp->getRegVentaDetLitros());
-                    $RegVenta->setRegVenta($RegVenta);
-                }else{
-                    //#### Encabezado de RegVenta
-                    $RegVenta->setRegVenta(new RegVenta());
-                    $RegVenta->getRegVenta()->setEntidad($user->getEntidad());
-                    $RegVenta->getRegVenta()->setAlcohol($alcoholDao->getAlcohol($RegVentaTmp->getAlcId()));
-                    $RegVenta->getRegVenta()->setRegVentaLitros($RegVentaTmp->getRegVentaDetLitros());
-                    $RegVenta->getRegVenta()->setRegVentaGrado($RegVentaTmp->getRegVentaGrado());
-                    $RegVenta->getRegVenta()->setRegVentaNombreEsp($RegVentaTmp->getRegVentaNombreEsp());
-                }
-
-                //## Detalle de RegVenta
-                $RegVenta->getRegVenta()->addRegVenta($RegVenta);
-                $RegVenta->setRegVentaFecha(new \DateTime());
-            }
-
-            //##################################################################################################
-            $form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
-        
-            $form->bindRequest($request);
-            
-            $RegVentaDao->editRegVenta($RegVenta);
-            $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
-            
-            return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
-        }else{
-            
-            $listaErrores = '';
-            
-            foreach($errores as $error){
-                $listaErrores = $listaErrores.$error;
-            }
-            
-            if($listaErrores != ''){
-                $this->get('session')->setFlash('notice', $listaErrores);
-            }else{
-                $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
-            }
-            
-            $opciones = $this->getRequest()->getSession()->get('opciones');
-            return $this->render('MinSalSCAProcesosBundle:RegVenta:showRegVenta.html.twig', array(
-                    'opciones' => $opciones, 
-                    'form' => $form->createView(), 
-                    'RegVentaId'=>$RegVenta->getRegVentaId(),
-                    'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
-                )
-            );
         }
+
+  return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
     }
     
     
@@ -226,7 +138,7 @@ class AccionSCARegVentaController extends Controller {
 //            $RegVenta = new RegVenta();
 //        }else{
 //        }
-//        
+        
         $form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
 
         return $this->render('MinSalSCAProcesosBundle:RegVenta:showRegVenta.html.twig', array(
@@ -237,36 +149,6 @@ class AccionSCARegVentaController extends Controller {
         ));
     }
     
-    /**
-     * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
-     * 
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    private function eliminarAction(RegVenta $RegVenta){
-        $auditUser = $this->container->get('security.context')->getToken()->getUser();
-        
-        $RegVentaDao = new RegVentaDao($this->getDoctrine());
-        $RegVentaDao = new RegVentaDao($this->getDoctrine());
-        
-        //Buscamos el encabezado para quitarle la cantidad a eliminar
-        $RegVentaOld = $RegVentaDao->findRegVenta(
-                            $auditUser->getEntidad()->getEntId(), 
-                            $RegVenta->getAlcId(), 
-                            $RegVenta->getRegVentaGrado(), 
-                            $RegVenta->getRegVentaNombreEsp()
-                        );
-        //$RegVentaOld = $RegVenta->getRegVenta();
-        $RegVentaLitros = $RegVentaOld->getRegVentaLitros();
-        $RegVentaOld->setRegVentaLitros($RegVentaLitros - $RegVenta->getRegVentaDetLitros());
-        $RegVentaOld->setAuditUserUpd($auditUser->getUsername());
-        $RegVentaOld->setAuditDateUpd(new \DateTime());
-        
-        $RegVentaDao->delRegVenta($RegVenta->getRegVentaId(), $auditUser->getUsername());
-        
-        $this->get('session')->setFlash('notice', '#### El registro ha sido eliminado ####');
-
-        return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
-    }
+   
 }
 ?>

@@ -21,9 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RegVenta {
     
     public function __construct() {
-        $this->RegVenta = new RegVenta();
-        $this->regveAccion = '+';
-        $this->regveComentario = 'RegVenta Inicial';
+        //$this->RegVenta = new RegVenta();
         $this->auditDeleted = false;
     }
     
@@ -55,50 +53,54 @@ class RegVenta {
     protected $RegVentaId;
     
     /**
+     * @var integer $entId
      * Es Many-To-One, Unidirectional
      * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad")
      * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
+     * @ORM\Column(name="ent_id", type="integer", nullable=false)
      */
     protected $entidad;
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Alcohol")
+     * @var integer $alcohol
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Alcohol")
      * @ORM\JoinColumn(name="alc_id", referencedColumnName="alc_id")
+     * * @ORM\Column(name="alc_id", type="integer", nullable=false)
      */
     protected $alcohol;
     
     /**
      * @var string $regveFecha
      *
-     * @ORM\Column(name="regve_fecha", type="date", nullable=false)
+     *@ORM\Column(name="regve_fecha", type="string", nullable=false)
      */
     private $regveFecha;
        
     /**
      * @var numeric $regveNIT
      *
-     * @ORM\Column(name="regve_nit", type="integer", nullable=false)
+     * @ORM\Column(name="regve_nit", type="decimal", nullable=false)
      *  */
     private $regveNIT;
      
      /**
      * @var string $regveNombre
      *
-     * @ORM\Column(name="regve_nombre", type="text", nullable=true)
+     * @ORM\Column(name="regve_nombre", type="string", nullable=true)
      */
     private $regveNombre;    
       
     /**
      * @var string $regveMinsal
      *
-     * @ORM\Column(name="regve_reg_minsal", type="text", nullable=true)
+     * @ORM\Column(name="regve_reg_minsal", type="decimal", nullable=true)
      */
     private $regveMinsal;
     
      /**
      * @var string $regvedgii
      *
-     * @ORM\Column(name="regve_reg_dgii", type="text", nullable=true)
+     * @ORM\Column(name="regve_reg_dgii", type="decimal", nullable=true)
      */
     private $regvedgii;
      
@@ -114,7 +116,7 @@ class RegVenta {
       /**
      * @var numeric $regveGrado
      *
-     * @ORM\Column(name="regve_grado", type="integer", nullable=false)
+     * @ORM\Column(name="regve_grado", type="decimal", nullable=false)
      *  */
     private $regveGrado;
     
