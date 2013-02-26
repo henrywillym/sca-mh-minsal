@@ -12,7 +12,7 @@ security:
                use_forward:    true
                check_path:     fos_user_security_check
                failure_path:   null
-               always_use_default_target_path: true
+               always_use_default_target_path: false
                default_target_path:            /SCA
                target_path_parameter:          _target_path
                use_referer:                    true
@@ -32,6 +32,7 @@ security:
         - { path: ^/SCA/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: /admin/*, role: ROLE_ADMIN }
         - { path: /SCA/admin/*, role: ROLE_ADMIN }
+        - { path: ^/SCA/*, role: ROLE_USER }
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER

@@ -6,9 +6,11 @@
 
 namespace MinSal\SCA\ProcesosBundle\Controller;
 
+use DateTime;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
+use MinSal\SCA\AdminBundle\EntityDao\EntidadDao;
 use MinSal\SCA\ProcesosBundle\Entity\Etapa;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
@@ -181,7 +183,7 @@ class AccionSCASolImportacionController extends Controller {
     public function getCuotasAction(Request $request) {
         $user = $this->get('security.context')->getToken()->getUser();
         $entId = 0;
-        $year = new \DateTime();
+        $year = new DateTime();
         $impDetId = $request->get('impDetId');
         
         $cuotaDao = new CuotaDao($this->getDoctrine());
@@ -388,9 +390,9 @@ class AccionSCASolImportacionController extends Controller {
                 $solImportacionDet->setSolImportacion($solImportacion);
                 $solImportacionDet->getSolImportacion()->setEntidad($user->getEntidad());
                 $solImportacionDet->getSolImportacion()->setTransicion($transicion);
-                $solImportacionDet->getSolImportacion()->setSolImpFecha(new \DateTime());
+                $solImportacionDet->getSolImportacion()->setSolImpFecha(new DateTime());
                 $solImportacionDet->getSolImportacion()->setAuditUserIns($user->getUsername());
-                $solImportacionDet->getSolImportacion()->setAuditDateIns(new \DateTime());
+                $solImportacionDet->getSolImportacion()->setAuditDateIns(new DateTime());
                 
                 //$solImportacionDao->addSolImportacion($solImportacion);
             
@@ -584,13 +586,12 @@ class AccionSCASolImportacionController extends Controller {
                             $solImportacionDet->getSolImportacion()->setTransicion($reg);
 
                             $solImportacionDet->getSolImportacion()->setAuditUserUpd($auditUser->getUsername());
-                            $solImportacionDet->getSolImportacion()->setAuditDateUpd(new \DateTime());
+                            $solImportacionDet->getSolImportacion()->setAuditDateUpd(new DateTime());
+                            
+                            $this->generarEmailEtapaNotificacion($solImportacionDet,$reg);
                             
                             $solImportacionDetDao->editSolImportacionDet($solImportacionDet);
 
-                            $this->generarEmailEtapaNotificacion($solImportacionDet,$reg);
-                            //var_dump(urlencode($url));die;
-                            
                             $this->get('session')->setFlash('notice', '#### El registro paso a etapa "'. $reg->getEtpFin()->getEtpNombre() .'" con estado "'.$reg->getEstado()->getEstNombre().'" ####');
                             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudes'));
                         }
@@ -636,7 +637,7 @@ class AccionSCASolImportacionController extends Controller {
             $invLitros = $inventario->getInvLitros();
             $inventario->setInvLitros( $invLitros + $litros);
             $inventario->setAuditUserUpd($user->getUsername());
-            $inventario->setAuditDateUpd(new \DateTime());
+            $inventario->setAuditDateUpd(new DateTime());
             $inventarioDet->setInventario($inventario);
         }else{
             //#### Encabezado de Inventario
@@ -645,18 +646,18 @@ class AccionSCASolImportacionController extends Controller {
             $inventarioDet->getInventario()->setAlcohol($alcoholDao->getAlcohol($cuota->getAlcohol()->getAlcId()));
             $inventarioDet->getInventario()->setInvLitros($litros);
             $inventarioDet->getInventario()->setAuditUserIns($user->getUsername());
-            $inventarioDet->getInventario()->setAuditDateIns(new \DateTime());
+            $inventarioDet->getInventario()->setAuditDateIns(new DateTime());
             $inventarioDet->getInventario()->setInvGrado($cuota->getCuoGrado());
             $inventarioDet->getInventario()->setInvNombreEsp($cuota->getCuoNombreEsp());
         }
 
         //## Detalle de inventario
         $inventarioDet->getInventario()->addInventarioDet($inventarioDet);
-        $inventarioDet->setInvDetFecha(new \DateTime());
+        $inventarioDet->setInvDetFecha(new DateTime());
 
         //#### Auditoría 
         $inventarioDet->setAuditUserIns($user->getUsername());
-        $inventarioDet->setAuditDateIns(new \DateTime());
+        $inventarioDet->setAuditDateIns(new DateTime());
         
         $inventarioDet->setInvDetAccion("+");
         $inventarioDet->setInvDetLitros($litros);
@@ -669,6 +670,7 @@ class AccionSCASolImportacionController extends Controller {
     
     private function generarEmailEtapaNotificacion(SolImportacionDet $solImportacionDet, Transicion $transicion){
         $transicionDao = new TransicionDao($this->getDoctrine());
+        $entidadDao = new EntidadDao($this->getDoctrine());
         
         $impDetId = $solImportacionDet->getImpDetId();
         $etpNombre = $transicion->getEtpFin()->getEtpNombre();
@@ -676,10 +678,22 @@ class AccionSCASolImportacionController extends Controller {
         $traId = $transicion->getTraId();
         $entId = $solImportacionDet->getSolImportacion()->getEntidad()->getEntId();
         
-        $url = $this->generateUrl('MinSalSCAProcesosBundle_mantCargarSolImportacion', array('impDetId' => $impDetId), true);
-
+                            
+        $url = urlencode($this->generateUrl('MinSalSCAProcesosBundle_mantCargarSolImportacion', array('impDetId' => $impDetId), true));
+        $url = $this->generateUrl('MinSalSCABundle_homepage', array(), true). '?url='.$url;
+        
         $subject = 'Ingreso de Solicitud #'.$impDetId." a etapa de \"".$etpNombre."\"";
         $emails = $transicionDao->getEmailsXTransicion($entId, $traId);
+        
+        if($transicion->getTraNotificaEmpresa()){
+            $emailsXEmpresa = $entidadDao->getEmailsXEmpresa($entId);
+            
+            foreach($emailsXEmpresa as $reg){
+                if(!in_array($reg, $emails)){
+                    $emails[] = $reg;
+                }
+            }
+        }
         
         foreach($emails as $email){
             $message = \Swift_Message::newInstance($subject)

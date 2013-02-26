@@ -110,5 +110,19 @@ class EntidadDao {
         }
         return $result;
     }
+    
+    public function getEmailsXEmpresa($entId){
+        $registros = $this->em->createQuery("SELECT distinct C.email
+                                          FROM MinSalSCAAdminBundle:Entidad E 
+                                            JOIN E.users C
+                                          WHERE E.entId = :entId
+                                            AND C.auditDeleted = false")
+                ->setParameter('entId',$entId);
+        $result = array();
+        foreach($registros->getResult() as $reg){
+            $result[] = $reg['email'];
+        }
+        return $result;
+    }
 }
 ?>

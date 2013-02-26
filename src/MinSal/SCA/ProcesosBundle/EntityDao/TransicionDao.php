@@ -71,7 +71,7 @@ class TransicionDao {
                                             LEFT JOIN B.usuarios C
                                             LEFT JOIN C.entidad D
                                           WHERE AA.traId = :traId
-                                            AND (D.entId = :entId OR C.userInterno = true)
+                                            AND (D.entId = :entId and AA.traNotificaEmpresa = true OR C.userInterno = true)
                                             AND C.auditDeleted = false")
                 ->setParameter('traId',$traId)
                 ->setParameter('entId',$entId);

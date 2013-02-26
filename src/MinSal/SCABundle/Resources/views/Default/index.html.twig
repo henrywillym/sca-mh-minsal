@@ -96,37 +96,49 @@
                         </h3>
                             {% endif %}    
                     </div>
+                        
+                    <div id="dialog-message" title="Información" style="display: none; font-size: large; font-weight:bolder ;text-align: center; vertical-align: middle">
+                        <br/><br/>
+                        Cargando...
+                    </div>
 
                     <div id="contenido">
 
-                             {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}              
-                                {% block body %}                                    
+                             {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %} 
+                                {% block body %}
                                     {% if opciones is not defined %}
-                                        <h2>Contacte al Administrador del Sistema para que le asigne un rol y asi podra ingresar al sistema correctamente</h2>
+                                        {% if not app.request.get('intento') %}
+                                            <script type="text/javascript">
+                                                $( "#dialog-message" ).dialog({
+                                                    modal: true
+                                                });
+
+                                                location.href= '{{ url('MinSalSCABundle_homepage') }}?intento=1';
+                                            </script>
+                                        {% else %}
+                                            <h2>Contacte al Administrador del Sistema para que le asigne un rol y asi podra ingresar al sistema correctamente</h2>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if app.request.get('url') %}
+                                            
+                                            <script type="text/javascript">
+                                                $( "#dialog-message" ).dialog({
+                                                    modal: true
+                                                });
+                                                
+                                                location.href= '{{ app.request.get('url') }}';
+                                            </script>
+                                        {% else %}
+                                            
+                                            <script type="text/javascript">
+                                                $( "#dialog-message" ).dialog({
+                                                    modal: true
+                                                });
+                                                
+                                                location.href= '{{ url('MinSalSCABundle_homepage') }}';
+                                            </script>
+                                        {% endif %}
                                     {% endif %}
-                        <!--<table>
-                            <tr>
-                                <td align="center">                                                
-                                    <br>                                               
-                                    <img align="center" src="{{ asset('bundles/minsalsca/images/sca1.png') }}" alt="descripción" height="100px" />                                    
-
-                                </td>
-                                <td>
-                                    <img align="right" src="{{ asset('bundles/minsalsca/images/planificacion.png') }}" alt="descripción" height="280px"  />                                    
-                                </td>
-                            </tr>
-                            <tr>
-                                <td >
-                                    <h3>“El Plan, lejos de ser un requisito jurídico legal, es
-                                        una herramienta para cuantificar los productos y
-                                        efectos reales que como gobierno generamos en la
-                                        sociedad a partir de la ejecución de nuestra
-                                        política y reforma de salud”.  </h3>                                                      
-                                    <h4>Adaptado de la Guía metodológica aplicada para la formulación de indicadores y el seguimiento a metas de gobierno en el municipio de Tocancipá, Cundinamarca, Colombia.</h4>
-                                </td>
-                            </tr>
-                        </table>-->
-
                                 {% endblock %} 
                              {% else %}
                                 {% block login %}

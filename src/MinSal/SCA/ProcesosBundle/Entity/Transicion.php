@@ -16,6 +16,7 @@ class Transicion {
         $this->auditDateIns = new \DateTime();
         $this->traComentario = false;
         $this->traLitrosLibera = false;
+        $this->traNotificaEmpresa = false;
         
         $this->solImportaciones = new ArrayCollection();
         //$this->solLocales = new ArrayCollection();
@@ -106,6 +107,13 @@ class Transicion {
      * @ORM\Column(name="tra_litros_libera", type="boolean", nullable=false)
      */
     private $traLitrosLibera;
+    
+    /**
+     * @var boolean $traNotificaEmpresa
+     *
+     * @ORM\Column(name="tra_notifica_empresa", type="boolean", nullable=false)
+     */
+    private $traNotificaEmpresa;
     
     /**
      * @var boolean $traLiberaTotal
@@ -295,14 +303,23 @@ class Transicion {
         $this->traLiberaTotal = $traLiberaTotal;
     }
     
-    public function getRoles() {
-        return $this->roles;
+    public function getRols() {
+        return $this->rols;
     }
 
-    public function setRoles($roles) {
-        $this->roles = $roles;
+    public function setRols($rols) {
+        $this->rols = $rols;
+    }
+    
+    public function getTraNotificaEmpresa() {
+        return $this->traNotificaEmpresa=== 'true' || $this->traNotificaEmpresa === true;
     }
 
+    public function setTraNotificaEmpresa($traNotificaEmpresa) {
+        $this->traNotificaEmpresa = $traNotificaEmpresa;
+    }
+
+    
     
                 
     //*********** CUSTOM SET/GET ******************
