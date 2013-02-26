@@ -48,6 +48,7 @@ class AccionSCARegVentaController extends Controller {
      * @return Response
      */
     public function consultarRegVentaJSONAction() {
+        //CARGA LA TABLA PRINCIPAL
         $user = $this->get('security.context')->getToken()->getUser();
         
         $RegVentaDao = new RegVentaDao($this->getDoctrine());
@@ -84,16 +85,16 @@ class AccionSCARegVentaController extends Controller {
          $idEnt=$user->getEntidad()->getEntId();
         
         
-        $id = $request->get('RegVenta_RegVentaId');
+        $id = $RegVenta->getRegVentaId('RegVentaId');
         $eliminar = $request->get('eliminar');
         //Verifica si se esta seleccionando la opcion de eliminar
-        if ($eliminar == 'true/') {
+   
+        if ($eliminar == 'true') {
              /**
          * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
          */
            $RegVentaDao->delRegVenta($id);
-  
-             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
+         
         } else {
            
          //SINO SE SELECCIONO LA OPCION DE ELIMINAR SE ACTUALIZARA O SE AGREGARA UN NUEVO REGISTRO   
@@ -118,8 +119,8 @@ class AccionSCARegVentaController extends Controller {
         }
         
         }
-
-  return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
+        return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
+        
     }
     
     

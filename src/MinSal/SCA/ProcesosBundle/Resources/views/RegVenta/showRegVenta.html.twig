@@ -18,7 +18,7 @@
 
 
         function enviarEliminar(){
-            if(confirm('!Desea eliminar el registro "'+$('#RegVenta_RegVentaNombreEsp').val()+'"?')){
+            if(confirm('!Desea eliminar el registro "'+$('#RegVenta_RegVentaId').val()+'"?')){
                 if(!confirm('!Desea abortar la eliminacion??')){
                     $('#valido').val(true);
                     $('#eliminar').val(true);
@@ -139,9 +139,9 @@
                         
                         <input id="btnGuardar" name="btnGuardar" type="submit" value="Actualizar" />
                         {% endif %}
-                        <input id="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>
+                        <input id="btnEliminar" name="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>
 
-                        <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantRegVenta')}}';"/>
+                        <input id="btnRegresar"  type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantRegVenta')}}';"/>
                     </td>
                 </tr>
             </table>    

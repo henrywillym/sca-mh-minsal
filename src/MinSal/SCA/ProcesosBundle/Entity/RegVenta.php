@@ -5,8 +5,6 @@ namespace MinSal\SCA\ProcesosBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
-use MinSal\SCA\ProcesosBundle\Entity\RegVenta;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 /**
  * RepositoryClass de RegVenta
@@ -22,6 +20,7 @@ class RegVenta {
     
     public function __construct() {
         //$this->RegVenta = new RegVenta();
+         //$this->alcohol = new Alcohol();
         $this->auditDeleted = false;
     }
     

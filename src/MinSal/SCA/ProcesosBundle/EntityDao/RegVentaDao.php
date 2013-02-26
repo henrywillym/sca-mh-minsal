@@ -2,7 +2,7 @@
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
 use MinSal\SCA\ProcesosBundle\Entity\RegVenta;
-use MinSal\SCA\UsersBundle\Entity\User;
+
 
 /**
  * RepositoryClass de RegVenta
@@ -46,31 +46,12 @@ class RegVentaDao {
      
          $registros = $this->em->createQuery("SELECT E
                                           FROM MinSalSCAProcesosBundle:RegVenta E
-                                          WHERE E.entidad = :entid")
+                                          WHERE E.entidad = :entid
+                                          AND E.auditDeleted = false")
                 ->setParameter('entid',$id);
         return $registros->getArrayResult();
     }
     
-    public function findRegVenta($entId, $alcId, $invGrado, $invNombreEsp) {
-        $registros = $this->em->createQuery("SELECT E
-                                          FROM MinSalSCAProcesosBundle:RegVenta E JOIN E.entidad A JOIN E.alcohol B
-                                          WHERE A.entId = :entId
-                                            AND B.alcId = :alcId
-                                            AND E.invGrado = :invGrado
-                                            AND E.invNombreEsp = :invNombreEsp")
-                ->setParameter('entId', $entId)
-                ->setParameter('alcId', $alcId)
-                ->setParameter('invGrado', $invGrado)
-                ->setParameter('invNombreEsp', $invNombreEsp);
-        $result= $registros->getResult();
-        
-        if($result !=null && count($result)>0){
-            return $result[0];
-        }else{
-            return null;
-        }
-    }
-
    	public function addRegVenta($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado) {
             
             $RegVenta=new RegVenta(); 
@@ -101,16 +82,13 @@ class RegVentaDao {
          */
         public function editRegVenta($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado){
             
-            $RegVenta= new RegVenta();            
+            //$RegVenta= new RegVenta();            
             $RegVenta=$this->repositorio->find($id);
-            
-            $RegVenta= new RegVenta();
              
-            if(!$RegVenta){
-                throw $this->createNotFoundException('No se encontro Registro de Venta con ese id '.$id);
-            }
-
-            	$RegVenta->setregveid($id);
+//            if(!$RegVenta){
+//                throw $this->createNotFoundException('No se encontro Registro de Venta con ese id '.$id);
+//            }
+            	$RegVenta->setRegVentaId($id);
                 $RegVenta->setregveNIT($nit);
                 $RegVenta->setregveNombre($nombcliente);
                 $RegVenta->setregveMinsal($reg_user);
@@ -126,7 +104,7 @@ class RegVentaDao {
             $this->em->flush();
             
             $matrizMensajes = array('El proceso de Actualizar termino con exito', 'RegVenta '.$RegVenta->getRegVentaId());
-            $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!');
+
             return $matrizMensajes;
         }
         
@@ -136,23 +114,19 @@ class RegVentaDao {
          */
         public function delRegVenta($id){            
   
-            $RegVenta= new RegVenta();            
+            //$RegVenta= new RegVenta();            
             $RegVenta=$this->repositorio->find($id);
-            
-            $RegVenta= new RegVenta();
-             
+                      
             if(!$RegVenta){
                 throw $this->createNotFoundException('No se encontro Registro de Venta con ese id '.$id);
             }
-				
-            $auditUser = $this->container->get('security.context')->getToken()->getUser();
-            $idEnt=$auditUser->getEntidad()->getEntId();
-
+            
             $RegVenta->setAuditDeleted("true");
             
+            $this->em->persist($RegVenta);
             $this->em->flush();
             
-            $matrizMensajes = array('El proceso de eliminar termino con exito', 'RegVenta '.$RegVenta->getregveid());
+            $matrizMensajes = array('El proceso de eliminar termino con exito', 'RegVenta '.$RegVenta->getRegVentaId());
 
             return $matrizMensajes;
         }
