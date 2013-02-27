@@ -10,11 +10,11 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 
 /**
- * Estructura para formulario de Registro de Ventas
+ * Estructura para formulario de Ingreso a detalle mensual de litros de alcoholes
  *
  * @author Daniel E. Diaz
  */
-class RegVentaType extends AbstractType {
+class RegMensualType extends AbstractType {
     private $doctrine;
     
     public function __construct($doctrine){
@@ -58,35 +58,39 @@ class RegVentaType extends AbstractType {
             'multiple'=>false,
             //'em'=> 'doctrine.orm.entity_manager'
         ));/**/
-        $builder->add('alcohol', 'choice', array(
-            'choices' => $this->getAlcoholes(),
+        $builder->add('regmen_mes', 'choice', array(
+            'choices' => $this->getMeses(),
             'required' => true,
             'expanded' => false,
             'multiple' => false,
-            'empty_value' => 'Debe Seleccionar un Alcohol'
+            'empty_value' => 'Debe Seleccionar un Mes'
         ));
-        $builder->add('regveFecha', null, array('label' => 'Fecha'));
-        $builder->add('regveNIT', null, array('label' => 'NIT'));
-        $builder->add('regveNombre', null, array('label' => 'Nombre Específico'));
-        $builder->add('regveMinsal', null, array('label' => 'Registro Usuario (MINSAL)'));
-        $builder->add('regvedgii', null, array('label' => 'Numero Registro DGII'));
-        $builder->add('regveLitros', null, array('label' => 'Grado'));
-        $builder->add('regveGrado',  null, array('label' => 'Cuota (Lts)'));
+        $builder->add('regmen_year', null, array('label' => 'A&ntilde;o'));
+        $builder->add('regmen_excedente_ant', null, array('label' => 'Excedente'));
+        $builder->add('regmen_prod', null, array('label' => 'Produccion'));
+        $builder->add('regmen_imp', null, array('label' => 'Importacion'));
+        $builder->add('regmen_compra_local', null, array('label' => 'Compra local'));
+        $builder->add('regmen_venta_local', null, array('label' => 'Venta Local'));
+        $builder->add('regmen_venta_inter',  null, array('label' => 'Venta Internacional'));
+        $builder->add('regmen_utilizacion',  null, array('label' => 'Utilizacion'));
+        $builder->add('regmen_perdida',  null, array('label' => 'Perdida , Merma'));
         
     }
 
     public function getName(){
-        return 'RegVenta';
+        return 'RegMensual';
     }
     
-    private function getAlcoholes(){
-        $alcoholDao = new AlcoholDao($this->doctrine);
-        $alcoholes = $alcoholDao->getAlcoholes();
+    private function getMeses(){
+    
+    $meses=array('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
         
         $lista = array();
+        $i=1;
         
-        foreach($alcoholes as $alc){
-            $lista[$alc['alcId']] = $alc['alcNombre'];
+        foreach($meses as $m){
+            $lista[$i] = $m;
+            $i++;
         }
         
         return $lista;

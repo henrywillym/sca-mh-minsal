@@ -11,7 +11,7 @@
             var myGrid = $('#theGrid');
             
             myGrid.jqGrid({ 
-                url: '{{ url('MinSalSCAProcesosBundle_consultarRegVentaJSON') }}',
+                url: '{{ url('MinSalSCAProcesosBundle_consultarRegMensualJSON') }}',
                 width: 1000,
                 height: 300,
                 datatype:'json',
@@ -34,19 +34,19 @@
                 colModel:[{
                         key:true,
                         label:'ID',
-                        name:'RegVentaId', 
-                        index: 'RegVentaId', 
+                        name:'RegMenId', 
+                        index: 'RegMenId', 
                         hidden: true,
                         width:20
                     },{ label:'NIT',
                         name:'regveNIT', 
                         index: 'nit',
-                        width:65
+                        width:50
                     },{
                         label:'Nombre Cliente',
                         name:'regveNombre', 
                         index: 'Nombre',
-                        width:75
+                        width:90
                     },{ 
                         label:'Cantidad (Ltr)',
                         name:'regveLitros', 
@@ -100,7 +100,7 @@
         }
         
         $("#agregarRegistro").click(function(){
-            location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarRegVenta', {'RegVentaId':'RegVentaId'})}}'.replace(/RegVentaId/g, '-1');
+            location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarRegMensual', {'RegMenId':'RegMenId'})}}'.replace(/RegMenId/g, '-1');
         });
         
     
@@ -109,7 +109,7 @@
             var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
             
             if( gr != null ){
-                location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarRegVenta', {'RegVentaId':'RegVentaId'})}}'.replace(/RegVentaId/g, gr);
+                location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarRegMensual', {'RegMenId':'RegMenId'})}}'.replace(/RegMenId/g, gr);
             }else{ 
                 alert("Por favor seleccione una fila para editar!"); 
             }
@@ -122,7 +122,10 @@
     <form action="" method="post">
         <table align="center">
             <tr><td align="center">
-                    <h1>Ingreso de Registro Mensual de Ventas de Importadores y Compradores Locales <br>Empresa "{{entNombComercial}}"</h1>
+                    <h2>DETALLE DE LITROS DE ALCOHOL ETILICO POTABLE Y NO POTABLE, METILICO, ISOPROPILICO
+                           <br> BUTILICO U OTROS ALCOHOLES NO POTABLES 
+                           <br> Empresa "{{entNombComercial}}"
+                    </h2>
                 </td>
             </tr>
             <tr>

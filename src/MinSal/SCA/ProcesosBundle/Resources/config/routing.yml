@@ -37,6 +37,25 @@ MinSalSCAProcesosBundle_mantCargarRegVenta:
     pattern:  /RegVenta/mantCargarRegVenta/{RegVentaId}
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:mantCargarRegVenta } 
     
+#****************************
+#*** Registro Detalle Menusal ***
+#****************************
+MinSalSCAProcesosBundle_mantRegMensual:
+    pattern:  /RegMensual/mantRegMensual
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:mantRegMensual } 
+    
+MinSalSCAProcesosBundle_consultarRegMensualJSON:
+    pattern:  /RegMensual/consultarRegMensualJSON
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:consultarRegMensualJSON } 
+
+MinSalSCAProcesosBundle_mantRegMensualEdicion:
+    pattern:  /RegMensual/mantRegMensualEdicion
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:mantRegMensualEdicion }
+
+MinSalSCAProcesosBundle_mantCargarRegMensual:
+    pattern:  /RegMensual/mantCargarRegMensual/{RegMenId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:mantCargarRegMensual } 
+    
         
     
     

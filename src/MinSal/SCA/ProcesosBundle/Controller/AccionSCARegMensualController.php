@@ -7,9 +7,9 @@
 namespace MinSal\SCA\ProcesosBundle\Controller;
 
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
-use MinSal\SCA\ProcesosBundle\Entity\RegVenta;
-use MinSal\SCA\ProcesosBundle\EntityDao\RegVentaDao;
-use MinSal\SCA\ProcesosBundle\Form\Type\RegVentaType;
+use MinSal\SCA\ProcesosBundle\Entity\RegMensual;
+use MinSal\SCA\ProcesosBundle\EntityDao\RegMensualDao;
+use MinSal\SCA\ProcesosBundle\Form\Type\RegMensualType;
 use MinSal\SCA\UsersBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,23 +19,23 @@ use Symfony\Component\HttpFoundation\Response;
 * Mantenimineto de Ingreso inicial a Registro de Ventas...
 * 
 */
-class AccionSCARegVentaController extends Controller {
+class AccionSCARegMensualController extends Controller {
 
     /**
      * Retorna la página principal del mantenimiento
      * @return type HTML.twig
      */
-    public function mantRegVentaAction() {
+    public function mantRegMensualAction() {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
         
         if($user->getEntidad()==null){
-            return $this->render('MinSalSCAProcesosBundle:RegVenta:mantRegVentaNoEntidad.html.twig', array(
+            return $this->render('MinSalSCAProcesosBundle:RegMensual:mantRegMensualNoEntidad.html.twig', array(
                         'opciones' => $opciones
                     )
             );
         }else{
-            return $this->render('MinSalSCAProcesosBundle:RegVenta:mantRegVenta.html.twig', array(
+            return $this->render('MinSalSCAProcesosBundle:RegMensual:mantRegMensual.html.twig', array(
                         'opciones' => $opciones,
                         'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
                     )
@@ -47,12 +47,12 @@ class AccionSCARegVentaController extends Controller {
      * Devuelve el listado principal de registros del mantenimiento
      * @return Response
      */
-    public function consultarRegVentaJSONAction() {
+    public function consultarRegMensualJSONAction() {
         //CARGA LA TABLA PRINCIPAL
         $user = $this->get('security.context')->getToken()->getUser();
         
-        $RegVentaDao = new RegVentaDao($this->getDoctrine());
-        $registros = $RegVentaDao->getJasonRegVenta($user->getEntidad()->getEntId());
+        $RegMensualDao = new RegMensualDao($this->getDoctrine());
+        $registros = $RegMensualDao->getJasonRegMensual($user->getEntidad()->getEntId());
 
         $numfilas = count($registros);
         
@@ -75,17 +75,17 @@ class AccionSCARegVentaController extends Controller {
      * Se encarga de ejecutar las acciones de Eliminar, agregar y editar
      * del mantenimiento
      */
-    public function mantRegVentaEdicionAction(request $request) {
-        $RegVenta=new RegVenta();
-        $RegVentaDao = new RegVentaDao($this->getDoctrine());
-	$form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
+    public function mantRegMensualEdicionAction(request $request) {
+        $RegMensual=new RegMensual();
+        $RegMensualDao = new RegMensualDao($this->getDoctrine());
+	$form = $this->createForm(new RegMensualType($this->getDoctrine()), $RegMensual);
         $form->bindRequest($request);
         
          $user = $this->get('security.context')->getToken()->getUser();
          $idEnt=$user->getEntidad()->getEntId();
         
         
-        $id = $RegVenta->getRegVentaId('RegVentaId');
+        $id = $RegMensual->getRegMenId('RegMenId');
         $eliminar = $request->get('eliminar');
         //Verifica si se esta seleccionando la opcion de eliminar
    
@@ -93,63 +93,63 @@ class AccionSCARegVentaController extends Controller {
              /**
          * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
          */
-           $RegVentaDao->delRegVenta($id);
+           $RegMensualDao->delRegMensual($id);
          $this->get('session')->setFlash('notice', 'El registro se Elimino Exitosamente');
         } else {
            
          //SINO SE SELECCIONO LA OPCION DE ELIMINAR SE ACTUALIZARA O SE AGREGARA UN NUEVO REGISTRO   
           $operacion = $request->get('btnGuardar');
         
-          $nit=$RegVenta->getregveNIT("nit");
-          $nombcliente=  $RegVenta->getregveNombre("nombcliente");
-          $reg_user=$RegVenta->getregveMinsal("reg_user");
-          $fecha=$RegVenta->getregveFecha("fecha");
-          $n_res = $RegVenta->getregvedgii("n_res");                
-          $AlcId =$RegVenta->getAlcohol("AlcId");
-          $RegVentaLitros =$RegVenta->getregveLitros("RegVentaLitros");
-          $RegVentaGrado =$RegVenta->getregveGrado("RegVentaGrado");
+          $nit=$RegMensual->getregveNIT("nit");
+          $nombcliente=  $RegMensual->getregveNombre("nombcliente");
+          $reg_user=$RegMensual->getregveMinsal("reg_user");
+          $fecha=$RegMensual->getregveFecha("fecha");
+          $n_res = $RegMensual->getregvedgii("n_res");                
+          $AlcId =$RegMensual->getAlcohol("AlcId");
+          $RegMensualLitros =$RegMensual->getregveLitros("RegMensualLitros");
+          $RegMensualGrado =$RegMensual->getregveGrado("RegMensualGrado");
      
 
         if ($operacion == 'Actualizar') {
-            $RegVentaDao->editRegVenta($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado);
+            $RegMensualDao->editRegMensual($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegMensualLitros,$RegMensualGrado);
         
             $this->get('session')->setFlash('notice', 'Los datos se han Actualizado exitosamente');
         }
 
         if ($operacion == 'Guardar') {
-            $RegVentaDao->addRegVenta($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado);
+            $RegMensualDao->addRegMensual($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegMensualLitros,$RegMensualGrado);
             $this->get('session')->setFlash('notice', 'Los datos se han Guardado exitosamente');
             
         }
         
         }
-        return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
+        return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegMensual'));
         
     }
     
     
     /*
-     * Se encarga de cargar los datos de la RegVenta para que sean editados
+     * Se encarga de cargar los datos de la RegMensual para que sean editados
      */
-    public function mantCargarRegVentaAction($RegVentaId) {
+    public function mantCargarRegMensualAction($RegMenId) {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
         
-        $RegVentaDao = new RegVentaDao($this->getDoctrine());
-        $RegVenta = $RegVentaDao->getRegVenta($RegVentaId);
+        $RegMensualDao = new RegMensualDao($this->getDoctrine());
+        $RegMensual = $RegMensualDao->getRegMensual($RegMenId);
         
         
-//        if( !$RegVenta ){
-//            $RegVenta = new RegVenta();
+//        if( !$RegMensual ){
+//            $RegMensual = new RegMensual();
 //        }else{
 //        }
         
-        $form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
+        $form = $this->createForm(new RegMensualType($this->getDoctrine()), $RegMensual);
 
-        return $this->render('MinSalSCAProcesosBundle:RegVenta:showRegVenta.html.twig', array(
+        return $this->render('MinSalSCAProcesosBundle:RegMensual:showRegMensual.html.twig', array(
             'form' => $form->createView(),
             'opciones' => $opciones,
-            'RegVentaId' => $RegVentaId,
+            'RegMenId' => $RegMenId,
             'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
         ));
     }

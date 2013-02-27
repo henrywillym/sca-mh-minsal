@@ -1,0 +1,177 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{% form_theme form 'MinSalSCAUsersBundle:ChangePassword/Form:fields.html.twig' %}
+{% block body %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#btnGuardar').button();
+            $('#btnEliminar').button();
+            $('#btnRegresar').button();
+
+            //Hoja de estilo a tabla
+           $('td>label').parent().attr('align','right');
+           if($('#RegMensual_RegMenId').val()=='' || $('#RegMensual_RegMenId').val()==-1){
+               $('#btnEliminar').hide();
+           }
+           $('#RegMensual_regveFecha').datepicker();
+           
+        });
+
+
+        function enviarEliminar(){
+            if(confirm('!Desea eliminar el registro "'+$('#RegMensual_RegMenId').val()+'"?')){
+                if(!confirm('!Desea abortar la eliminacion??')){
+                    $('#valido').val(true);
+                    $('#eliminar').val(true);
+                    $('#formulario').submit();
+                    return true;
+                }
+            }
+            return false;
+        }
+    </script>
+    
+    <form id="formulario" action="{{ path('MinSalSCAProcesosBundle_mantRegMensualEdicion') }}" {{ form_enctype(form) }} method="POST" class="RegMensualTypeForm">
+        <input type="hidden" id="valido" value=false/>
+        <input type="hidden" id="eliminar" name="eliminar" value=false/>
+            <table align='center' style="border: 1px solid;" >
+                <tr>
+                    <td align='center' colspan="2">
+                        <h2>INGRESE EL DETALLE DE LITROS DE ALCOHOL ETILICO POTABLE Y NO POTABLE, METILICO, ISOPROPILICO
+                           <br> BUTILICO U OTROS ALCOHOLES NO POTABLES 
+                           <br> Empresa "{{entNombComercial}}"
+                        </h2>
+                        {% if app.session.hasFlash('notice') %}
+                            <div class="flash-notice">
+                                {{ app.session.flash('notice') }}
+                            </div><br/>
+                        {% endif %}
+                    </td>
+                </tr>
+                
+                  <tr>
+                      <td><label id="fecha" >A&ntilde;o:</label></td>
+                    <td>
+                       {{ form_widget(form.regmen_year) }}
+                        <div class="flash-notice">
+                            {{form_errors(form.regmen_year)}}
+                        </div>
+                    </td>
+                </tr>
+                 
+                 <tr>
+                    <td><label id="AlcId" >Mes:</label></td>
+                    <td>
+                        {{ form_widget(form.regmen_mes) }}
+                        {{ form_errors(form.regmen_mes) }}
+                    </td>
+                </tr>
+                    <tr><td>&nbsp;</td></tr>
+                <tr>
+                    <tr>
+                    <td><label id="n_res" >EXCEDENTE DEL MES ANTERIOR DE ALCOHOL (EN LITROS):</label></td>
+                    <td>
+                        {{ form_widget(form.regmen_excedente_ant) }}
+                        {{ form_errors(form.regmen_excedente_ant) }}
+                    </td>
+                </tr>
+                  <tr><td>&nbsp;</td></tr>
+               
+                   <tr>
+                    <td><label id="RegMensualLitros" >PRODUCCION DE ALCOHOL (EN LITROS):</label></td>
+                    <td>
+                        {{ form_widget(form.regmen_prod) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_prod) }}
+                        </div>
+                    </td>
+                </tr>   
+                     <tr>
+                    <td><label id="RegMensualLitros" >IMPORTACION DE ALCOHOL (EN LITROS):</label></td>
+                    <td>
+                        {{ form_widget(form.regmen_imp) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_imp) }}
+                        </div>
+                    </td>
+                </tr>   
+                   
+                 <tr>
+                    <td><label id="RegMensualGrado" >COMPRA LOCAL DE ALCOHOL (EN LITROS):</label></td>
+                    <td>
+                        {{ form_widget(form.regmen_compra_local) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_compra_local) }}
+                        </div>
+                    </td>
+                </tr>  
+                <tr><td>&nbsp;</td></tr>
+                 <tr>
+                    <td><label id="nombcliente" >VENTA LOCAL DE ALCOHOL (EN LITROS):</label></td>
+                    <td>
+                       {{ form_widget(form.regmen_venta_local) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_venta_local) }}
+                        </div>
+                    </td>
+                </tr>
+              
+               <tr>
+                    <td><label id="nombcliente" >VENTA INTERNACIONAL DE ALCOHOL (EN LITROS):</label></td>
+                    <td>
+                       {{ form_widget(form.regmen_venta_inter) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_venta_inter) }}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label id="nit" >SALIDA DE ALCOHOL PARA USO EN LA PRODUCCION (EN LITROS):</label></td>
+                    <td>
+                       {{ form_widget(form.regmen_utilizacion) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_utilizacion) }}
+                        </div>
+                    </td>
+                </tr>
+             
+               
+                  
+                <tr>
+                    <td><label id="reg_user" >MERMAS, PERDIDAS DE ALCOHOL (Litros):</label></td>
+                    <td>
+                        {{ form_widget(form.regmen_perdida) }}
+                        {{ form_errors(form.regmen_perdida) }}
+                    </td>
+                </tr>
+               
+               
+                
+                
+                <tr>
+                    <td colspan="2"><hr/></td>
+                </tr> 
+                
+                            
+                
+                <tr>
+                    <td align='center' colspan=2 >
+                        <div id="msgDialog">
+                        </div>
+                        <br>
+                        {% if  RegMenId==-1 %}
+                        <input id="btnGuardar" name="btnGuardar" type="submit" value="Guardar" />
+                        {% endif %}
+                         {% if  RegMenId!=-1 %}
+                        
+                        <input id="btnGuardar" name="btnGuardar" type="submit" value="Actualizar" />
+                        {% endif %}
+                        <input id="btnEliminar" name="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>
+
+                        <input id="btnRegresar"  type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantRegMensual')}}';"/>
+                    </td>
+                </tr>
+            </table>    
+
+    {{ form_rest(form) }}
+        </form>
+{% endblock%}

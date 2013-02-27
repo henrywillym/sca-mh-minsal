@@ -78,28 +78,28 @@ class RegVenta {
     /**
      * @var numeric $regveNIT
      *
-     * @ORM\Column(name="regve_nit", type="decimal", nullable=false)
+     * @ORM\Column(name="regve_nit", type="string", nullable=false)
      *  */
     private $regveNIT;
      
      /**
      * @var string $regveNombre
      *
-     * @ORM\Column(name="regve_nombre", type="string", nullable=true)
+     * @ORM\Column(name="regve_nombre", type="string", nullable=false)
      */
     private $regveNombre;    
       
     /**
      * @var string $regveMinsal
      *
-     * @ORM\Column(name="regve_reg_minsal", type="decimal", nullable=true)
+     * @ORM\Column(name="regve_reg_minsal", type="decimal", nullable=false)
      */
     private $regveMinsal;
     
      /**
      * @var string $regvedgii
      *
-     * @ORM\Column(name="regve_reg_dgii", type="decimal", nullable=true)
+     * @ORM\Column(name="regve_reg_dgii", type="decimal", nullable=false)
      */
     private $regvedgii;
      

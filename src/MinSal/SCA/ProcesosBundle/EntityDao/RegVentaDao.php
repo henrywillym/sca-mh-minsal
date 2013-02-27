@@ -44,10 +44,12 @@ class RegVentaDao {
     
     public function getJasonRegVenta($id) {
      
-         $registros = $this->em->createQuery("SELECT E
-                                          FROM MinSalSCAProcesosBundle:RegVenta E
-                                          WHERE E.entidad = :entid
-                                          AND E.auditDeleted = false")
+         $registros = $this->em->createQuery("SELECT E.RegVentaId,E.regveNIT,E.regveNombre,E.regveLitros,
+                                              A.alcNombre,E.regveFecha,E.regveMinsal,E.regvedgii
+                                              FROM MinSalSCAProcesosBundle:RegVenta E , MinSalSCAAdminBundle:Alcohol A 
+                                              WHERE E.entidad = :entid
+                                              AND E.alcohol=A.alcId
+                                              AND E.auditDeleted = false")
                 ->setParameter('entid',$id);
         return $registros->getArrayResult();
     }
