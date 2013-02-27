@@ -1,3 +1,18 @@
-/app/cache/
-/app/logs/
-/nbproject/
+# Bootstrap
+/app/bootstrap*
+ 
+# Symfony directories
+/vendor/*
+*/logs/*
+*/cache/*
+/web/uploads/*
+ 
+# Configuration files
+app/config/parameters.ini
+app/config/parameters.yml
+ 
+#Carpeta nbproject de netbeans
+nbproject/
+
+#Archivos de respaldo
+*~

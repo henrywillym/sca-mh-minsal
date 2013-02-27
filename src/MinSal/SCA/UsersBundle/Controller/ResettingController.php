@@ -33,8 +33,6 @@ class ResettingController extends BaseController{
         $process = $formHandler->process($user);
 
         if ($process) {
-            $this->authenticateUser($user);
-
             //$this->setFlash('fos_user_success', 'resetting.flash.success');
 
             //return new RedirectResponse($this->getRedirectionUrl($user));
@@ -43,16 +41,20 @@ class ResettingController extends BaseController{
             $this->generateOpciones($user);
             $opciones = $request->getSession()->get('opciones');
 
-            return $this->container->get('templating')->renderResponse('MinSalSCAUsersBundle:Registration:confirmed.html.twig', array(
+            $response = $this->container->get('templating')->renderResponse('MinSalSCAUsersBundle:Registration:confirmed.html.twig', array(
                 'user' => $user,
                 'opciones' => $opciones
             ));
-        }
+			
+			$this->authenticateUser($user, $response);
 
-        return $this->container->get('templating')->renderResponse('FOSUserBundle:Resetting:reset.html.'.$this->getEngine(), array(
+            return $response;
+        }
+		
+		return $this->container->get('templating')->renderResponse('FOSUserBundle:Resetting:reset.html.'.$this->getEngine(), array(
             'token' => $token,
             'form' => $form->createView(),
-            'theme' => $this->container->getParameter('fos_user.template.theme'),
+            //'theme' => $this->container->getParameter('fos_user.template.theme'),
         ));
     }
     

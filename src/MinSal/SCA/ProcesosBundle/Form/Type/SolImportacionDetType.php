@@ -4,7 +4,7 @@ namespace MinSal\SCA\ProcesosBundle\Form\Type;
 use Doctrine\ORM\EntityRepository;
 //use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
@@ -28,7 +28,7 @@ class SolImportacionDetType extends AbstractType {
      * 
      * @param \Symfony\Component\OptionsResolver\OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions1(OptionsResolverInterface $resolver){
+    public function setDefaultOptions(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
             'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet'
         ));
@@ -45,7 +45,7 @@ class SolImportacionDetType extends AbstractType {
         );
     }
     
-    public function buildForm(FormBuilder $builder, array $opciones){
+    public function buildForm(FormBuilderInterface $builder, array $opciones){
         $builder->add('impDetId', 'hidden');
         
         $builder->add('arancel', 'entity', array(
@@ -93,9 +93,9 @@ class SolImportacionDetType extends AbstractType {
             //'em'=> 'doctrine.orm.entity_manager'
         ));/**/
         
-        $builder->add('cuota.cuoId', 'hidden', array(
+        $builder->add('cuoId', 'hidden', array(
             'label'=>'Nombre del Alcohol',
-            //'property_path'=>false
+            'property_path'=> 'cuota.cuoId'
         ));/**/
             
         $builder->add('impDetFactCom', 'text', array('label' => 'No. Factura Comercial','required'=>true, 'attr' => array('autocomplete' => 'off'),));

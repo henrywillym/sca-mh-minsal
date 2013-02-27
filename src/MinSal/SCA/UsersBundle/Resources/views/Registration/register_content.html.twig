@@ -17,7 +17,7 @@
                 return true;
             }else{
                 $.getJSON('{{ path('MinSalSCAUsersBundle_verificaCreacion') }}'+
-                        '?idUsuario='+ $('#fos_user_registration_form_idUsuario').val() +
+                        '?idUsuario='+ $('#fos_user_registration_form_id').val() +
                         '&username='+$("#fos_user_registration_form_username").get(0).value+
                         '&email='+$("#fos_user_registration_form_email").get(0).value, 
                     function(data) {
@@ -60,7 +60,7 @@
     });
     
     function AcomodarFormulario(){
-        if($('#fos_user_registration_form_idUsuario').val() ==''){
+        if($('#fos_user_registration_form_id').val() ==''){
             $('#eliminarUsuario').hide();
         }else{
             $('#eliminarUsuario').show();

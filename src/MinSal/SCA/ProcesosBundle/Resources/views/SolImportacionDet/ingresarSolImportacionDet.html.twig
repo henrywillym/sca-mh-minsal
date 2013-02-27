@@ -148,15 +148,15 @@
                     $('#cuota')[0].innerHTML = data;
                     //$('#cuota>select').attr('id','cuota');
                     
-                    if($('[id="SolImportacionDet_cuota.cuoId"]').val() !='' ){
-                        $('#cuota').val($('[id="SolImportacionDet_cuota.cuoId"]').val());
+                    if($('[id="SolImportacionDet_cuoId"]').val() !='' ){
+                        $('#cuota').val($('[id="SolImportacionDet_cuoId"]').val());
                     }
                     
                     $('#cuota').change(function(){
                         $('#grado').val($('#cuota').children("option").filter("[value='"+ $('#cuota').val() +"']").attr('grado'));
                         $('#disponible').val($('#cuota').children("option").filter("[value='"+ $('#cuota').val() +"']").attr('disponible'));
                         calcularSaldo();
-                        $('[id="SolImportacionDet_cuota.cuoId"]').val($('#cuota').val());
+                        $('[id="SolImportacionDet_cuoId"]').val($('#cuota').val());
                     });
                     
                     $('#cuota').change();

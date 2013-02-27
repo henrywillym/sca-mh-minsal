@@ -126,11 +126,17 @@ class AccionSCASolImportacionController extends Controller {
         $numfilas = count($registros);
         
         if ($numfilas != 0) {
-            //array_multisort($registros, SORT_ASC);
+            $solImportacion = new SolImportacion();
+            $i = 0;
             
-        } else {
-            //$rows[0]['id'] = 0;
-            //$rows[0]['cell'] = array(' ', ' ',' ', ' ', ' ', ' ', ' ', ' ');
+            foreach ($registros as $ent) {
+                $solImportacion->setSolImpFecha($ent['solImpFecha']);
+                $solImportacion->setAuditDateIns($ent['auditDateIns']);
+                
+                $registros[$i]['solImpFechaText']= $solImportacion->getSolImpFechaText();
+                $registros[$i]['auditDateInsText']= $solImportacion->getAuditDateInsText();
+                $i=$i+1;
+            }
         }
 
         $datos = json_encode($registros);
@@ -161,6 +167,20 @@ class AccionSCASolImportacionController extends Controller {
             $registros = $solImportacionDetDao->getSolImportacionesDetByEntidad($user->getEntidad()->getEntId());
         }
         $numfilas = count($registros);
+        
+        if ($numfilas != 0) {
+            $solImportacion = new SolImportacion();
+            $i = 0;
+            
+            foreach ($registros as $ent) {
+                $solImportacion->setSolImpFecha($ent['solImpFecha']);
+                $solImportacion->setAuditDateIns($ent['auditDateIns']);
+                
+                $registros[$i]['solImpFechaText']= $solImportacion->getSolImpFechaText();
+                $registros[$i]['auditDateInsText']= $solImportacion->getAuditDateInsText();
+                $i=$i+1;
+            }
+        }
         
         $datos = json_encode($registros);
         $pages = floor($numfilas / 10) + 1;

@@ -5,7 +5,7 @@ use Doctrine\ORM\EntityRepository;
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\Form\Type\AlcoholType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 
@@ -44,7 +44,7 @@ class InventarioDetType extends AbstractType {
         );
     }
     
-    public function buildForm(FormBuilder $builder, array $opciones){
+    public function buildForm(FormBuilderInterface $builder, array $opciones){
         $builder->add('invDetId', 'hidden');
         
         /*$builder->add('alcohol', 'entity', array(

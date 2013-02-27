@@ -52,7 +52,7 @@ class User extends BaseUser {
      * @ORM\Column(name="usuario_codigo", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $idUsuario;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad", inversedBy="users", cascade={"persist"})
@@ -256,7 +256,7 @@ class User extends BaseUser {
      * @return integer 
      */
     public function getIdUsuario() {
-        return $this->idUsuario;
+        return $this->id;
     }
 
     /**
@@ -265,7 +265,7 @@ class User extends BaseUser {
      * @param integer $idUsuario
      */
     public function setIdUsuario($idUsuario) {
-        $this->idUsuario= $idUsuario;
+        $this->id= $idUsuario;
     }
 
     /**
