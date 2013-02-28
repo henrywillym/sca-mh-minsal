@@ -18,8 +18,8 @@ class RegistrationFormHandler extends BaseHandler{
     
     private $container;
 
-    public function __construct($form, $request, $userManager, $mailer, $container){
-        parent::__construct($form, $request, $userManager, $mailer);
+    public function __construct($form, $request, $userManager, $mailer, $tokenGenerator, $container){
+        parent::__construct($form, $request, $userManager, $mailer, $tokenGenerator);
         $this->container = $container;
     }
     
@@ -37,12 +37,12 @@ class RegistrationFormHandler extends BaseHandler{
     }*/
     
     public function process($confirmation = false){
-        $user = $this->userManager->createUser();
+        $user = $this->createUser();
         $this->form->setData($user);
 
-        if ('POST' == $this->request->getMethod()) {
-            $this->form->bindRequest($this->request);
-            
+        if ('POST' === $this->request->getMethod()) {
+            $this->form->bind($this->request);
+            //var_dump($this->form->getErrorsAsString(10));die;
             if ($this->form->isValid()) {
                 
                 $tmp = $user->getIdUsuario();

@@ -251,30 +251,17 @@ class User extends BaseUser {
    
 
     /**
-     * Get idUsuario
-     *
-     * @return integer 
-     */
-    public function getIdUsuario() {
-        return $this->id;
-    }
-
-    /**
-     * Set idUsuario
-     *
-     * @param integer $idUsuario
-     */
-    public function setIdUsuario($idUsuario) {
-        $this->id= $idUsuario;
-    }
-
-    /**
      * Get username
      *
      * @return string 
      */
     public function getUsername() {
         return $this->username;
+    }
+    
+    public function setUsername($username) {
+        parent::setUsername($username);
+        return $this->username = $username;
     }
 
     
@@ -419,6 +406,15 @@ class User extends BaseUser {
         $this->auditDeleted = $auditDeleted;
     }
     
+    public function getId() {
+        return parent::getId();
+    }
+
+    public function setId($id) {
+        $this->id = $id;
+    }
+
+        
     public function getUserInternoTipoText() {
     	//ACA SE FILTRA CUAL ES EL TIPO DE MINISTERIO AL QUE PERTENECE
         if($this->userInternoTipo == User::$MINSAL){

@@ -142,8 +142,8 @@
     {# LA URL DICE QUE ES PARA USUARIOS EXTERNOS, PERO LA VERDAD ES QUE POR LA ESTRUCTURA DE LOS PARAMETROS, FUNCIONA PARA USUARIOS INTERNOS #}
     {# ************************************************** #}
     <form id="formUsuario" action="{{ path('MinSalSCAUsersBundle_registerUsuarioExterno', {'userInterno':userInterno, 'entId':entId}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_registration_register">
-        <input type="hidden" id="valido" value=false/>
-        <input type="hidden" id="eliminar" name="eliminar" value=false/>
+        <input type="hidden" id="valido" value="false" />
+        <input type="hidden" id="eliminar" name="eliminar" value="false" />
         
             <table align='center' style="border: 1px solid;" >
                 <tr>

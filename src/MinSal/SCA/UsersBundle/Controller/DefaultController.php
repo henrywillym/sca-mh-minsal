@@ -114,7 +114,6 @@ class DefaultController extends BaseController {
 
         return $this->container->get('templating')->renderResponse('MinSalSCAUsersBundle:Registration:register.html.twig', array(
             'form' => $form->createView(),
-            'theme' => $this->container->getParameter('fos_user.template.theme'),
             'userInterno' => $userInterno,
             'entId' => $entId,
             'entNombre' => $entNombre,
@@ -196,7 +195,6 @@ class DefaultController extends BaseController {
         //FOSUserBundle:Registration:register.html
         return $this->container->get('templating')->renderResponse('MinSalSCAUsersBundle:Registration:register.html.'.$this->getEngine(), array(
             'form' => $form->createView(),
-            'theme' => $this->container->getParameter('fos_user.template.theme'),
             'userInterno' => $userInterno,
             'entId' => $entId,
             'entNombre' => $entNombre,
