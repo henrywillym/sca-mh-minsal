@@ -4,6 +4,7 @@ namespace MinSal\SCA\UsersBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Controller\RegistrationController as BaseController;
+use FOS\UserBundle\Model\UserInterface;
 use MinSal\SCA\AdminBundle\Entity\Empleado;
 use MinSal\SCA\AdminBundle\Entity\RolSistema;
 use MinSal\SCA\AdminBundle\EntityDao\EmpleadoDao;
@@ -132,6 +133,11 @@ class DefaultController extends BaseController {
         
         $userInterno = $request->get("userInterno");
         $eliminar = $request->get("eliminar");
+        $update = $request->get("update");
+        
+        if($update === 'true'){
+            return $this->updateAction($request);
+        }
         
         if($eliminar === 'true'){
             return $this->eliminarAction($request);
@@ -278,11 +284,11 @@ class DefaultController extends BaseController {
         $form->setData($user);
         $form->bindRequest($request);
         
-        $userDao= new UserDao($this->container->get("doctrine"));
-        $user = $userDao->eliminarUsuario($user->getIdUsuario(), $auditUser);
-                
+        $userDao = new UserDao($this->container->get("doctrine"));
+        $user = $userDao->eliminarUsuario($user->getIdUsuario(), $auditUser->getUsername());
+
         $this->setFlash('fos_user_success', '#### El usuario "'.$user->getUsername().'" ha sido eliminado ####');
-                
+
         $route = 'MinSalSCAUsersBundle_mantMostrarUsuarios';
         $url = $this->container->get('router')->generate($route, array(
             'userInterno' => $userInterno,
@@ -291,6 +297,98 @@ class DefaultController extends BaseController {
             'opciones' => $opciones,
         ));
         return new RedirectResponse($url);
+    }
+    
+    private function updateAction($request){
+        $opciones = $request->getSession()->get('opciones');
+        $userInterno = $request->get("userInterno");
+        $id = $request->get("fos_user_registration_form");
+        $auditUser = $this->container->get('security.context')->getToken()->getUser();
+        $confirmationEnabled = $this->container->getParameter('fos_user.registration.confirmation.enabled');
+        
+        $entId = '';
+        $entNombre = '';
+        
+        if($userInterno == 'false'){
+            $entId = $request->get("entId");
+            $entidadDao = new EntidadDao($this->container->get("doctrine"));//fos_user.user_manager
+            $entNombre = $entidadDao->getEntidad($entId)->getEntNombre();
+        }
+        
+        $user = new User();
+        $userDao= new UserDao($this->container->get("doctrine"));
+        $user = $userDao->getUserEspecifico($id['id']);
+        $form = $this->container->get('fos_user.registration.form');//$form = $this->createForm(new RegistrationFormType(), $usuario);
+        $form->setData($user);
+        $form->bindRequest($request);
+        
+        if($form->isValid()){
+            
+            $rolDao= new RolDao($this->container->get("doctrine"));
+
+            //Se asignan roles dependiendo del usuario interno
+            if($userInterno =='false'){
+                $user->setRols($rolDao->getRolesEspecificos(
+                        $user->getEntidad()->getEntImportador(),
+                        $user->getEntidad()->getEntProductor(),
+                        $user->getEntidad()->getEntComprador(),
+                        $user->getEntidad()->getEntCompVend(),
+                        $user->getUserTipo(),
+                        $user->getUserInterno(),
+                        $user->getUserInternoTipo()
+                ));
+            }else{
+                $user->setRols($rolDao->getRolesEspecificos(
+                        false,
+                        false,
+                        false,
+                        false,
+                        $user->getUserTipo(),
+                        $user->getUserInterno(),
+                        $user->getUserInternoTipo()
+                ));
+            }
+            
+            $this->onSuccess($user, $confirmationEnabled);
+            
+            $user = $userDao->updateUsuario($user, $auditUser->getUsername());
+
+            $this->container->get('session')->setFlash('notice', '#### El usuario "'.$user->getUsername().'" ha actualizado ####');
+
+            $route = 'MinSalSCAUsersBundle_mantMostrarUsuarios';
+            $url = $this->container->get('router')->generate($route, array(
+                'userInterno' => $userInterno,
+                'entId' => $entId,
+                'entNombre' => $entNombre,
+                'opciones' => $opciones,
+            ));
+            return new RedirectResponse($url);
+        }
+        
+        //FOSUserBundle:Registration:register.html
+        return $this->container->get('templating')->renderResponse('MinSalSCAUsersBundle:Registration:register.html.'.$this->getEngine(), array(
+            'form' => $form->createView(),
+            'userInterno' => $userInterno,
+            'entId' => $entId,
+            'entNombre' => $entNombre,
+            'opciones' => $opciones,
+        ));
+    }
+    
+    protected function onSuccess($user, $confirmation){
+       if ($confirmation) {
+            $user->setEnabled(false);
+            
+            $this->container->get('fos_user.user_manager');
+            $tokenGenerator = $this->container->get('fos_user.util.token_generator');
+            $user->setConfirmationToken($tokenGenerator->generateToken());
+            
+            $mailer = $this->container->get('fos_user.mailer');
+            $mailer->sendConfirmationEmailMessage($user);
+        } else {
+            $user->setConfirmationToken(null);
+            $user->setEnabled(true);
+        }
     }
     
 }

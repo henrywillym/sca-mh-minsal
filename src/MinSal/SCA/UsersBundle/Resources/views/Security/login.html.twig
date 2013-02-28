@@ -39,12 +39,20 @@
         <tr>
             <td colspan="2" style=" font-size: 12px; font-family: Verdana, Geneva, sans-serif; color: red " >
                 {% if error %}
-                 {% if error=='Bad credentials' %}
-                    <div>NO EXISTE ESE USUARIO</div>
-                 {% endif %}
-                 {% if error=='The presented password is invalid.' %}
-                    <div>USUARIO/PASSWORD INCORRECTOS</div>
-                 {% endif %}
+                    {% if error=='Bad credentials' %}
+                       <div>NO EXISTE ESE USUARIO</div>
+                    {% elseif error=='The presented password is invalid.' %}
+                       <div>USUARIO/PASSWORD INCORRECTOS</div>
+                    {% elseif error=='User account is disabled.' %}
+                       <div>LA CUENTA SE ENCUENTRA INACTIVA. PARA ACTIVARLA ES NECESARIO INGREASAR A LA DIRECCION QUE SE PROPORCIONA EN EL CORREO DE ACTIVACION</div>
+                    {% else %}
+                       {{ error }}
+                    {% endif %}
+                {% endif %}
+                {% if app.request.session.get('notice') %}
+                    <div class="flash-notice">
+                        {{ app.request.session.get('notice') }}
+                    </div><br/>
                 {% endif %}
             </td>
         </tr>

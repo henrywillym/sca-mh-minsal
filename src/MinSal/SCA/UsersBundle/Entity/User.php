@@ -260,7 +260,6 @@ class User extends BaseUser {
     }
     
     public function setUsername($username) {
-        parent::setUsername($username);
         return $this->username = $username;
     }
 
