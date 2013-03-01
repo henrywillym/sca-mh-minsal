@@ -29,7 +29,7 @@ class RegMensualType extends AbstractType {
      */
     public function setDefaultOptions1(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
-            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\RegVenta'
+            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\RegMensual'
         ));
     }
     
@@ -40,24 +40,13 @@ class RegMensualType extends AbstractType {
      */
     public function getDefaultOptions(array $options){
         return array(
-            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\RegVenta'
+            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\RegMensual'
         );
     }
     
     public function buildForm(FormBuilder $builder, array $opciones){
-        $builder->add('RegVentaId', 'hidden');
+        $builder->add('RegMenId', 'hidden');
         
-        /*$builder->add('alcohol', 'entity', array(
-            'class'=>'MinSalSCAAdminBundle:Alcohol',
-            'query_builder' => function(EntityRepository $er) {
-                return $er->createQueryBuilder('u')
-                        ->where('u.auditDeleted = false');
-            },
-            'property'=> 'alcNombre',
-            'expanded'=>false,
-            'multiple'=>false,
-            //'em'=> 'doctrine.orm.entity_manager'
-        ));/**/
         $builder->add('regmen_mes', 'choice', array(
             'choices' => $this->getMeses(),
             'required' => true,
@@ -65,7 +54,7 @@ class RegMensualType extends AbstractType {
             'multiple' => false,
             'empty_value' => 'Debe Seleccionar un Mes'
         ));
-        $builder->add('regmen_year', null, array('label' => 'A&ntilde;o'));
+        $builder->add('regmen_year', null, array('data' => date("Y"),'attr' => array('readonly' => 'readonly'),'label' => 'A&ntilde;o'));
         $builder->add('regmen_excedente_ant', null, array('label' => 'Excedente'));
         $builder->add('regmen_prod', null, array('label' => 'Produccion'));
         $builder->add('regmen_imp', null, array('label' => 'Importacion'));

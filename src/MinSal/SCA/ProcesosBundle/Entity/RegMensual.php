@@ -19,8 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RegMensual {
     
     public function __construct() {
-        //$this->RegMensual = new RegMensual();
-         //$this->alcohol = new Alcohol();
+
         $this->auditDeleted = false;
     }
     
@@ -160,7 +159,7 @@ class RegMensual {
     /**
      * @var string $audit_date_ins
      *
-     *@ORM\Column(name="audit_date_ins", type="string", nullable=false)
+     *@ORM\Column(name="audit_date_ins", type="datetime", nullable=false)
      */
     protected $audit_date_ins;
     
@@ -175,7 +174,7 @@ class RegMensual {
       /**
      * @var string $audit_date_upd
      *
-     *@ORM\Column(name="audit_date_upd", type="string", nullable=false)
+     *@ORM\Column(name="audit_date_upd", type="datetime", nullable=false)
      */
     protected $audit_date_upd;
     
@@ -187,7 +186,7 @@ class RegMensual {
      */
     protected $auditDeleted;
     
-    
+
     public function getRegMenId() {
         return $this->RegMenId;
     }
@@ -204,115 +203,116 @@ class RegMensual {
         $this->entidad = $entidad;
     }
 
-    public function getRegmen_year() {
+    public function getRegmenyear() {
         return $this->regmen_year;
     }
 
-    public function setRegmen_year($regmen_year) {
+    public function setRegmenyear($regmen_year) {
         $this->regmen_year = $regmen_year;
     }
 
-    public function getRegmen_mes() {
+ public function getRegmenmes() {
+ 
         return $this->regmen_mes;
     }
 
-    public function setRegmen_mes($regmen_mes) {
+    public function setRegmenmes($regmen_mes) {
         $this->regmen_mes = $regmen_mes;
     }
 
-    public function getRegmen_excedente_ant() {
+    public function getRegmenexcedenteant() {
         return $this->regmen_excedente_ant;
     }
 
-    public function setRegmen_excedente_ant($regmen_excedente_ant) {
+    public function setRegmenexcedenteant($regmen_excedente_ant) {
         $this->regmen_excedente_ant = $regmen_excedente_ant;
     }
 
-    public function getRegmen_prod() {
+    public function getRegmenprod() {
         return $this->regmen_prod;
     }
 
-    public function setRegmen_prod($regmen_prod) {
+    public function setRegmenprod($regmen_prod) {
         $this->regmen_prod = $regmen_prod;
     }
 
-    public function getRegmen_imp() {
+    public function getRegmenimp() {
         return $this->regmen_imp;
     }
 
-    public function setRegmen_imp($regmen_imp) {
+    public function setRegmenimp($regmen_imp) {
         $this->regmen_imp = $regmen_imp;
     }
 
-    public function getRegmen_compra_local() {
+    public function getRegmencompralocal() {
         return $this->regmen_compra_local;
     }
 
-    public function setRegmen_compra_local($regmen_compra_local) {
+    public function setRegmencompralocal($regmen_compra_local) {
         $this->regmen_compra_local = $regmen_compra_local;
     }
 
-    public function getRegmen_venta_local() {
+    public function getRegmenventalocal() {
         return $this->regmen_venta_local;
     }
 
-    public function setRegmen_venta_local($regmen_venta_local) {
+    public function setRegmenventalocal($regmen_venta_local) {
         $this->regmen_venta_local = $regmen_venta_local;
     }
 
-    public function getRegmen_venta_inter() {
+    public function getRegmenventainter() {
         return $this->regmen_venta_inter;
     }
 
-    public function setRegmen_venta_inter($regmen_venta_inter) {
+    public function setRegmenventainter($regmen_venta_inter) {
         $this->regmen_venta_inter = $regmen_venta_inter;
     }
 
-    public function getRegmen_utilizacion() {
+    public function getRegmenutilizacion() {
         return $this->regmen_utilizacion;
     }
 
-    public function setRegmen_utilizacion($regmen_utilizacion) {
+    public function setRegmenutilizacion($regmen_utilizacion) {
         $this->regmen_utilizacion = $regmen_utilizacion;
     }
 
-    public function getRegmen_perdida() {
+    public function getRegmenperdida() {
         return $this->regmen_perdida;
     }
 
-    public function setRegmen_perdida($regmen_perdida) {
+    public function setRegmenperdida($regmen_perdida) {
         $this->regmen_perdida = $regmen_perdida;
     }
 
-    public function getAudit_user_ins() {
+    public function getAudituserins() {
         return $this->audit_user_ins;
     }
 
-    public function setAudit_user_ins($audit_user_ins) {
+    public function setAudituserins($audit_user_ins) {
         $this->audit_user_ins = $audit_user_ins;
     }
 
-    public function getAudit_date_ins() {
+    public function getAuditdateins() {
         return $this->audit_date_ins;
     }
 
-    public function setAudit_date_ins($audit_date_ins) {
+    public function setAuditdateins($audit_date_ins) {
         $this->audit_date_ins = $audit_date_ins;
     }
 
-    public function getAudit_user_upd() {
+    public function getAudituserupd() {
         return $this->audit_user_upd;
     }
 
-    public function setAudit_user_upd($audit_user_upd) {
+    public function setAudituserupd($audit_user_upd) {
         $this->audit_user_upd = $audit_user_upd;
     }
 
-    public function getAudit_date_upd() {
+    public function getAuditdateupd() {
         return $this->audit_date_upd;
     }
 
-    public function setAudit_date_upd($audit_date_upd) {
+    public function setAuditdateupd($audit_date_upd) {
         $this->audit_date_upd = $audit_date_upd;
     }
 
@@ -323,6 +323,7 @@ class RegMensual {
     public function setAuditDeleted($auditDeleted) {
         $this->auditDeleted = $auditDeleted;
     }
+
 
     
     

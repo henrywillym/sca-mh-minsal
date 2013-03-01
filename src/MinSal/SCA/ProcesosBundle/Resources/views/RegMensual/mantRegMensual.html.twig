@@ -38,39 +38,34 @@
                         index: 'RegMenId', 
                         hidden: true,
                         width:20
-                    },{ label:'NIT',
-                        name:'regveNIT', 
-                        index: 'nit',
-                        width:50
+                    },{ label:'A&ntilde;o',
+                        name:'regmen_year', 
+                        index: 'anio',
+                        width:30
                     },{
-                        label:'Nombre Cliente',
-                        name:'regveNombre', 
-                        index: 'Nombre',
-                        width:90
+                        label:'Mes',
+                        name:'regmen_mes', 
+                        index: 'mes',
+                        width:45
                     },{ 
-                        label:'Cantidad (Ltr)',
-                        name:'regveLitros', 
-                        index: 'regveLitros', 
-                        width:50
-                    },{ 
-                        label:'Nombre Alcohol',
-                        name:'alcNombre', 
-                        index: 'alcohol', 
-                        width:90
-                    },{ 
-                        label:'Fecha',
-                        name:'regveFecha', 
-                        index: 'regveFecha', 
+                        label:'Excedente Mes Anterior',
+                        name:'regmen_excedente_ant', 
+                        index: 'excedente', 
                         width:60
                     },{ 
-                        label:'Registro de Usuario(MINSAL)',
-                        name:'regveMinsal', 
-                        index: 'regveMinsal', 
-                        width:90
+                        label:'Total de Entradas',
+                        name:'t_ent', 
+                        index: 'tentradas', 
+                        width:80
                     },{ 
-                        label:'Numero Resolucion DGII',
-                        name:'regvedgii', 
-                        index: 'regvedgii', 
+                        label:'Total de Salidas',
+                        name:'t_sal', 
+                        index: 'tsalidas', 
+                        width:80
+                    },{
+                        label:'Inventario Final',
+                        name:'inv_fin', 
+                        index: 'invfinal', 
                         width:90
                     }
                 ],
@@ -114,6 +109,7 @@
                 alert("Por favor seleccione una fila para editar!"); 
             }
         });
+
   //fin
        
       });

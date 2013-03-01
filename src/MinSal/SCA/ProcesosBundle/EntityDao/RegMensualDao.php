@@ -44,32 +44,41 @@ class RegMensualDao {
     
     public function getJasonRegMensual($id) {
      
-         $registros = $this->em->createQuery("SELECT E.RegMenId,E.regveNIT,E.regveNombre,E.regveLitros,
-                                              A.alcNombre,E.regveFecha,E.regveMinsal,E.regvedgii
-                                              FROM MinSalSCAProcesosBundle:RegMensual E , MinSalSCAAdminBundle:Alcohol A 
-                                              WHERE E.entidad = :entid
-                                              AND E.alcohol=A.alcId
-                                              AND E.auditDeleted = false")
+ $registros = $this->em->createQuery("
+                        SELECT E.RegMenId, E.regmen_mes,E.regmen_year,E.regmen_excedente_ant,
+                        (E.regmen_prod + E.regmen_imp + E.regmen_compra_local) t_ent,
+                 (E.regmen_venta_local + E.regmen_venta_inter + E.regmen_utilizacion + E.regmen_perdida) t_sal, 
+ (E.regmen_excedente_ant + (E.regmen_prod + E.regmen_imp + E.regmen_compra_local) - (E.regmen_venta_local + E.regmen_venta_inter + E.regmen_utilizacion + E.regmen_perdida)) inv_fin
+                                      FROM MinSalSCAProcesosBundle:RegMensual E  
+                                      WHERE E.entidad = :entid
+                                      AND E.auditDeleted = false")
                 ->setParameter('entid',$id);
         return $registros->getArrayResult();
     }
     
-   	public function addRegMensual($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegMensualLitros,$RegMensualGrado) {
+   	public function addRegMensual($year,$idEnt,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user) {
             
             $RegMensual=new RegMensual(); 
            
 
-            	//$RegMensual->setregveid($id);
-                $RegMensual->setRegveNIT($nit);
-                $RegMensual->setRegveNombre($nombcliente);
-                $RegMensual->setRegveMinsal($reg_user);
-                $RegMensual->setRegveFecha($fecha);
-                $RegMensual->setRegvedgii($n_res);                
-		$RegMensual->setAlcohol($AlcId);
-		$RegMensual->setRegveLitros($RegMensualLitros);
-                $RegMensual->setRegveGrado($RegMensualGrado);
-                $RegMensual->setEntidad($idEnt);
+          $RegMensual->setEntidad($idEnt);
+          $RegMensual->setRegmenyear($year);
+          $RegMensual->setRegmenmes($regmen_mes);
+          $RegMensual->setRegmenexcedenteant($regmen_exc);
+          $RegMensual->setRegmenprod($regmen_prod);
+          $RegMensual->setRegmenimp($regmen_imp);
+          $RegMensual->setRegmencompralocal($regmen_c_l);
+          $RegMensual->setRegmenventalocal($regmen_v_l);
+          $RegMensual->setRegmenutilizacion($regmen_util);
+          $RegMensual->setRegmenventainter($regmen_v_i);
+          $RegMensual->setRegmenperdida($regmen_perd);
+                $RegMensual->setAudituserins($user->getUsername());
+                $RegMensual->setAuditdateins(new \DateTime());
+                $RegMensual->setAudituserupd($user->getUsername());
+                $RegMensual->setAuditdateupd(new \DateTime());
                 $RegMensual->setAuditDeleted("false");
+                
+                
   
             $this->em->persist($RegMensual);
 	    $this->em->flush();	    
@@ -82,7 +91,7 @@ class RegMensualDao {
         /*
          * Actualizar RegMensual
          */
-        public function editRegMensual($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegMensualLitros,$RegMensualGrado){
+        public function editRegMensual($id,$idEnt,$year,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user){
             
             //$RegMensual= new RegMensual();            
             $RegMensual=$this->repositorio->find($id);
@@ -90,16 +99,20 @@ class RegMensualDao {
 //            if(!$RegMensual){
 //                throw $this->createNotFoundException('No se encontro Registro de Venta con ese id '.$id);
 //            }
-            	$RegMensual->setRegMenId($id);
-                $RegMensual->setregveNIT($nit);
-                $RegMensual->setregveNombre($nombcliente);
-                $RegMensual->setregveMinsal($reg_user);
-                $RegMensual->setregveFecha($fecha);
-                $RegMensual->setregvedgii($n_res);                
-		$RegMensual->setAlcohol($AlcId);
-		$RegMensual->setregveLitros($RegMensualLitros);
-                $RegMensual->setregveGrado($RegMensualGrado);
-                $RegMensual->setEntidad($idEnt);
+          
+        $RegMensual->setEntidad($idEnt);
+          $RegMensual->setRegmenyear($year);
+          $RegMensual->setRegmenmes($regmen_mes);
+          $RegMensual->setRegmenexcedenteant($regmen_exc);
+          $RegMensual->setRegmenprod($regmen_prod);
+          $RegMensual->setRegmenimp($regmen_imp);
+          $RegMensual->setRegmencompralocal($regmen_c_l);
+          $RegMensual->setRegmenventalocal($regmen_v_l);
+          $RegMensual->setRegmenutilizacion($regmen_util);
+          $RegMensual->setRegmenventainter($regmen_v_i);
+          $RegMensual->setRegmenperdida($regmen_perd);
+                $RegMensual->setAudituserupd($user->getUsername());
+                $RegMensual->setAuditdateupd(new \DateTime());
                 $RegMensual->setAuditDeleted("false");
             
             $this->em->persist($RegMensual);	
@@ -114,7 +127,7 @@ class RegMensualDao {
         /*
          * eliminar RegMensual
          */
-        public function delRegMensual($id){            
+        public function delRegMensual($id,$user){            
   
             //$RegMensual= new RegMensual();            
             $RegMensual=$this->repositorio->find($id);
@@ -123,6 +136,8 @@ class RegMensualDao {
                 throw $this->createNotFoundException('No se encontro Registro de Venta con ese id '.$id);
             }
             
+            $RegMensual->setAudituserupd($user->getUsername());
+            $RegMensual->setAuditdateupd(new \DateTime());
             $RegMensual->setAuditDeleted("true");
             
             $this->em->persist($RegMensual);

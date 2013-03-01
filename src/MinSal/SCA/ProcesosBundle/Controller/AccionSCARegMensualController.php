@@ -53,12 +53,10 @@ class AccionSCARegMensualController extends Controller {
         
         $RegMensualDao = new RegMensualDao($this->getDoctrine());
         $registros = $RegMensualDao->getJasonRegMensual($user->getEntidad()->getEntId());
-
         $numfilas = count($registros);
         
         $datos = json_encode($registros);
-        $pages = floor($numfilas / 10) + 1;
-
+         $pages = floor($numfilas / 10) + 1;
         $jsonresponse = '{
                "page":"1",
                "total":"' . $pages . '",
@@ -93,34 +91,37 @@ class AccionSCARegMensualController extends Controller {
              /**
          * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
          */
-           $RegMensualDao->delRegMensual($id);
+         $RegMensualDao->delRegMensual($id,$user);
          $this->get('session')->setFlash('notice', 'El registro se Elimino Exitosamente');
         } else {
            
          //SINO SE SELECCIONO LA OPCION DE ELIMINAR SE ACTUALIZARA O SE AGREGARA UN NUEVO REGISTRO   
           $operacion = $request->get('btnGuardar');
         
-          $nit=$RegMensual->getregveNIT("nit");
-          $nombcliente=  $RegMensual->getregveNombre("nombcliente");
-          $reg_user=$RegMensual->getregveMinsal("reg_user");
-          $fecha=$RegMensual->getregveFecha("fecha");
-          $n_res = $RegMensual->getregvedgii("n_res");                
-          $AlcId =$RegMensual->getAlcohol("AlcId");
-          $RegMensualLitros =$RegMensual->getregveLitros("RegMensualLitros");
-          $RegMensualGrado =$RegMensual->getregveGrado("RegMensualGrado");
-     
+          $year=$RegMensual->getRegmenyear("year");
+          $regmen_mes= $RegMensual->getRegmenmes("mes");
+          $regmen_exc=$RegMensual->getRegmenexcedenteant("excednt");
+          $regmen_prod=$RegMensual->getRegmenprod("Prod");
+          $regmen_imp =$RegMensual->getRegmenimp("import");
+          $regmen_c_l =$RegMensual->getRegmencompralocal("comp_local");
+          $regmen_v_l =$RegMensual->getRegmenventalocal("venta_local");
+          $regmen_v_i =$RegMensual->getRegmenventainter("venta_inter");
+          $regmen_util=$RegMensual->getRegmenutilizacion("utilizacion");
+          $regmen_perd=$RegMensual->getRegmenperdida("perdida");
 
+         if ($operacion == 'Guardar') {
+            $RegMensualDao->addRegMensual($year,$idEnt,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user);
+            $this->get('session')->setFlash('notice', 'Los datos se han Guardado exitosamente');
+            
+        }
+        
         if ($operacion == 'Actualizar') {
-            $RegMensualDao->editRegMensual($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegMensualLitros,$RegMensualGrado);
+            $RegMensualDao->editRegMensual($id,$idEnt,$year,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user);
         
             $this->get('session')->setFlash('notice', 'Los datos se han Actualizado exitosamente');
         }
 
-        if ($operacion == 'Guardar') {
-            $RegMensualDao->addRegMensual($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegMensualLitros,$RegMensualGrado);
-            $this->get('session')->setFlash('notice', 'Los datos se han Guardado exitosamente');
-            
-        }
+       
         
         }
         return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegMensual'));
