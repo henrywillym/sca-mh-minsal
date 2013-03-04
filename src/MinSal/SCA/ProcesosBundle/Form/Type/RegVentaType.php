@@ -65,13 +65,13 @@ class RegVentaType extends AbstractType {
             'multiple' => false,
             'empty_value' => 'Debe Seleccionar un Alcohol'
         ));
-        $builder->add('regveFecha', null, array('label' => 'Fecha'));
+        $builder->add('regveFecha', null, array('label' => 'Fecha','attr' => array('readonly' => 'readonly')));
         $builder->add('regveNIT', null, array('label' => 'NIT'));
         $builder->add('regveNombre', null, array('label' => 'Nombre Específico'));
         $builder->add('regveMinsal', null, array('label' => 'Registro Usuario (MINSAL)'));
         $builder->add('regvedgii', null, array('label' => 'Numero Registro DGII'));
-        $builder->add('regveLitros', null, array('label' => 'Grado'));
-        $builder->add('regveGrado',  null, array('label' => 'Cuota (Lts)'));
+        $builder->add('regveLitros', null, array('label' => 'lts'));
+        $builder->add('regveGrado',  null, array('label' => 'Grado'));
         
     }
 

@@ -109,11 +109,15 @@ class AccionSCARegVentaController extends Controller {
           $RegVentaLitros =$RegVenta->getregveLitros("RegVentaLitros");
           $RegVentaGrado =$RegVenta->getregveGrado("RegVentaGrado");
      
-
+   $errores=$RegVenta->isValid();
+if(count($errores)==0){
         if ($operacion == 'Actualizar') {
+            
+         
+                
             $RegVentaDao->editRegVenta($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado);
-        
             $this->get('session')->setFlash('notice', 'Los datos se han Actualizado exitosamente');
+
         }
 
         if ($operacion == 'Guardar') {
@@ -122,9 +126,24 @@ class AccionSCARegVentaController extends Controller {
             
         }
         
-        }
-        return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantRegVenta'));
+ }else{
+     $listaErrores = '';
+            
+            foreach($errores as $error){
+                $listaErrores = $listaErrores.$error;
+            }
+      $this->get('session')->setFlash('notice', $listaErrores); 
+      }
+                    
         
+        
+        }
+        $form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
+        return $this->render('MinSalSCAProcesosBundle:RegVenta:showRegVenta.html.twig', array(
+            'form' => $form->createView(),
+            'RegVentaId' => $id,
+            'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
+        ));
     }
     
     

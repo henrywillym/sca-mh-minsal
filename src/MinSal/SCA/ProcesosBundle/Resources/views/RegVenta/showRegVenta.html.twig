@@ -13,9 +13,16 @@
                $('#btnEliminar').hide();
            }
            $('#RegVenta_regveFecha').datepicker();
-           {$('#RegVenta_regveNIT').mask("9999-999999-999-9",{placeholder:"_"});}
            
-           
+            //VALIDACION DE CAMPOS
+            $("#RegVenta_regveGrado").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+            $("#RegVenta_regveLitros").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+            {$('#RegVenta_regveNIT').mask("9999-999999-999-9",{placeholder:"_"});}
+            
         });
 
 
@@ -30,6 +37,8 @@
             }
             return false;
         }
+        
+        
     </script>
     
     <form id="formulario" action="{{ path('MinSalSCAProcesosBundle_mantRegVentaEdicion') }}" {{ form_enctype(form) }} method="POST" class="RegVentaTypeForm">

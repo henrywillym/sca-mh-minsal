@@ -24,6 +24,33 @@
    
    $("input").blur(function(){calculoInvF();});
 
+$("#RegMensual_regmen_excedente_ant").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+$("#RegMensual_regmen_prod").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+$("#RegMensual_regmen_imp").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+$("#RegMensual_regmen_compra_local").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+$("#RegMensual_regmen_venta_local").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+$("#RegMensual_regmen_venta_inter").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+$("#RegMensual_regmen_utilizacion").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+$("#RegMensual_regmen_perdida").blur(function(){
+            this.value=(this.value.replace(/\D/g, ''));    
+            });
+
+
+    
         });
  
 function calculoInvF(){

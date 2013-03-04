@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * RepositoryClass de RegVenta
  *
@@ -30,14 +31,16 @@ class RegVenta {
     
     public function isValid(){
         $msg = array();
-        if($this->getInvGrado()){
-            if($this->getInvGrado()+0 <=0 || $this->getInvGrado()+0 >100 ){
-                $msg[]='- El grado ingresado "'.$this->getInvGrado().'" debe ser mayor a 0 y menor a 100';
-            }
-        }else{
-            $msg[]='- El campo "Grados" se encuentra vacio';
-        }
         
+        if($this->getregveGrado()){
+          
+            if($this->getregveGrado()+0 <=0 || $this->getregveGrado()+0 >100 ){
+                $msg[]='- El grado ingresado "'.$this->getregveGrado().'" debe ser mayor a 0 y menor a 100';
+            }
+            }else{
+            $msg[]='- El Valor Ingresado "'.$this->getregveGrado().'" No es un Numero';
+            }
+         
         return $msg;
     }
         
@@ -107,8 +110,7 @@ class RegVenta {
      * @var numeric $regveLitros
      *
      * @ORM\Column(name="regve_litros", type="decimal", nullable=false)
-     * @Assert\Type(type="real", message="Los litros ingresados ->{{value}} no es un número valido"),
-     * @Assert\Min(limit="0", message="Los litros ingresados {{value}} deben ser mayor a 0")
+    *  @Assert\Min(limit = "0", message = "Litros debe ser Mayor a Cero")
      */
     private $regveLitros;
     
