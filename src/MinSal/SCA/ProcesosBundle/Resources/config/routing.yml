@@ -70,3 +70,62 @@ MinSalSCAProcesosBundle_mantSolImportacionVerSolicitudesMINSAL:
 MinSalSCAProcesosBundle_getEtapas:
     pattern:  /Solicitud/Importacion/getEtapas
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolImportacion:getEtapas }
+
+
+
+#*****************************
+#***    Solicitud Local    ***
+#*****************************
+MinSalSCAProcesosBundle_mantSolLocalIngreso:
+    pattern:  /Solicitud/Local/Ingreso
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:mantSolLocalIngreso }
+    
+MinSalSCAProcesosBundle_consultarSolLocalDetJSON:
+    pattern:  /Solicitud/Local/Consultar/{etpId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:consultarSolLocalJSON }
+
+MinSalSCAProcesosBundle_mantSolLocalEdicion:
+    pattern:  /Solicitud/Local/Edicion
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:mantSolLocalEdicion }
+
+MinSalSCAProcesosBundle_mantCargarSolLocal:
+    pattern:  /Solicitud/Local/Cargar/{localDetId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:mantCargarSolLocal }
+    
+MinSalSCAProcesosBundle_cambiarEstado:
+    pattern:  /Solicitud/Local/CambiarEstado/{localDetId}/{traId}/update
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:cambiarEstado }
+
+MinSalSCAProcesosBundle_getCuotas:
+    pattern:  /Solicitud/Local/getCuotas
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getCuotas }
+
+MinSalSCAProcesosBundle_getProveedores:
+    pattern:  /Solicitud/Local/getProveedores
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getProveedores }
+
+#Visualizacion de solicitudes Locales por empresa
+MinSalSCAProcesosBundle_mantSolLocalVerSolicitudes:
+    pattern:  /Solicitud/Local/VerSolicitudes
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:mantSolLocalVerSolicitudes } 
+    
+MinSalSCAProcesosBundle_verSolLocalesJSON:
+    pattern:  /Solicitud/Local/VerSolicitudes/Consultar
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:verSolLocalesJSON } 
+
+MinSalSCAProcesosBundle_getSearchEstados:
+    pattern:  /Solicitud/Local/getSearchEstados 
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getSearchEstados }
+
+MinSalSCAProcesosBundle_getSearchEtapas:
+    pattern:  /Solicitud/Local/getSearchEtapas
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getSearchEtapas }
+    
+    
+MinSalSCAProcesosBundle_mantSolLocalVerSolicitudesMINSAL:
+    pattern:  /Solicitud/Local/VerSolicitudes/{etpEntidad}/
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:mantSolLocalVerSolicitudes, etpEntidad: 'MINSAL'}
+    
+MinSalSCAProcesosBundle_getEtapas:
+    pattern:  /Solicitud/Local/getEtapas
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getEtapas }

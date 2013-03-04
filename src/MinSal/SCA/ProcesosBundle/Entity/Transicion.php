@@ -19,7 +19,7 @@ class Transicion {
         $this->traNotificaEmpresa = false;
         
         $this->solImportaciones = new ArrayCollection();
-        //$this->solLocales = new ArrayCollection();
+        $this->solLocales = new ArrayCollection();
         $this->parentsTransicion = new ArrayCollection();
         $this->childrenTransicion = new ArrayCollection();
     }
@@ -59,9 +59,9 @@ class Transicion {
     protected $solImportaciones;
     
     /**
-     * ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", mappedBy="transicion")
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", mappedBy="transicion")
      */
-    //protected $solLocales;
+    protected $solLocales;
     
     /**
      * Many to Many Self-Reference
@@ -318,13 +318,24 @@ class Transicion {
     public function setTraNotificaEmpresa($traNotificaEmpresa) {
         $this->traNotificaEmpresa = $traNotificaEmpresa;
     }
+    
+    public function getSolLocales() {
+        return $this->solLocales;
+    }
 
+    public function setSolLocales($solLocales) {
+        $this->solLocales = $solLocales;
+    }
     
     
-                
+    
     //*********** CUSTOM SET/GET ******************
     public function addSolImportacion($solImportacion) {
         $this->solImportaciones[] = $solImportacion;
+    }
+    
+    public function addSolLocal($solLocal) {
+        $this->solLocales[] = $solLocal;
     }
     
     public function addParentTransicion($transicion) {

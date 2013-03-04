@@ -2,7 +2,7 @@
 namespace MinSal\SCA\ProcesosBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-//use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -10,11 +10,11 @@ use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
 
 /**
- * Estructura para formulario de Ingreso de Solicitud de Importaciones
+ * Estructura para formulario de Ingreso de Solicitudes Locales
  *
  * @author Henry Willy Melara
  */
-class SolImportacionDetType extends AbstractType {
+class SolLocalDetType extends AbstractType {
     private $doctrine;
     //private $entId;
     
@@ -30,7 +30,7 @@ class SolImportacionDetType extends AbstractType {
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
-            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet'
+            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\SolLocalDet'
         ));
     }
     
@@ -41,24 +41,13 @@ class SolImportacionDetType extends AbstractType {
      */
     public function getDefaultOptions(array $options){
         return array(
-            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet'
+            'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\SolLocalDet'
         );
     }
     
     public function buildForm(FormBuilderInterface $builder, array $opciones){
-        $builder->add('impDetId', 'hidden');
+        $builder->add('localDetId', 'hidden');
         
-        $builder->add('arancel', 'entity', array(
-            'class'=>'MinSalSCAProcesosBundle:Arancel',
-            'query_builder' => function(EntityRepository $er) {
-                return $er->createQueryBuilder('u')
-                        ->where('u.auditDeleted = false');
-            },
-            //'property'=> 'araDescripcion',
-            'expanded'=>false,
-            'multiple'=>false,
-            'label'=> 'Inciso Arancelario'
-        ));/**/
         
         /*##### OJO ===> 
          * No se utilizo un atributo en el formbuilder, debido a que el DropDownList debia pasarsele los Grados, Cuota Disponible
@@ -68,13 +57,13 @@ class SolImportacionDetType extends AbstractType {
         /*
         $entId = $this->entId;
         $entidad = $this->entidad;
-        $cuoTipoImportacion = Cuota::$cuoTipoImportacion;
+        $cuoTipoLocal = Cuota::$cuoTipoLocal;
         $year = new \DateTime();
         $year = $year->format('Y');
         
         $builder->add('cuota', 'entity', array(
             'class'=>'MinSalSCAAdminBundle:Cuota',
-            'query_builder' => function(EntityRepository $er) use($entId, $cuoTipoImportacion, $year) {
+            'query_builder' => function(EntityRepository $er) use($entId, $cuoTipoLocal, $year) {
                 return $er->createQueryBuilder('a')
                             ->select('a')
                             ->join('a.entidad','B')
@@ -83,7 +72,7 @@ class SolImportacionDetType extends AbstractType {
                                     AND a.cuoYear = :cuoYear
                                     AND a.auditDeleted = false')
                             ->setParameter('entId', $entId)
-                            ->setParameter('cuoTipo', $cuoTipoImportacion)
+                            ->setParameter('cuoTipo', $cuoTipoLocal)
                             ->setParameter('cuoYear', $year);
             },
             'property'=> 'cuoNombreEsp',
@@ -97,25 +86,23 @@ class SolImportacionDetType extends AbstractType {
             'label'=>'Nombre del Alcohol',
             'property_path'=> 'cuota.cuoId'
         ));/**/
-            
-        $builder->add('impDetFactCom', 'text', array('label' => 'No. Factura Comercial','required'=>true, 'attr' => array('autocomplete' => 'off'),));
-        $builder->add('impDetProvNom', 'text', array('label' => 'Nombre Empresa Proveedora','required'=>true));
-        $builder->add('impDetPaisProc',  null, array('label' => 'País de Procedencia'));
-        $builder->add('impDetPaisOri',  null, array('label' => 'País de Origen'));
-        $builder->add('impDetProvDirec',  'text', array('label' => 'Dirección Proveedor (Exterior)','required'=>true));
-        $builder->add('impDetLitros',  null, array('label' => 'Cantidad (Lts)', 'attr' => array('autocomplete' => 'off'),));
-        $builder->add('impDetUso',  null, array('label' => 'Uso del Alcohol'));
         
-        //$builder->add('solImportacion.solImpComentario',  'hidden', array('label' => 'Comentarios'));
-        $builder->add('impDetLitrosLib',  null, array(
+        $builder->add('entId', 'hidden', array(
+            'label'=>'Nombre del Proveedor',
+            'property_path'=> 'proveedor.entId'
+        ));/**/
+            
+        $builder->add('localDetLitros',  null, array('label' => 'Cantidad (Lts)', 'attr' => array('autocomplete' => 'off'),));
+        $builder->add('localDetUso',  null, array('label' => 'Uso del Alcohol'));
+        
+        $builder->add('localDetLitrosLib',  null, array(
             'label' => 'Litros Liberados',
             'attr' => array('readonly' => 'readonly'),
         ));
     }
 
     public function getName(){
-        return 'SolImportacionDet';
+        return 'SolLocalDet';
     }
 }
-
 ?>

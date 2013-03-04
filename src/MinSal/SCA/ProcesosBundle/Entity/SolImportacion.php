@@ -4,6 +4,7 @@ namespace MinSal\SCA\ProcesosBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+
 use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
 use MinSal\SCA\ProcesosBundle\Entity\Transicion;

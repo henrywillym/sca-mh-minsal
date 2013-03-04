@@ -27,7 +27,7 @@ class InventarioDetType extends AbstractType {
      * 
      * @param \Symfony\Component\OptionsResolver\OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions1(OptionsResolverInterface $resolver){
+    public function setDefaultOptions(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
             'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\InventarioDet'
         ));
