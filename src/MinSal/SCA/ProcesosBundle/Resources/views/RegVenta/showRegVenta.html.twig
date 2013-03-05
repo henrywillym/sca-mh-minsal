@@ -23,8 +23,18 @@
             });
             {$('#RegVenta_regveNIT').mask("9999-999999-999-9",{placeholder:"_"});}
             
+            //Se muestra el grado
+            getGrado();
+             $("#RegVenta_alcohol").change(function(){getGrado();})
+                   
         });
 
+//FUNCION PARA OBTENER EL GRADO SEGUN EL TIPO DE ALCOHOL
+function getGrado(){
+$.post('{{ url('MinSalSCAProcesosBundle_getGradoRV',{'CuoId':'CuoId'})}}'.replace(/CuoId/g, $("#RegVenta_alcohol").val()), function(data) {
+  $('#RegVenta_regveGrado').val(data);
+});
+}
 
         function enviarEliminar(){
             if(confirm('!Desea eliminar el registro "'+$('#RegVenta_RegVentaId').val()+'"?')){

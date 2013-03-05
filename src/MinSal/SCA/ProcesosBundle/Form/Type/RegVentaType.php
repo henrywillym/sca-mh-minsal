@@ -16,11 +16,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class RegVentaType extends AbstractType {
     private $doctrine;
-    
-    public function __construct($doctrine){
+    public $entid;
+    public function __construct($doctrine,$eid){
         $this->doctrine = $doctrine;
+        $this->em = $this->doctrine->getEntityManager();
+        $this->entid=$eid;
     }
-    
+
     
     /**
      * Utilizado en Symfony 2.1
@@ -62,8 +64,7 @@ class RegVentaType extends AbstractType {
             'choices' => $this->getAlcoholes(),
             'required' => true,
             'expanded' => false,
-            'multiple' => false,
-            'empty_value' => 'Debe Seleccionar un Alcohol'
+            'multiple' => false
         ));
         $builder->add('regveFecha', null, array('label' => 'Fecha','attr' => array('readonly' => 'readonly')));
         $builder->add('regveNIT', null, array('label' => 'NIT'));
@@ -80,13 +81,17 @@ class RegVentaType extends AbstractType {
     }
     
     private function getAlcoholes(){
-        $alcoholDao = new AlcoholDao($this->doctrine);
-        $alcoholes = $alcoholDao->getAlcoholes();
+        
+        $registros = $this->em->createQuery("SELECT E
+                                          FROM MinSalSCAAdminBundle:Cuota E
+                                          WHERE E.entidad = :entid ")
+                ->setParameter('entid',$this->entid);
+        $result= $registros->getArrayResult();
         
         $lista = array();
         
-        foreach($alcoholes as $alc){
-            $lista[$alc['alcId']] = $alc['alcNombre'];
+        foreach($result as $alc){
+            $lista[$alc['cuoId']] = $alc['cuoNombreEsp'];
         }
         
         return $lista;

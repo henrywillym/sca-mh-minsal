@@ -36,6 +36,9 @@ MinSalSCAProcesosBundle_mantRegVentaEdicion:
 MinSalSCAProcesosBundle_mantCargarRegVenta:
     pattern:  /RegVenta/mantCargarRegVenta/{RegVentaId}
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:mantCargarRegVenta } 
+MinSalSCAProcesosBundle_getGradoRV:
+    pattern:  /RegVenta/getGradoRV/{CuoId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:getGradoRV } 
     
 #****************************
 #*** Registro Detalle Menusal ***

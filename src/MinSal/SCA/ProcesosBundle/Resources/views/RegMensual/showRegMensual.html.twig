@@ -17,36 +17,77 @@
            $('#btnGuardar').css("width","80px");
            $('#btnEliminar').css("width","80px");
            $('#btnRegresar').css("width","80px");
+           //SET VALORES
+           
+           if($("#RegMensual_regmen_prod").val()=="") $("#RegMensual_regmen_prod").val(0);
+           if($("#RegMensual_regmen_imp").val()=="") $("#RegMensual_regmen_imp").val(0);
+           if($("#RegMensual_regmen_compra_local").val()=="") $("#RegMensual_regmen_compra_local").val(0);
+           if($("#RegMensual_regmen_venta_local").val()=="") $("#RegMensual_regmen_venta_local").val(0);
+           if($("#RegMensual_regmen_venta_inter").val()=="") $("#RegMensual_regmen_venta_inter").val(0);
+
+           
+           
+
+$("#RegMensual_regmen_prod").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value="";  
+            });
+$("#RegMensual_regmen_imp").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value="";
+            });
+$("#RegMensual_regmen_compra_local").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value="";  
+            });
+$("#RegMensual_regmen_venta_local").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value=""; 
+            });
+$("#RegMensual_regmen_venta_inter").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value="";   
+            });
+
+
+
            
            
 //CALCULO PARA MOSTRAR EN INVENTARIO FINAL       
    calculoInvF();
    
-   $("input").blur(function(){calculoInvF();});
+            $("input").blur(function(){calculoInvF();});
+            $("input").focus(function(){calculoInvF();});
 
+//FUNCIONES PARA VALIDACION DE CARACTERES DIFERENTES A NUMEROS
 $("#RegMensual_regmen_excedente_ant").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+this.value=(this.value.replace(/\D/g, ''));    
             });
 $("#RegMensual_regmen_prod").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/\D/g, ''));    
             });
 $("#RegMensual_regmen_imp").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/\D/g, ''));    
             });
 $("#RegMensual_regmen_compra_local").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/\D/g, ''));    
             });
 $("#RegMensual_regmen_venta_local").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/\D/g, ''));    
             });
 $("#RegMensual_regmen_venta_inter").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/\D/g, ''));    
             });
 $("#RegMensual_regmen_utilizacion").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+        this.value=(this.value.replace(/\D/g, ''));    
             });
 $("#RegMensual_regmen_perdida").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+           this.value=(this.value.replace(/\D/g, ''));    
             });
 
 
@@ -54,15 +95,25 @@ $("#RegMensual_regmen_perdida").blur(function(){
         });
  
 function calculoInvF(){
+
+  if($("#RegMensual_regmen_excedente_ant").val()==""){ var exc  = 0; }else{ var exc  = $("#RegMensual_regmen_excedente_ant").val();}
+   if($("#RegMensual_regmen_prod").val()=="") { var prod =0; }else{ var prod =$("#RegMensual_regmen_prod").val();}
+   if($("#RegMensual_regmen_imp").val()=="") {var imp  = 0; }else{ var imp  =$("#RegMensual_regmen_imp").val();}
+  if($("#RegMensual_regmen_compra_local").val()==""){  var compl=0; }else{ var compl= $("#RegMensual_regmen_compra_local").val();}
+   if($("#RegMensual_regmen_venta_local").val()=="") { var ventl=0; }else{ var ventl=$("#RegMensual_regmen_venta_local").val();}
+   if($("#RegMensual_regmen_venta_inter").val()=="") { var venti=0; }else{ var venti=$("#RegMensual_regmen_venta_inter").val();}
+   if($("#RegMensual_regmen_utilizacion").val()=="") { var utiliz=0; }else{ var utiliz=$("#RegMensual_regmen_utilizacion").val();}
+  if($("#RegMensual_regmen_perdida").val()=="") { var perdida=0; }else{ var perdida=$("#RegMensual_regmen_perdida").val();}
+
 $("#RegMensual_Exist").val(
-        parseFloat($("#RegMensual_regmen_excedente_ant").val())
-        + parseFloat($("#RegMensual_regmen_prod").val())
-        + parseFloat($("#RegMensual_regmen_imp").val())
-        + parseFloat($("#RegMensual_regmen_compra_local").val())
-        - parseFloat($("#RegMensual_regmen_venta_local").val())
-        - parseFloat($("#RegMensual_regmen_venta_inter").val())
-        - parseFloat($("#RegMensual_regmen_utilizacion").val())
-        - parseFloat($("#RegMensual_regmen_perdida").val())
+        parseFloat(exc)
+        + parseFloat(prod)
+        + parseFloat(imp)
+        + parseFloat(compl)
+        - parseFloat(ventl)
+        - parseFloat(venti)
+        - parseFloat(utiliz)
+        - parseFloat(perdida)
         
     );
 }

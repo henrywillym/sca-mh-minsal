@@ -141,5 +141,20 @@ class RegVentaDao {
                  ->setParameter('entId',$entId);
         return $result->getSingleScalarResult();
     }/**/
+        
+        public function getGrado($id) {
+            //OBTIENE EL GRADO DESDE LA TABLA CUOTA PARA MOSTRARLO EN EL CAMPO GRADO DEEL FORMULARIO REGVENTA
+     $registros = $this->em->createQuery("SELECT E.cuoGrado
+                                          FROM MinSalSCAAdminBundle:Cuota E
+                                          WHERE E.cuoId = :cuoid ")
+                ->setParameter('cuoid',$id);
+        $result= $registros->getArrayResult();
+       $grado=0;
+         foreach($result as $gr){
+            $grado=$gr['cuoGrado'];
+        }
+        
+            return $grado ;
+    }
 }
 ?>

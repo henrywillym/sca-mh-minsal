@@ -24,7 +24,7 @@ class AccionSCARegVentaController extends Controller {
     /**
      * Retorna la página principal del mantenimiento
      * @return type HTML.twig
-     */
+     */  
     public function mantRegVentaAction() {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
@@ -78,11 +78,13 @@ class AccionSCARegVentaController extends Controller {
     public function mantRegVentaEdicionAction(request $request) {
         $RegVenta=new RegVenta();
         $RegVentaDao = new RegVentaDao($this->getDoctrine());
-	$form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
-        $form->bindRequest($request);
-        
+       
          $user = $this->get('security.context')->getToken()->getUser();
          $idEnt=$user->getEntidad()->getEntId();
+         
+	$form = $this->createForm(new RegVentaType($this->getDoctrine(),$idEnt), $RegVenta);
+        $form->bindRequest($request);
+       
         
         
         $id = $RegVenta->getRegVentaId('RegVentaId');
@@ -138,7 +140,7 @@ if(count($errores)==0){
         
         
         }
-        $form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
+        $form = $this->createForm(new RegVentaType($this->getDoctrine(),$idEnt), $RegVenta);
         return $this->render('MinSalSCAProcesosBundle:RegVenta:showRegVenta.html.twig', array(
             'form' => $form->createView(),
             'RegVentaId' => $id,
@@ -153,6 +155,7 @@ if(count($errores)==0){
     public function mantCargarRegVentaAction($RegVentaId) {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
+         $idEnt=$user->getEntidad()->getEntId();
         
         $RegVentaDao = new RegVentaDao($this->getDoctrine());
         $RegVenta = $RegVentaDao->getRegVenta($RegVentaId);
@@ -163,7 +166,7 @@ if(count($errores)==0){
 //        }else{
 //        }
         
-        $form = $this->createForm(new RegVentaType($this->getDoctrine()), $RegVenta);
+        $form = $this->createForm(new RegVentaType($this->getDoctrine(),$idEnt), $RegVenta);
 
         return $this->render('MinSalSCAProcesosBundle:RegVenta:showRegVenta.html.twig', array(
             'form' => $form->createView(),
@@ -171,6 +174,16 @@ if(count($errores)==0){
             'RegVentaId' => $RegVentaId,
             'entNombComercial'=> $user->getEntidad()->getEntNombComercial()
         ));
+    }
+    
+    
+    public function getGradoRVAction($CuoId){
+        //FUNCION QUE GENERA EL VALOR DEL GRADO PARA MOSTRARLO EN EL CAMPO GRADO DEL FORM REGVENTA
+     $RegVentaDao = new RegVentaDao($this->getDoctrine());
+     $grado = $RegVentaDao->getGrado($CuoId);
+     $response = new Response($grado);
+
+        return $response;
     }
     
    

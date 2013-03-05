@@ -54,6 +54,7 @@ class RegMensualType extends AbstractType {
             'multiple' => false,
             'empty_value' => 'Debe Seleccionar un Mes'
         ));
+        
         $builder->add('regmen_year', null, array('data' => date("Y"),'attr' => array('readonly' => 'readonly'),'label' => 'A&ntilde;o'));
         $builder->add('regmen_excedente_ant', null, array('label' => 'Excedente'));
         $builder->add('regmen_prod', null, array('label' => 'Produccion'));
@@ -63,7 +64,6 @@ class RegMensualType extends AbstractType {
         $builder->add('regmen_venta_inter',  null, array('label' => 'Venta Internacional'));
         $builder->add('regmen_utilizacion',  null, array('label' => 'Utilizacion'));
         $builder->add('regmen_perdida',  null, array('label' => 'Perdida , Merma'));
-        
     }
 
     public function getName(){

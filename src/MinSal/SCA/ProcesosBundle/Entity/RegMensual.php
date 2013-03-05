@@ -86,7 +86,7 @@ class RegMensual {
      /**
      * @var string $regmen_prod
     *
-     * @ORM\Column(name="regmen_prod", type="decimal", nullable=false)
+     * @ORM\Column(name="regmen_prod", type="decimal", nullable=true)
      * @Assert\Type(type="real", message="Los litros ingresados ->{{value}} no es un número valido"),
      * @Assert\Min(limit="0", message="Los litros ingresados {{value}} deben ser mayor a 0")
       */
