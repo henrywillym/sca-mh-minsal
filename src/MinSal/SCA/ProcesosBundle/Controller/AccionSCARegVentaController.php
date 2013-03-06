@@ -95,7 +95,7 @@ class AccionSCARegVentaController extends Controller {
              /**
          * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
          */
-           $RegVentaDao->delRegVenta($id);
+           $RegVentaDao->delRegVenta($id,$user);
          $this->get('session')->setFlash('notice', 'El registro se Elimino Exitosamente');
         } else {
            
@@ -117,13 +117,13 @@ if(count($errores)==0){
             
          
                 
-            $RegVentaDao->editRegVenta($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado);
+            $RegVentaDao->editRegVenta($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado,$user);
             $this->get('session')->setFlash('notice', 'Los datos se han Actualizado exitosamente');
 
         }
 
         if ($operacion == 'Guardar') {
-            $RegVentaDao->addRegVenta($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado);
+            $RegVentaDao->addRegVenta($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado,$user);
             $this->get('session')->setFlash('notice', 'Los datos se han Guardado exitosamente');
             
         }

@@ -44,17 +44,17 @@ class RegVentaDao {
     
     public function getJasonRegVenta($id) {
      
-         $registros = $this->em->createQuery("SELECT E.RegVentaId,E.regveNIT,E.regveNombre,E.regveLitros,
-                                              A.alcNombre,E.regveFecha,E.regveMinsal,E.regvedgii
-                                              FROM MinSalSCAProcesosBundle:RegVenta E , MinSalSCAAdminBundle:Alcohol A 
-                                              WHERE E.entidad = :entid
-                                              AND E.alcohol=A.alcId
-                                              AND E.auditDeleted = false")
+         $registros = $this->em->createQuery("SELECT R.RegVentaId,R.regveNIT,R.regveNombre,R.regveLitros,
+                                              C.cuoNombreEsp,R.regveFecha,R.regveMinsal,R.regvedgii
+                                              FROM MinSalSCAProcesosBundle:RegVenta R , MinSalSCAAdminBundle:Cuota C 
+                                              WHERE R.entidad = :entid
+                                              AND C.cuoId = R.alcohol
+                                              AND R.auditDeleted = false")
                 ->setParameter('entid',$id);
         return $registros->getArrayResult();
     }
     
-   	public function addRegVenta($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado) {
+   	public function addRegVenta($fecha,$idEnt,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado,$user) {
             
             $RegVenta=new RegVenta(); 
            
@@ -70,6 +70,11 @@ class RegVentaDao {
                 $RegVenta->setRegveGrado($RegVentaGrado);
                 $RegVenta->setEntidad($idEnt);
                 $RegVenta->setAuditDeleted("false");
+                    $RegVenta->setAudituserins($user->getUsername());
+                    $RegVenta->setAuditdateins(new \DateTime());
+                    $RegVenta->setAudituserupd($user->getUsername());
+                    $RegVenta->setAuditdateupd(new \DateTime());
+                    $RegVenta->setAuditDeleted("false");
   
             $this->em->persist($RegVenta);
 	    $this->em->flush();	    
@@ -82,7 +87,7 @@ class RegVentaDao {
         /*
          * Actualizar RegVenta
          */
-        public function editRegVenta($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado){
+        public function editRegVenta($id,$idEnt, $fecha,$nit, $nombcliente, $reg_user, $n_res,$AlcId,$RegVentaLitros,$RegVentaGrado,$user){
             
             //$RegVenta= new RegVenta();            
             $RegVenta=$this->repositorio->find($id);
@@ -100,7 +105,10 @@ class RegVentaDao {
 		$RegVenta->setregveLitros($RegVentaLitros);
                 $RegVenta->setregveGrado($RegVentaGrado);
                 $RegVenta->setEntidad($idEnt);
-                $RegVenta->setAuditDeleted("false");
+                        $RegVenta->setAudituserupd($user->getUsername());
+                        $RegVenta->setAuditdateupd(new \DateTime());
+                        $RegVenta->setAuditDeleted("false");
+                
             
             $this->em->persist($RegVenta);	
             $this->em->flush();
@@ -114,7 +122,7 @@ class RegVentaDao {
         /*
          * eliminar RegVenta
          */
-        public function delRegVenta($id){            
+        public function delRegVenta($id,$user){            
   
             //$RegVenta= new RegVenta();            
             $RegVenta=$this->repositorio->find($id);
@@ -123,6 +131,8 @@ class RegVentaDao {
                 throw $this->createNotFoundException('No se encontro Registro de Venta con ese id '.$id);
             }
             
+            $RegVenta->setAudituserupd($user->getUsername());
+            $RegVenta->setAuditdateupd(new \DateTime());
             $RegVenta->setAuditDeleted("true");
             
             $this->em->persist($RegVenta);

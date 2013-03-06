@@ -15,16 +15,24 @@
            $('#RegVenta_regveFecha').datepicker();
            
             //VALIDACION DE CAMPOS
+            $("#RegVenta_regveMinsal").blur(function(){
+            this.value=(this.value.replace(/[^\d\-]/g, ''));    
+            });
+            $("#RegVenta_regvedgii").blur(function(){
+            this.value=(this.value.replace(/[^\d\-]/g, ''));    
+            });
             $("#RegVenta_regveGrado").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+            this.value=(this.value.replace(/[^\d\.]/g, ''));    
             });
             $("#RegVenta_regveLitros").blur(function(){
-            this.value=(this.value.replace(/\D/g, ''));    
+            this.value=(this.value.replace(/[^\d\.]/g, ''));    
             });
+                        
             {$('#RegVenta_regveNIT').mask("9999-999999-999-9",{placeholder:"_"});}
             
-            //Se muestra el grado
-            getGrado();
+            //Se muestra el grado correspondiente
+          if( $('#RegVenta_regveGrado').val()=="") getGrado();
+          
              $("#RegVenta_alcohol").change(function(){getGrado();})
                    
         });

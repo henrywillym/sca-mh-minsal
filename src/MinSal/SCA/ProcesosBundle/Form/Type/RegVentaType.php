@@ -72,7 +72,7 @@ class RegVentaType extends AbstractType {
         $builder->add('regveMinsal', null, array('label' => 'Registro Usuario (MINSAL)'));
         $builder->add('regvedgii', null, array('label' => 'Numero Registro DGII'));
         $builder->add('regveLitros', null, array('label' => 'lts'));
-        $builder->add('regveGrado',  null, array('label' => 'Grado'));
+        $builder->add('regveGrado',  null, array('label' => 'Grado','attr' => array('readonly' => 'readonly')));
         
     }
 

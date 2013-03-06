@@ -37,9 +37,7 @@ class RegVenta {
             if($this->getregveGrado()+0 <=0 || $this->getregveGrado()+0 >100 ){
                 $msg[]='- El grado ingresado "'.$this->getregveGrado().'" debe ser mayor a 0 y menor a 100';
             }
-            }else{
-            $msg[]='- El Valor Ingresado "'.$this->getregveGrado().'" No es un Numero';
-            }
+        }
          
         return $msg;
     }
@@ -65,9 +63,9 @@ class RegVenta {
     
     /**
      * @var integer $alcohol
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Alcohol")
-     * @ORM\JoinColumn(name="alc_id", referencedColumnName="alc_id")
-     * * @ORM\Column(name="alc_id", type="integer", nullable=false)
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Cuota")
+     * @ORM\JoinColumn(name="cuo_id", referencedColumnName="cuo_id")
+     * * @ORM\Column(name="cuo_id", type="integer", nullable=false)
      */
     protected $alcohol;
     
@@ -95,14 +93,14 @@ class RegVenta {
     /**
      * @var string $regveMinsal
      *
-     * @ORM\Column(name="regve_reg_minsal", type="decimal", nullable=false)
+     * @ORM\Column(name="regve_reg_minsal", type="string", nullable=false)
      */
     private $regveMinsal;
     
      /**
      * @var string $regvedgii
      *
-     * @ORM\Column(name="regve_reg_dgii", type="decimal", nullable=false)
+     * @ORM\Column(name="regve_reg_dgii", type="string", nullable=false)
      */
     private $regvedgii;
      
@@ -121,13 +119,43 @@ class RegVenta {
      *  */
     private $regveGrado;
     
+    /**
+     * @var string $audit_user_ins
+     *
+     *@ORM\Column(name="audit_user_ins", type="string", nullable=false)
+     */
+    protected $audit_user_ins;
+    
+     
+    /**
+     * @var string $audit_date_ins
+     *
+     *@ORM\Column(name="audit_date_ins", type="datetime", nullable=false)
+     */
+    protected $audit_date_ins;
+    
+     
+    /**
+     * @var string $audit_user_upd
+     *
+     *@ORM\Column(name="audit_user_upd", type="string", nullable=false)
+     */
+    protected $audit_user_upd;
+    
+      /**
+     * @var string $audit_date_upd
+     *
+     *@ORM\Column(name="audit_date_upd", type="datetime", nullable=false)
+     */
+    protected $audit_date_upd;
+    
+    
      /**
      * @var string $auditDeleted
      *
      * @ORM\Column(name="audit_deleted", type="boolean", nullable=false)
      */
-    private $auditDeleted;
-    
+    protected $auditDeleted;
     
     
     public function getRegVentaId() {
@@ -208,6 +236,38 @@ class RegVenta {
 
     public function setRegveGrado($regveGrado) {
         $this->regveGrado = $regveGrado;
+    }
+    
+    public function getAudituserins() {
+        return $this->audit_user_ins;
+    }
+
+    public function setAudituserins($audit_user_ins) {
+        $this->audit_user_ins = $audit_user_ins;
+    }
+
+    public function getAuditdateins() {
+        return $this->audit_date_ins;
+    }
+
+    public function setAuditdateins($audit_date_ins) {
+        $this->audit_date_ins = $audit_date_ins;
+    }
+
+    public function getAudituserupd() {
+        return $this->audit_user_upd;
+    }
+
+    public function setAudituserupd($audit_user_upd) {
+        $this->audit_user_upd = $audit_user_upd;
+    }
+
+    public function getAuditdateupd() {
+        return $this->audit_date_upd;
+    }
+
+    public function setAuditdateupd($audit_date_upd) {
+        $this->audit_date_upd = $audit_date_upd;
     }
 
     public function getAuditDeleted() {

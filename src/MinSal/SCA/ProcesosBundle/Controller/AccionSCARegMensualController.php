@@ -54,6 +54,25 @@ class AccionSCARegMensualController extends Controller {
         $RegMensualDao = new RegMensualDao($this->getDoctrine());
         $registros = $RegMensualDao->getJasonRegMensual($user->getEntidad()->getEntId());
         $numfilas = count($registros);
+         
+            $i = 0;
+            //PARA MOSTRAR EL MES CORRECTAMENTE
+            foreach ($registros as $reg) {
+                if($reg['regmen_mes']==1) $registros[$i]['regmen_mes']="Enero";
+                if($reg['regmen_mes']==2) $registros[$i]['regmen_mes']="Febrero";
+                if($reg['regmen_mes']==3) $registros[$i]['regmen_mes']="Marzo";
+                if($reg['regmen_mes']==4) $registros[$i]['regmen_mes']="Abril";
+                if($reg['regmen_mes']==5) $registros[$i]['regmen_mes']="Mayo";
+                if($reg['regmen_mes']==6) $registros[$i]['regmen_mes']="Junio";
+                if($reg['regmen_mes']==7) $registros[$i]['regmen_mes']="Julio";
+                if($reg['regmen_mes']==8) $registros[$i]['regmen_mes']="Agosto";
+                if($reg['regmen_mes']==9) $registros[$i]['regmen_mes']="Septiembre";
+                if($reg['regmen_mes']==10) $registros[$i]['regmen_mes']="Octubre";
+                if($reg['regmen_mes']==11) $registros[$i]['regmen_mes']="Noviembre";
+                if($reg['regmen_mes']==12) $registros[$i]['regmen_mes']="Diciembre";
+                $i=$i+1;
+            }
+        
         
         $datos = json_encode($registros);
          $pages = floor($numfilas / 10) + 1;
