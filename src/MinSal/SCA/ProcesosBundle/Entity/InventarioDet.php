@@ -64,7 +64,7 @@ class InventarioDet {
     protected $solImportacionDet;
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocalDet", inversedBy="inventariosDet")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocalDet", inversedBy="inventariosDet", cascade={"persist"})
      * @ORM\JoinColumn(name="localdet_id", referencedColumnName="localdet_id")
      */
     protected $solLocalDet;

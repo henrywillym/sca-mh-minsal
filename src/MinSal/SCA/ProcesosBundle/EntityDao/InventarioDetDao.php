@@ -51,7 +51,7 @@ class InventarioDetDao {
         $registros = $this->em->createQuery("SELECT E
                                           FROM MinSalSCAProcesosBundle:InventarioDet E 
                                                 JOIN E.inventario A
-                                                JOIN E.solLocal B
+                                                JOIN E.solLocalDet B
                                           WHERE A.invId = :invId
                                             AND B.localDetId = :localDetId
                                             AND E.invDetAccion = :invDetAccion
@@ -61,8 +61,8 @@ class InventarioDetDao {
                 ->setParameter('invDetAccion', $invDetAccion);
         
         $result= $registros->getResult();
-        if($result !=null && count($result)>0 && $result[1] != null){
-            return $result[1];
+        if($result !=null && count($result)>0 && $result[0] != null){
+            return $result[0];
         }else{
             return null;
         }

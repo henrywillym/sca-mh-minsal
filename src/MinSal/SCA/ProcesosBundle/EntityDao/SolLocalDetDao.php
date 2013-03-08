@@ -17,7 +17,7 @@ class SolLocalDetDao {
     
     var $fluId;
     
-    private $sqlSelect = " E.localDetId, E.localDetLitros, E.localDetLitrosLib, F.auditUserIns, F.auditDateIns,
+    private $sqlSelect = " distinct E.localDetId, E.localDetLitros, E.localDetLitrosLib, F.auditUserIns, F.auditDateIns,
                         C.estId, C.estNombre, 
                         D.etpId, D.etpNombre,
                         F.solLocalFecha,
@@ -182,11 +182,11 @@ class SolLocalDetDao {
      * en cuenta al momento de obtener los litros del inventario por cuota.
      * 
      * @param int $entId ID de la entidad proveedora del alcohol
-     * @param int $cuoId ID de la cuota del proveedor del alcohol
+     * @param int $invId ID de la cuota del proveedor del alcohol
      * @return int
      * @deprecated
      */
-    public function getLitrosSolicitudXCuotaProveedor($entId, $cuoId){
+    public function getLitrosSolicitudXCuotaProveedor($entId, $invId){
         $registros = $this->em->createQuery("SELECT sum(E.localDetLitros - E.localDetLitrosLib)
                                           FROM MinSalSCAProcesosBundle:SolLocalDet E 
                                                 JOIN E.inventariosDet B
@@ -196,10 +196,10 @@ class SolLocalDetDao {
                                                 JOIN A.transicion F
                                                 JOIN F.etpFin G
                                           WHERE D.entId = :entId
-                                            AND C.cuoId = :cuoId
+                                            AND C.invId = :invId
                                             AND G.etpId not in (".Etapa::$FINALIZADA_OBS.",".Etapa::$RECEPCION_TOTAL_INV.")")
                 ->setParameter('entId', $entId)
-                ->setParameter('cuoId', $cuoId);
+                ->setParameter('invId', $invId);
         
         $result= $registros->getSingleResult();
         

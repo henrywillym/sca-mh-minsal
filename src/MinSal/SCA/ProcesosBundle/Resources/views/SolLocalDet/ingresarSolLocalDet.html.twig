@@ -107,6 +107,10 @@
                 msg += '- No se puede ingresar la solicitud debido a que no existen proveedores con existencias\n';
             }
             
+            if(localDetId == '0' && $('#disponibleProv').val() - $('#SolLocalDet_localDetLitros').val() < 0){
+                msg += '- No se puede ingresar la solicitud debido a que las existencias del proveedor no pueden cubrir la cantidad a solicitar\n';
+            }
+            
             return msg;
         }
         
@@ -199,6 +203,8 @@
                     
                     $('#invId').change(function(){
                         $('#provDireccion').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('provDireccion'));
+                        $('#gradoProv').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('grado'));
+                        $('#disponibleProv').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('disponible'));
                         $('[id="SolLocalDet_invId"]').val($('#invId').val());
                     });
                     
@@ -217,6 +223,8 @@
         <input type="hidden" id="eliminar" name="eliminar" value=false />
         <input type="hidden" id="solLocalComentario" name="solLocalComentario" />
         <input type="hidden" id="localDetLitrosLib" name="localDetLitrosLib" />
+        <input type="hidden" id="disponibleProv" name="disponibleProv" />
+        <input type="hidden" id="gradoProv" name="gradoProv" />
 
             <table align='center' style="border: 1px solid;">
                 <tr>

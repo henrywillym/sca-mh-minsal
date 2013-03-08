@@ -8,6 +8,7 @@ use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SCA\AdminBundle\EntityDao\EntidadDao;
+use MinSal\SCA\ProcesosBundle\Entity\Estado;
 use MinSal\SCA\ProcesosBundle\Entity\Etapa;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
@@ -297,15 +298,15 @@ class AccionSCASolLocalController extends Controller {
             $selected ='';
             
             foreach($registros as $reg){
-                $litrosInventario = $inventarioDetDao->getLitrosVendidosYReservaXInventario($reg['entId'], $reg['invId']);
-                //$litrosSolicitudesPendientes = $solLocalDetDao->getLitrosSolicitudXCuotaProveedor($reg['entId'], $reg['cuoId']);
+                //$litrosInventario = $inventarioDetDao->getLitrosVendidosYReservaXInventario($reg['entId'], $reg['invId']);
+                //$litrosSolicitudesPendientes = $solLocalDetDao->getLitrosSolicitudXCuotaProveedor($reg['entId'], $reg['invId']);
                 
-                if($reg['invLitros'] == $litrosInventario){
-                    throw new Exception("El detalle de inventario (".$reg['invLitros'].")no coincide con el total de inventario invId -> ".$reg['invId']." almacenado (".$litrosInventario.")");
-                }
+                /*if(round($reg['invLitros']+0, 2) != round($litrosSolicitudesPendientes+0,2)){
+                    throw new Exception("El detalle de inventario (".round($reg['invLitros']+0, 2).")no coincide con el total de inventario invId -> ".$reg['invId']." almacenado (".round($litrosSolicitudesPendientes, 2).")");
+                }*/
                 $disponible = $reg['invLitros'];// - $litrosSolicitudesPendientes;
                 
-                $debug[$i]['$litrosInventario']=$litrosInventario;
+                //$debug[$i]['$litrosInventario']=$litrosInventario;
                 //$debug[$i]['$litrosSolicitudesPendientes']=$litrosSolicitudesPendientes;
                 $debug[$i]['invLitros']=$reg['invLitros'];
                 $debug[$i]['entId']=$reg['entId'];
@@ -317,7 +318,7 @@ class AccionSCASolLocalController extends Controller {
                         $selected = '';
                     }
                     
-                    $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . $disponible . " provDireccion=\"". $reg['entDireccionMatriz'] ."\">" . $reg['invNombreEsp'] . ' ('. $reg['invGrado'] .'%) - ' . $reg['entNombComercial']. "</option>";
+                    $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . round($disponible,2) . " provDireccion=\"". $reg['entDireccionMatriz'] ."\">" . $reg['invNombreEsp'] . ' ('. $reg['invGrado'] .'%) - ' . $reg['entNombComercial']. "</option>";
                     $i++;
                 }
             }
@@ -470,7 +471,7 @@ class AccionSCASolLocalController extends Controller {
         
         $transicion = null;
         
-        $errores = $solLocalDetTmp->isValid($this->getDoctrine(), $user->getEntidad());
+        $errores = $solLocalDetTmp->isValid($this->getDoctrine(), $user->getEntidad(), $request->get('invId'));
         
         if(($form->isValid() && count($errores)==0)){
             if( $solLocalDetTmp->getLocalDetId() ){
@@ -492,9 +493,17 @@ class AccionSCASolLocalController extends Controller {
                 $solLocal->addSolLocalDet($solLocalDet);
                 $solLocalDet->setCuota($cuotaDao->getCuota($request->get('cuota')));
                 
-                $inventarioDet = $this->agregarInventarioProveedor(null, $request->get('invId'), $solLocalDetTmp->getLocalDetLitros(), true, false);
+                $inventarioDet = $this->agregarInventarioProveedor(
+                    new SolLocalDet(),
+                    $request->get('invId'),
+                    $solLocalDetTmp->getLocalDetLitros(),
+                    $solLocalDetTmp->getCuota()->getCuoGrado(),
+                    true,
+                    false
+                );
+                
                 $inventarioDet->setSolLocalDet($solLocalDet);
-                $inventarioDet->getSolLocalDet()->addInventarioDet($inventarioDet);
+                $solLocalDet->addInventarioDet($inventarioDet);
             }
             //##################################################################################################
             $form = $this->createForm(new SolLocalDetType($this->getDoctrine()), $solLocalDet);
@@ -608,8 +617,10 @@ class AccionSCASolLocalController extends Controller {
      * pendiente extraer la nueva transicion a la que se actualizara la solicitud
      * pendiente validar si la solicitud no ha sido previamente cambiada de estado y se quiere volver a cambiar. (submit + back + submit again)
      * 
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param type $localDetId
+     * @param type $traId
+     * @return type
      */
     public function cambiarEstadoAction(Request $request, $localDetId, $traId){
         $auditUser = $this->container->get('security.context')->getToken()->getUser();
@@ -618,6 +629,7 @@ class AccionSCASolLocalController extends Controller {
         $solLocalDao = new SolLocalDao($this->getDoctrine());
         $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
         $transicionDao = new TransicionDao($this->getDoctrine());
+        $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
         
         //Buscamos el encabezado para realizar la transicion
         $solLocalDet = new SolLocalDet();
@@ -662,10 +674,11 @@ class AccionSCASolLocalController extends Controller {
                                 $solLocalDet->addInventarioDet($inventarioDet);
                                 
                                 $inventarioDetProv = $this->agregarInventarioProveedor(
-                                    $solLocalDet->getLocalDetId(),
-                                    $inventarioProv->getInvId(), 
-                                    $solLocalDet->getLocalDetLitros(), 
-                                    false, 
+                                    $solLocalDet,
+                                    $inventarioProv->getInvId(),
+                                    $localDetLitros - $localDetLitrosLib ,
+                                    $solLocalDet->getCuota()->getCuoGrado(),
+                                    false,
                                     false
                                 );
                                 $inventarioDetProv->setSolLocalDet($solLocalDet);
@@ -693,10 +706,11 @@ class AccionSCASolLocalController extends Controller {
                                         $solLocalDet->addInventarioDet($inventarioDet);
                                         
                                         $inventarioDetProv = $this->agregarInventarioProveedor(
-                                            $solLocalDet->getLocalDetId(),
-                                            $inventarioProv->getInvId(), 
-                                            $solLocalDet->getLocalDetLitros(), 
-                                            false, 
+                                            $solLocalDet,
+                                            $inventarioProv->getInvId(),
+                                            $litrosLib,
+                                            $solLocalDet->getCuota()->getCuoGrado(),
+                                            false,
                                             true
                                         );
                                         $inventarioDetProv->setSolLocalDet($solLocalDet);
@@ -706,7 +720,17 @@ class AccionSCASolLocalController extends Controller {
                                     $errorList = $errorList.'- Debe ingresar un número valido';
                                 }
                             }
-
+                        }
+                        
+                        if($reg->getEtpFin()->getEtpId() == Etapa::$FINALIZADA_OBS 
+                                && ($reg->getEstado()->getEstId() == Estado::$CANCELADO
+                                || $reg->getEstado()->getEstId() == Estado::$RECHAZADO)
+                            ){
+                                /*NOTA: Solo se busca el registro de inventario que esten en R (reserva) para eliminarse
+                                 * Los demás se asumen que si ya entraron a inventario no hay reversa 
+                                 */
+                                $inventarioDetTmp = $inventarioDetDao->findInventarioDet($inventarioProv->getInvId(), $localDetId, 'R');
+                                $inventarioDetTmp = $this->eliminarInventarioDetProveedorAction($inventarioDetTmp);
                         }
 
                         if($errorList == ''){
@@ -797,13 +821,15 @@ class AccionSCASolLocalController extends Controller {
         return $inventarioDet;
     }
     
-    private function agregarInventarioProveedor($localDetId, $invId, $litros, $reserva, $liberarParcial){
+    //############# AGREGAR LOS VALORES A LOS CAMPOS DE DETALLE DE INVENTARIO
+    private function agregarInventarioProveedor(SolLocalDet $solLocalDet, $invId, $litros, $grados, $reserva, $liberarParcial){
         $user = $this->get('security.context')->getToken()->getUser();
         $inventarioDao = new InventarioDao($this->getDoctrine());
         $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
         //$inventarioDetDao = new InventarioDetDao($this->getDoctrine());
         //$alcoholDao = new AlcoholDao($this->getDoctrine());
         $inventarioDet = null;
+        $localDetId = $solLocalDet->getLocalDetId();
         
         //Buscamos si el encabezado en la tabla de "Inventario" existe
         $inventario = $inventarioDao->getInventario($invId);
@@ -811,9 +837,11 @@ class AccionSCASolLocalController extends Controller {
         if($inventario != null){
             $invLitros = $inventario->getInvLitros();
             $invReservado = $inventario->getInvReservado();
+            $invGrado = $inventario->getInvGrado();
             
             if($reserva){
-                $inventario->setInvReservado($invReservado + $litros);
+                //Esta formula es para convertir los litros en el grado del inventario del proveedor
+                $inventario->setInvReservado($invReservado + $litros*$grados/$invGrado);
                 
                 $inventarioDet = new InventarioDet();
                 $inventarioDet->setInvDetFecha(new DateTime());
@@ -821,11 +849,11 @@ class AccionSCASolLocalController extends Controller {
                 $inventarioDet->setAuditUserIns($user->getUsername());
                 $inventarioDet->setAuditDateIns(new DateTime());
                 
-                $inventarioDet->setInvDetLitros($litros);
+                $inventarioDet->setInvDetLitros($litros*$grados/$invGrado);
                 $inventarioDet->setInvDetAccion("R");
             }else{
-                $inventario->setInvLitros($invLitros - $litros);
-                $inventario->setReservado($invReservado - $litros);
+                $inventario->setInvLitros($invLitros - $litros*$grados/$invGrado);
+                $inventario->setInvReservado($invReservado - $litros*$grados/$invGrado);
                 
                 $inventarioDet = $inventarioDetDao->findInventarioDet($invId, $localDetId, 'R');
                 
@@ -839,15 +867,15 @@ class AccionSCASolLocalController extends Controller {
                     $inventarioDetParcial->setAuditUserIns($user->getUsername());
                     $inventarioDetParcial->setAuditDateIns(new DateTime());
 
-                    $inventarioDetParcial->setInvDetLitros($litros);
+                    $inventarioDetParcial->setInvDetLitros($litros*$grados/$invGrado);
                     $inventarioDetParcial->setInvDetAccion("-");
+                    $inventarioDetParcial->setSolLocalDet($solLocalDet);
                     
                     $inventarioDetParcial->setInventario($inventario);
                     $inventarioDetParcial->getInventario()->addInventarioDet($inventarioDetParcial);
                     
-                    $inventarioDet->setInvDetLitros($inventarioDet->getInvDetLitros() - $litros);
+                    $inventarioDet->setInvDetLitros($inventarioDet->getInvDetLitros() - $litros*$grados/$invGrado);
                 }else{
-                    //$inventarioDet->setInvDetLitros($litros);
                     $inventarioDet->setInvDetAccion("-");
                 }
             }
@@ -915,6 +943,43 @@ class AccionSCASolLocalController extends Controller {
 
             $this->get('mailer')->send($message);
         }
+    }
+    
+    /**
+     * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    private function eliminarInventarioDetProveedorAction(InventarioDet $inventarioDet){
+        $auditUser = $this->container->get('security.context')->getToken()->getUser();
+        
+        //Buscamos el encabezado para quitarle la cantidad a eliminar
+        $inventarioOld = $inventarioDet->getInventario();
+        
+        $invLitros = $inventarioOld->getInvLitros();
+        $invReservado = $inventarioOld->getInvReservado();
+        
+        if($inventarioDet->getInvDetAccion() == '+'){
+            $inventarioOld->setInvLitros($invLitros - $inventarioDet->getInvDetLitros());
+        
+        }else if($inventarioDet->getInvDetAccion() == 'R'){
+            //$inventarioOld->setInvLitros($invLitros - $inventarioDet->getInvDetLitros());
+            $inventarioOld->setInvReservado($invReservado - $inventarioDet->getInvDetLitros());
+            
+        }else if($inventarioDet->getInvDetAccion() == '-'){
+            $inventarioOld->setInvLitros($invLitros + $inventarioDet->getInvDetLitros());
+        }
+        
+        $inventarioOld->setAuditUserUpd($auditUser->getUsername());
+        $inventarioOld->setAuditDateUpd(new \DateTime());
+        
+        $inventarioDet->setAuditUserUpd($auditUser->getUsername());
+        $inventarioDet->setAuditDateUpd(new \DateTime());
+        $inventarioDet->setAuditDeleted(true);
+        $inventarioDet->setInvDetComentario("Solicitud #".$inventarioDet->getSolLocalDet()->getLocalDetId()." Cancelada/Rechazada");
+        
+        return $inventarioDet;
     }
 }
 ?>

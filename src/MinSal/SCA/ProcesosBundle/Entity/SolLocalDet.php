@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
+use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\SolLocalDao;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -28,14 +29,15 @@ class SolLocalDet {
     /**
      * Se encarga de validar que el valor de los grados se encuentre dentro del rango
      */
-    public function isValid($doctrine, $entidad){
+    public function isValid($doctrine, $entidad, $invId){
         $msg = array();
-        if($this->getLocalDetLitros()){
+        if($this->getLocalDetLitros() && $invId){
             if($this->getLocalDetLitros()+0 <=0 ){
                 $msg[]='- La cantidad en litros ingresados "'.$this->getLocalDetLitros().'" debe ser mayor a 0';
             }else{
                 $solLocalDao = new SolLocalDao($doctrine);
                 $inventarioDetDao = new InventarioDetDao($doctrine);
+                $inventarioDao = new InventarioDao($doctrine);
 
                 $litrosInventario = $inventarioDetDao->getLitrosInventarioXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
                 $litrosSolicitudesPendientes = $solLocalDao->getLitrosSolicitudXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
@@ -45,9 +47,22 @@ class SolLocalDet {
                 if( $this->getLocalDetLitros() > $disponible ){
                     $msg[]='- La cantidad en litros ingresados "'.$this->getLocalDetLitros().'" es mayor al saldo disponible de la cuota "'.$disponible.'"';
                 }
+                
+                $inventario = $inventarioDao->getInventario($invId);
+                $litrosDisponiblesProveedor = $inventario->getInvLitros() - $inventario->getInvReservado();
+                
+                if( $this->getLocalDetLitros() > $litrosDisponiblesProveedor ){
+                    $msg[]='- No se puede ingresar la solicitud debido a que las existencias del proveedor no pueden cubrir la cantidad a solicitar';
+                }
             }
         }else{
-            $msg[]='- El campo "Cantidad" se encuentra vacio';
+            if(!$this->getLocalDetLitros()){
+                $msg[]='- El campo "Cantidad" se encuentra vacio';
+            }
+            
+            if(!$invId){
+                $msg[]='- Debe seleccionar un proveedor';
+            }
         }
         
         return $msg;
