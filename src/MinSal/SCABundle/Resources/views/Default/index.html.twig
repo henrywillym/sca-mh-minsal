@@ -56,8 +56,8 @@
                                             {%if(opc.nombreOpcion == 'Inicio') %}                                                    
                                                     
                                             {% else %}
-                                                $('#nav').append('<li id="li{{ opc.idOpcionSistema }}" class="top"><a  class="top_link" href="{{ path(opc.enlace) }}"><span class="down">{{ opc.nombreOpcion }}</span></a></li>');                                        
-                                                $('#li{{ opc.idOpcionSistema }}').append('<ul id="opc{{ opc.idOpcionSistema }}" class="sub"></ul>');  
+                                                $('#nav').append('<li id="li{{ opc.idOpcionSistema }}" class="top"><a  class="top_link" href="{{ path(opc.enlace) }}"><span class="down">{{ opc.nombreOpcion }}</span></a></li>');
+                                                $('#li{{ opc.idOpcionSistema }}').append('<ul id="opc{{ opc.idOpcionSistema }}" class="sub"></ul>');
                                             {% endif %}                                                                                                     
                                             {% for subopc in opciones %}  
                                                 {% if subopc.idOpcionSistema2 == opc.idOpcionSistema  %}
@@ -69,7 +69,7 @@
                                         {% endif %}                                
                                     {% endfor %}
                                  {% else %}        
-                                        $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_security_logout') }}"><span >{{ 'Salir'|trans({}, 'FOSUserBundle') }} </span></a></li>');                                           
+                                        $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('fos_user_security_logout') }}"><span >{{ 'Salir'|trans({}, 'FOSUserBundle') }} </span></a></li>');
                                  {% endif %}  
                              {% endif %}  
                              $('#nav').append('<li class="top"><a  class="top_link" href="{{ path('MinSalSCAUsersBundle_mantChangePassword') }}"><span >{{ 'Cambiar Clave'|trans({}, 'FOSUserBundle') }}</span></a></li>');
@@ -81,6 +81,34 @@
                          {% endif %} 
                         
                       });
+                      
+                      $('#loadingDiv')
+                            .hide()  // hide it initially
+                            .ajaxStart(function() {
+                                $(this).show();
+                                $(this).dialog({
+                                    modal: true,
+                                    resizable: false,
+                                    draggable: false,
+                                    height: 125,
+                                    width: 180,
+                                    position: 'center',
+                                    show:{
+                                        effect: "puff",
+                                        duration: 400
+                                    },
+                                    hide:{
+                                        effect: "explode",
+                                        duration: 300
+                                    },
+                                    closeOnEscape: false
+                                });
+                                $( 'a.ui-dialog-titlebar-close' ).remove();
+                            })
+                            .ajaxStop(function() {
+                                $( this ).dialog( "close" );
+                            })
+                        ;
                   });
                 </script>
                 <div class="container">
@@ -105,6 +133,11 @@
                     <div id="dialog-message" title="Información" style="display: none; font-size: large; font-weight:bolder ;text-align: center; vertical-align: middle">
                         <br/><br/>
                         Cargando...
+                    </div>
+                        
+                    <div id="loadingDiv" title="Cargando ..." style="display:none; text-align: center; vertical-align: middle;">
+                        <br/><IMG src="{{ asset('bundles/minsalsca/images/loadingSpinner.gif') }}" /><br/><br/>
+                        Espere un momento ... 
                     </div>
 
                     <div id="contenido">

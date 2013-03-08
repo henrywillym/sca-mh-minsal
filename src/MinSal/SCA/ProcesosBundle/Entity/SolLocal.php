@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\ProcesosBundle\Entity\SolLocalDet;
 use MinSal\SCA\ProcesosBundle\Entity\Transicion;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -64,7 +63,7 @@ class SolLocal {
     /**
      * @var \DateTime $solLocalFecha
      *
-     * @ORM\Column(name="sollocal_fecha", type="datetime", nullable=false)
+     * @ORM\Column(name="sollocal_fecha", type="date", nullable=false)
      */
     private $solLocalFecha;
     

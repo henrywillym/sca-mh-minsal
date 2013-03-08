@@ -270,8 +270,8 @@ class AccionSCASolImportacionController extends Controller {
         $roles = $user->getRols();
         $traIdSeries = array();
         $registros= array();
-        //$tmpIndex = array();
         $entId = 0;
+        $result = array();
         
         if($user->getEntidad()){
             $entId = $user->getEntidad()->getEntId();
@@ -282,7 +282,8 @@ class AccionSCASolImportacionController extends Controller {
 
             foreach($transiciones as $transicion){
                 foreach($transicion->getParentsTransicion() as $reg){
-                    if(!array_key_exists($reg->getEtpFin()->getEtpId(), $traIdSeries)){//$tmpIndex)){
+                    if($reg->getFlujo()->getFluId() == Flujo::$IMPORTACION && !array_key_exists($reg->getEtpFin()->getEtpId(), $traIdSeries)){//$tmpIndex)){
+                        $tmp['traId'] = $reg->getTraId();
                         $tmp['id'] = $reg->getEtpFin()->getEtpId();
                         $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
                         $tmp['cantidad'] = $solImportacionDao->getCantidadSolicitudesXEtapa($entId, $reg->getEtpFin()->getEtpId());
@@ -292,9 +293,13 @@ class AccionSCASolImportacionController extends Controller {
                     }
                 }
             }
+            
+            foreach($traIdSeries as $etapa){
+                $result[$etapa['traId']]=$etapa;
+            }
         }
         
-        $registros['registros'] = $traIdSeries;
+        $registros['registros'] = $result;
         
         $datos = json_encode($registros);
         
@@ -489,12 +494,12 @@ class AccionSCASolImportacionController extends Controller {
                 foreach($transicionesRol as $transicionRol){
                     foreach($nextTransiciones as $reg){
                         if($transicionRol->getTraId() == $reg->getTraId()){
-                            if(!array_key_exists($reg->getTraId(), $tmpIndex)){
+                            if($reg->getFlujo()->getFluId() == Flujo::$IMPORTACION && !array_key_exists($reg->getTraId(), $tmpIndex)){
                             //if(count($result)==0){
                                 $arrayTrans = array();
 
                                 $arrayTrans['id'] = $reg->getTraId();
-                                $arrayTrans['nombre'] = $reg->getEstado()->getEstNombre();
+                                $arrayTrans['nombre'] = $reg->getEstado()->getEstNombreBoton();
                                 $arrayTrans['comentario'] = $reg->getTraComentario()?"true":"false";
                                 $arrayTrans['litrosLibera'] = $reg->getTraLitrosLibera()?"true":"false";
                                 
@@ -510,6 +515,8 @@ class AccionSCASolImportacionController extends Controller {
         
         $form = $this->createForm(new SolImportacionDetType($this->getDoctrine()), $solImportacionDet);
         $comentario = $solImportacionDet->getSolImportacion()->getSolImpComentario();
+        $etapa = $solImportacionDet->getSolImportacion()->getTransicion()->getEtpFin()->getEtpNombre();
+        $estado = $solImportacionDet->getSolImportacion()->getTransicion()->getEstado()->getEstNombre();
         
         return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:ingresarSolImportacionDet.html.twig', array(
             'form' => $form->createView(),
@@ -517,7 +524,9 @@ class AccionSCASolImportacionController extends Controller {
             'impDetId' => $impDetId,
             'entNombComercial'=> $entNombComercial, 
             'transiciones' => $result,
-            'comentario' => $comentario
+            'comentario' => $comentario,
+            'etapa' => $etapa,
+            'estado' => $estado
         ));
     }
     
@@ -552,7 +561,7 @@ class AccionSCASolImportacionController extends Controller {
 
             foreach($transicionesRol as $transicionRol){
                 foreach($nextTransiciones as $reg){
-                    if($transicionRol->getTraId() == $reg->getTraId() && $traId == $reg->getTraId()){
+                    if($reg->getFlujo()->getFluId() == Flujo::$IMPORTACION && $transicionRol->getTraId() == $reg->getTraId() && $traId == $reg->getTraId()){
                         if($reg->getTraComentario()){
                             $solImpComentario = $request->get('solImpComentario');
                             if($solImpComentario==null || $solImpComentario==''){
@@ -647,7 +656,7 @@ class AccionSCASolImportacionController extends Controller {
 
         //Buscamos si el encabezado en la tabla de "Inventario" existe
         $inventario = $inventarioDao->findInventario(
-                            $user->getEntidad()->getEntId(),
+                            $cuota->getEntidad()->getEntId(),
                             $cuota->getAlcohol()->getAlcId(),
                             $cuota->getCuoGrado(),
                             $cuota->getCuoNombreEsp()
@@ -662,7 +671,7 @@ class AccionSCASolImportacionController extends Controller {
         }else{
             //#### Encabezado de Inventario
             $inventarioDet->setInventario(new Inventario());
-            $inventarioDet->getInventario()->setEntidad($user->getEntidad());
+            $inventarioDet->getInventario()->setEntidad($cuota->getEntidad());
             $inventarioDet->getInventario()->setAlcohol($alcoholDao->getAlcohol($cuota->getAlcohol()->getAlcId()));
             $inventarioDet->getInventario()->setInvLitros($litros);
             $inventarioDet->getInventario()->setAuditUserIns($user->getUsername());

@@ -1,5 +1,5 @@
 {% extends 'MinSalSCABundle:Default:index.html.twig' %}
-{# Muestra todas las solicitudes de importacion asociadas a la empresa del usuario#}
+{# Muestra todas las solicitudes de Compra Local asociadas a la empresa del usuario#}
 
 {% block body %}
     <script type="text/javascript">
@@ -29,7 +29,7 @@
                         datatype:'json',
                         loadonce: true
                 }).trigger('reloadGrid')
-                .jqGrid('setCaption', 'Solicitudes de Importación - Etapa: "' + etpNombre+'"');
+                .jqGrid('setCaption', 'Compras Locales - Etapa: "' + etpNombre+'"');
             }
             
             $('[name=transiciones]').css({'background-color':'', 'color':''});
@@ -41,7 +41,7 @@
         var global_i = 0;
         var global_color = 'navy';
         function cargarEtapas(){
-            $.getJSON('{{ url('MinSalSCAProcesosBundle_getEtapasImportacion') }}', function (json) {
+            $.getJSON('{{ url('MinSalSCAProcesosBundle_getEtapasLocal') }}', function (json) {
                 // Falta programar que se llame recurrentemente cada cierto tiempo para mantener actualizado el contador
                 // y el grid con las solicitudes.
                 
@@ -103,24 +103,16 @@
                 },
                 pager: jQuery('#pager'),
                 viewrecords: true, 
-                caption: 'Solicitudes de Importación',
+                caption: 'Compras Locales',
                 colModel:[{
                         key:true,
                         label:'ID',
-                        name:'impDetId', 
-                        index: 'impDetId', 
+                        name:'localDetId', 
+                        index: 'localDetId', 
                         //hidden: true,
                         width:30,
                         searchoptions:{
                             sopt: searchOptionNumber
-                        }
-                    },{
-                        label:'Factura Comercial',
-                        name:'impDetFactCom', 
-                        index: 'impDetFactCom',
-                        width:140,
-                        searchoptions:{
-                            sopt: searchOptionText
                         }
                     },{
                         label:'Nombre Alcohol',
@@ -140,16 +132,16 @@
                         }
                     },{ 
                         label:'Cantidad (Ltr)',
-                        name:'impDetLitros', 
-                        index: 'impDetLitros', 
+                        name:'localDetLitros', 
+                        index: 'localDetLitros', 
                         width:90,
                         searchoptions:{
                             sopt: searchOptionNumber
                         }
                     },{ 
                         label:'Fecha Ingreso',
-                        name:'solImpFechaText', 
-                        index: 'solImpFechaText', 
+                        name:'solLocalFechaText', 
+                        index: 'solLocalFechaText', 
                         width:90,
                         searchoptions:{
                             sopt: searchOptionDate,
@@ -164,7 +156,7 @@
                         stype:'select',
                         //width:100,
                         searchoptions:{
-                            dataUrl: '{{ url('MinSalSCAProcesosBundle_getSearchEtapasImportacion') }}',
+                            dataUrl: '{{ url('MinSalSCAProcesosBundle_getSearchEtapasLocal') }}',
                             searchhidden: false,
                             sopt: ['in','ni']
                         }
@@ -176,38 +168,22 @@
                         search:true,
                         stype:'select',
                         searchoptions:{
-                            dataUrl: '{{ url('MinSalSCAProcesosBundle_getSearchEstadosImportacion') }}',
+                            dataUrl: '{{ url('MinSalSCAProcesosBundle_getSearchEstadosLocal') }}',
                             searchhidden: false,
                             sopt: ['in','ni']
                         }
                     },{
                         label:'Nombre Proveedor',
-                        name:'impDetProvNom', 
-                        index: 'impDetProvNom',
-                        width:90,
-                        searchoptions:{
-                            sopt: searchOptionText
-                        }
-                    },{
-                        label:'País Procedencia',
-                        name:'impDetPaisProc', 
-                        index: 'impDetPaisProc',
-                        width:90,
-                        searchoptions:{
-                            sopt: searchOptionText
-                        }
-                    },{
-                        label:'País Origen',
-                        name:'impDetPaisOri', 
-                        index: 'impDetPaisOri',
+                        name:'entNombComercial', 
+                        index: 'entNombComercial',
                         width:90,
                         searchoptions:{
                             sopt: searchOptionText
                         }
                     },{
                         label:'Ltr. Liberados',
-                        name:'impDetLitrosLib', 
-                        index: 'impDetLitrosLib',
+                        name:'localDetLitrosLib', 
+                        index: 'localDetLitrosLib',
                         width:90,
                         searchoptions:{
                             sopt: searchOptionNumber
@@ -253,7 +229,7 @@
             cargarEtapas();
             
             $("#agregarRegistro").click(function(){
-                location.href = '{{ url('MinSalSCAProcesosBundle_mantSolImportacionIngreso')}}';
+                location.href = '{{ url('MinSalSCAProcesosBundle_mantSolLocalIngreso')}}';
             });
 
 
@@ -262,7 +238,7 @@
                 var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
 
                 if( gr != null ){
-                    location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarSolImportacion', {'impDetId':'impDetId'})}}'.replace(/impDetId/g, gr);
+                    location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarSolLocal', {'localDetId':'localDetId'})}}'.replace(/localDetId/g, gr);
                 }else{ 
                     alert("Por favor seleccione una fila para editar!"); 
                 }
@@ -288,9 +264,9 @@
         <table align="center">
             <tr><td align="center">
                     {% if entNombComercial %}
-                        <h1>Solicitudes de Importación de "{{entNombComercial}}"</h1>
+                        <h1>Compras Locales de "{{entNombComercial}}"</h1>
                     {% else %}
-                        <h1>Evaluacion de Solicitudes de Importación</h1>
+                        <h1>Evaluacion de Registro de Compras Locales</h1>
                     {% endif %}
                 </td>
             </tr>
@@ -307,8 +283,8 @@
                         {% if entNombComercial %}
                         <span id="solicitudesIngresadas">
                             <span id="tra0" name="transiciones" class="etapa"
-                                  onclick="verSolxEtapa(0, 'Solicitudes de Importación Ingresadas');">
-                                Ver Solicitudes Ingresadas
+                                  onclick="verSolxEtapa(0, 'Compras Locales Ingresadas');">
+                                Ver Compras Locales
                             </span>
                         </span>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

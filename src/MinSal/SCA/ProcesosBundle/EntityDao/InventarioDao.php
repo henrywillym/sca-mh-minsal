@@ -39,9 +39,16 @@ class InventarioDao {
                                           FROM MinSalSCAProcesosBundle:Inventario E
                                           WHERE E.invId = :invId
                                           order by E.auditDateUpd DESC, E.auditDateIns DESC")
-                //->setParameter('entId',$entId)
+                //->setParameter('entId',$entId) 
                 ->setParameter('invId',$id);
-        return $registros->getArrayResult();
+        
+         $result= $registros->getResult();
+        
+        if($result !=null && count($result)>0){
+            return $result[0];
+        }else{
+            return null;
+        }
     }
     
     public function findInventario($entId, $alcId, $invGrado, $invNombreEsp) {

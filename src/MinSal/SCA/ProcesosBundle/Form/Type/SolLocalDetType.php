@@ -53,47 +53,19 @@ class SolLocalDetType extends AbstractType {
          * No se utilizo un atributo en el formbuilder, debido a que el DropDownList debia pasarsele los Grados, Cuota Disponible
          * Y con el QUeryBuilder no se puede modificar como se genera el HTML.
         */
-            
-        /*
-        $entId = $this->entId;
-        $entidad = $this->entidad;
-        $cuoTipoLocal = Cuota::$cuoTipoLocal;
-        $year = new \DateTime();
-        $year = $year->format('Y');
-        
-        $builder->add('cuota', 'entity', array(
-            'class'=>'MinSalSCAAdminBundle:Cuota',
-            'query_builder' => function(EntityRepository $er) use($entId, $cuoTipoLocal, $year) {
-                return $er->createQueryBuilder('a')
-                            ->select('a')
-                            ->join('a.entidad','B')
-                            ->where('B.entId = :entId
-                                    AND a.cuoTipo = :cuoTipo
-                                    AND a.cuoYear = :cuoYear
-                                    AND a.auditDeleted = false')
-                            ->setParameter('entId', $entId)
-                            ->setParameter('cuoTipo', $cuoTipoLocal)
-                            ->setParameter('cuoYear', $year);
-            },
-            'property'=> 'cuoNombreEsp',
-            'expanded'=>false,
-            'multiple'=>false,
-            'label'=>'Nombre del Alcohol',
-            //'em'=> 'doctrine.orm.entity_manager'
-        ));/**/
         
         $builder->add('cuoId', 'hidden', array(
             'label'=>'Nombre del Alcohol',
             'property_path'=> 'cuota.cuoId'
-        ));/**/
-        
-        $builder->add('entId', 'hidden', array(
+        ));
+        /*
+        $builder->add('invId', 'hidden', array(
             'label'=>'Nombre del Proveedor',
-            'property_path'=> 'proveedor.entId'
+            'property_path'=> 'inventariosDet.inventario.invId'
         ));/**/
             
         $builder->add('localDetLitros',  null, array('label' => 'Cantidad (Lts)', 'attr' => array('autocomplete' => 'off'),));
-        $builder->add('localDetUso',  null, array('label' => 'Uso del Alcohol'));
+        $builder->add('localDetUso',  null, array('label' => 'Uso del Alcohol', 'attr' => array('style' => 'max-height: 50px; max-width: 200px;')));
         
         $builder->add('localDetLitrosLib',  null, array(
             'label' => 'Litros Liberados',

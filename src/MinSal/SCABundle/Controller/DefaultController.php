@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
        $result = array();
        foreach ( $args as &$array ) {
            foreach ( $array as $key => &$value ) {
-               $result[$key] = $value;
+               $result[$value->getIdOpcionSistema()] = $value;
            }
        }
        return $result;
@@ -46,7 +46,6 @@ class DefaultController extends Controller {
                     //$opciones = $rol->getOpcionesSistema();
                      $opciones = new ArrayCollection(array_merge_maintain_keys($opciones->toArray(), $rol->getOpcionesSistema()->toArray())); 
                 }
-            
                 $peticion = $this->getRequest();
                 $sesion = $peticion->getSession();
                 $sesion->set('opciones', $opciones);

@@ -18,7 +18,7 @@
                 <label for="username">{{ 'Usuario:'|trans({}, 'FOSUserBundle') }}</label>
             </td>
             <td>
-                <input type="text" id="username" name="_username" value="{{ last_username }}" />
+                <input type="text" id="username" name="_username" autocomplete="off" value="{{ last_username }}" />
             </td>
         </tr>
         
@@ -44,7 +44,27 @@
                     {% elseif error=='The presented password is invalid.' %}
                        <div>USUARIO/PASSWORD INCORRECTOS</div>
                     {% elseif error=='User account is disabled.' %}
-                       <div>LA CUENTA SE ENCUENTRA INACTIVA. PARA ACTIVARLA ES NECESARIO INGREASAR A LA DIRECCION QUE SE PROPORCIONA EN EL CORREO DE ACTIVACION</div>
+                       <div id="msgDialogComentario" title="Notificación" style="display:none">
+                           LA CUENTA NO SE ENCUENTRA CONFIRMADA AUN. PARA ACTIVARLA ES NECESARIO SEGUIR LAS INSTRUCCIONES QUE SE PROPORCIONARON EN EL CORREO DE ACTIVACION
+                       </div>
+                       <script type="text/javascript"> 
+                           $("#msgDialogComentario").dialog({
+                                modal: true,
+                                resizable: false,
+                                draggable: false,
+                                position: 'center',
+                                dialogClass: "no-close",
+                                buttons:[
+                                    {
+                                        text: "OK",
+                                        click: function() {
+                                            $( this ).dialog( "close" );
+                                        }
+                                    }
+                                ]
+                            });
+                       </script>
+                       
                     {% else %}
                        {{ error }}
                     {% endif %}

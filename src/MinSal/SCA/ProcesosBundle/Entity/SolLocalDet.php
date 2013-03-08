@@ -4,9 +4,11 @@ namespace MinSal\SCA\ProcesosBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
+use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
+use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
+use MinSal\SCA\ProcesosBundle\EntityDao\SolLocalDao;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -57,17 +59,10 @@ class SolLocalDet {
      * @ORM\JoinColumn(name="cuo_id", referencedColumnName="cuo_id")
      */
     protected $cuota;
-    
+            
     /**
-     * 
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad")
-     * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
-     */
-    protected $proveedor;
-        
-    /**
-     * ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolicitudLocal", inversedBy="solLocalesDet", cascade={"persist"})
-     * ORM\JoinColumn(name="sollocal_id", referencedColumnName="sollocal_id")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", inversedBy="solLocalesDet", cascade={"persist"})
+     * @ORM\JoinColumn(name="sollocal_id", referencedColumnName="sollocal_id")
      */
     protected $solLocal;
     
@@ -168,15 +163,6 @@ class SolLocalDet {
     public function setLocalDetLitrosLib($localDetLitrosLib) {
         $this->localDetLitrosLib = $localDetLitrosLib;
     }
-
-    public function getProveedor() {
-        return $this->proveedor;
-    }
-
-    public function setProveedor($proveedor) {
-        $this->proveedor = $proveedor;
-    }
-
         
     /******  CUSTOM SET/GET *******/
     public function addInventarioDet($inventarioDet) {
