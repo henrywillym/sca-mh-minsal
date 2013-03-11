@@ -1,0 +1,304 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{% form_theme form 'MinSalSCAUsersBundle:ChangePassword/Form:fields.html.twig' %}
+{% block body %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#btnGuardar').button();
+            $('#btnEliminar').button();
+            $('#btnRegresar').button();
+
+            //Hoja de estilo a tabla
+           $('td>label').parent().attr('align','right');
+           if($('#RegMensual_RegMenId').val()=='' || $('#RegMensual_RegMenId').val()==-1){
+               $('#btnEliminar').hide();
+           }
+           $('#RegMensual_regveFecha').datepicker();
+           $('input').css("width","160px");
+           $('#btnGuardar').css("width","80px");
+           $('#btnEliminar').css("width","80px");
+           $('#btnRegresar').css("width","80px");
+           //SET VALORES
+           
+           if($("#RegMensual_regmen_prod").val()=="") $("#RegMensual_regmen_prod").val(0);
+           if($("#RegMensual_regmen_imp").val()=="") $("#RegMensual_regmen_imp").val(0);
+           if($("#RegMensual_regmen_compra_local").val()=="") $("#RegMensual_regmen_compra_local").val(0);
+           if($("#RegMensual_regmen_venta_local").val()=="") $("#RegMensual_regmen_venta_local").val(0);
+           if($("#RegMensual_regmen_venta_inter").val()=="") $("#RegMensual_regmen_venta_inter").val(0);
+
+           
+           
+
+$("#RegMensual_regmen_prod").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value="";  
+            });
+$("#RegMensual_regmen_imp").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value="";
+            });
+$("#RegMensual_regmen_compra_local").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value="";  
+            });
+$("#RegMensual_regmen_venta_local").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value=""; 
+            });
+$("#RegMensual_regmen_venta_inter").focus(function(){
+    if(this.value=="" || this.value=="0")
+ this.value="";   
+            });
+
+
+
+           
+           
+//CALCULO PARA MOSTRAR EN INVENTARIO FINAL       
+   calculoInvF();
+   
+            $("input").blur(function(){calculoInvF();});
+            $("input").focus(function(){calculoInvF();});
+
+//FUNCIONES PARA VALIDACION DE CARACTERES DIFERENTES A NUMEROS
+$("#RegMensual_regmen_excedente_ant").blur(function(){
+this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+$("#RegMensual_regmen_prod").blur(function(){
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+$("#RegMensual_regmen_imp").blur(function(){
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+$("#RegMensual_regmen_compra_local").blur(function(){
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+$("#RegMensual_regmen_venta_local").blur(function(){
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+$("#RegMensual_regmen_venta_inter").blur(function(){
+            if(this.value=="") this.value=0;
+    else this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+$("#RegMensual_regmen_utilizacion").blur(function(){
+        this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+$("#RegMensual_regmen_perdida").blur(function(){
+           this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+
+
+    
+        });
+ 
+function calculoInvF(){
+//SUMA DE TODOS LOS VALORES
+  if($("#RegMensual_regmen_excedente_ant").val()==""){ var exc  = 0; }else{ var exc  = $("#RegMensual_regmen_excedente_ant").val();}
+   if($("#RegMensual_regmen_prod").val()=="") { var prod =0; }else{ var prod =$("#RegMensual_regmen_prod").val();}
+   if($("#RegMensual_regmen_imp").val()=="") {var imp  = 0; }else{ var imp  =$("#RegMensual_regmen_imp").val();}
+  if($("#RegMensual_regmen_compra_local").val()==""){  var compl=0; }else{ var compl= $("#RegMensual_regmen_compra_local").val();}
+   if($("#RegMensual_regmen_venta_local").val()=="") { var ventl=0; }else{ var ventl=$("#RegMensual_regmen_venta_local").val();}
+   if($("#RegMensual_regmen_venta_inter").val()=="") { var venti=0; }else{ var venti=$("#RegMensual_regmen_venta_inter").val();}
+   if($("#RegMensual_regmen_utilizacion").val()=="") { var utiliz=0; }else{ var utiliz=$("#RegMensual_regmen_utilizacion").val();}
+  if($("#RegMensual_regmen_perdida").val()=="") { var perdida=0; }else{ var perdida=$("#RegMensual_regmen_perdida").val();}
+
+$("#RegMensual_Exist").val(
+        (parseFloat(exc)
+        + parseFloat(prod)
+        + parseFloat(imp)
+        + parseFloat(compl)
+        - parseFloat(ventl)
+        - parseFloat(venti)
+        - parseFloat(utiliz)
+        - parseFloat(perdida)).toFixed(2)
+        
+    );
+}
+
+
+        function enviarEliminar(){
+            if(confirm('!Desea eliminar el registro "'+$('#RegMensual_RegMenId').val()+'"?')){
+                if(!confirm('!Desea abortar la eliminacion??')){
+                    $('#valido').val(true);
+                    $('#eliminar').val(true);
+                    $('#formulario').submit();
+                    return true;
+                }
+            }
+            return false;
+        }
+    </script>
+    
+    <form id="formulario" action="{{ path('MinSalSCAProcesosBundle_mantRegMensualEdicion') }}" {{ form_enctype(form) }} method="POST" class="RegMensualTypeForm">
+        <input type="hidden" id="valido" value=false/>
+        <input type="hidden" id="eliminar" name="eliminar" value=false/>
+            <table border=0 align='center' >
+                <tr>
+                    <td align='center' colspan="3">
+                        <h2>INGRESE EL DETALLE DE LITROS DE ALCOHOL ETILICO POTABLE Y NO POTABLE, METILICO, ISOPROPILICO
+                           <br> BUTILICO U OTROS ALCOHOLES NO POTABLES 
+                           <br> Empresa "{{entNombComercial}}"
+                        </h2>
+                        {% if app.session.hasFlash('notice') %}
+                            <div class="flash-notice">
+                                {{ app.session.flash('notice') }}
+                            </div><br/>
+                        {% endif %}
+                    </td>
+                </tr>
+                </table>
+        
+                <table border=0 align='left' cellspacing="0">
+                <tr>
+                    <td rowspan="18" width="15%"></td>
+                    <td width="250"></td>
+                    <td width="250" style="border-top:1px solid;border-right:1px solid;border-left:1px solid;border-bottom:1px solid;">
+                        <label id="year" >A&ntilde;o:</label></td>
+                    <td width="80" style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                       {{ form_widget(form.regmen_year) }}
+                        <div class="flash-notice">
+                            {{form_errors(form.regmen_year)}}
+                        </div>
+                    </td>
+                </tr>
+                 
+                 <tr>
+                     <td></td>
+                    <td style="border-right:1px solid;border-left:1px solid;border-bottom:1px solid;">
+                        <label id="mes" >Mes:</label></td>
+                    <td style="border-right:1px solid;border-bottom:1px solid;">
+                        {{ form_widget(form.regmen_mes) }}
+                        {{ form_errors(form.regmen_mes) }}
+                    </td>
+                </tr>
+                    <tr><td colspan="3">&nbsp;</td></tr>
+                <tr >
+                    <td style="border:1px solid"><label><b>Inventario incial</b></label></td>
+                    <td style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                        <label id="excednt" >Excedente del Mes anterior de Alcohol <br>(En Litros):</label></td>
+                    <td style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                        {{ form_widget(form.regmen_excedente_ant) }}
+                        {{ form_errors(form.regmen_excedente_ant) }}
+                    </td>
+                </tr>
+                  <tr><td colspan="3">&nbsp;</td></tr>
+               
+                   <tr>
+                     <td style="border:1px solid" rowspan="3"><label><b>Entradas de Alcohol durante el Mes</b></label></td>
+                     <td style="border-top:1px solid;border-right:1px solid">
+                     <label id="Prod" >Producci&oacute;n de Alcohol (En Litros):</label></td>
+                      <td style="border-top:1px solid;border-right:1px solid">
+                        {{ form_widget(form.regmen_prod) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_prod) }}
+                        </div>
+                      </td>
+                </tr>   
+                     <tr>
+                    <td style="border-top:1px solid;border-right:1px solid">
+                        <label id="import" >Importaci&oacute;n de Alcohol (En Litros):</label></td>
+                    <td style="border-top:1px solid;border-right:1px solid">
+                        {{ form_widget(form.regmen_imp) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_imp) }}
+                        </div>
+                    </td>
+                </tr>   
+                   
+                 <tr>
+                    <td style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                        <label id="comp_local" >Compra Local de Alcohol (En Litros):</label></td>
+                    <td style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                        {{ form_widget(form.regmen_compra_local) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_compra_local) }}
+                        </div>
+                    </td>
+                </tr>  
+              <tr><td colspan="3">&nbsp;</td></tr>
+                 <tr>
+                    <td style="border:1px solid" rowspan="4">
+                        <label><b>Salidas de Alcohol durante el Mes</b></label></td>
+                    <td style="border-top:1px solid;border-right:1px solid">
+                        <label id="venta_local" >Venta Local de Alcohol (En Litros):</label></td>
+                    <td style="border-top:1px solid;border-right:1px solid">
+                       {{ form_widget(form.regmen_venta_local) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_venta_local) }}
+                        </div>
+                    </td>
+                </tr>
+              
+               <tr>
+                    <td style="border-top:1px solid;border-right:1px solid">
+                        <label id="venta_inter" >Venta Internacional de Alcohol (En Litros):</label></td>
+                    <td style="border-top:1px solid;border-right:1px solid">
+                       {{ form_widget(form.regmen_venta_inter) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_venta_inter) }}
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td style="border-top:1px solid;border-right:1px solid">
+                        <label id="utilizacion" >Salida de Alcohol para uso en la Produccion &nbsp;&nbsp;(En Litros):</label></td>
+                    <td style="border-top:1px solid;border-right:1px solid">
+                       {{ form_widget(form.regmen_utilizacion) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regmen_utilizacion) }}
+                        </div>
+                    </td>
+                </tr>
+                                            
+                <tr>
+                    <td style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                        <label id="perdida" >Mermas, Perdidas de Alcohol (En Litros):</label></td>
+                    <td style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                        {{ form_widget(form.regmen_perdida) }}
+                        {{ form_errors(form.regmen_perdida) }}
+                    </td>
+                </tr>
+              
+               <tr><td colspan="3">&nbsp;</td></tr>
+               
+                <tr>
+                    <td style="border:1px solid"><label><b>Inventario Final</b></label></td>
+                    <td style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                        <label>Existencia Final del Mes de Alcohol<br> (En Litros):</label></td>
+                    <td style="border-top:1px solid;border-right:1px solid;border-bottom:1px solid;">
+                        <input type="text" readonly="true" id="RegMensual_Exist" name="RegMensual_Exist" ></td>
+                </tr>
+            
+                 <tr>
+                    <td colspan="3"><hr/></td>
+                </tr> 
+                
+                <tr>
+                    <td width="5"></td>
+                    <td align='left' colspan=2 >
+                        <div id="msgDialog">
+                        </div>
+                        <br>
+                        {% if  RegMenId==-1 %}
+                        <input id="btnGuardar" name="btnGuardar" type="submit" value="Guardar" />
+                        {% endif %}
+                         {% if  RegMenId!=-1 %}
+                        
+                        <input id="btnGuardar" name="btnGuardar" type="submit" value="Actualizar" />
+                        {% endif %}
+                        <input id="btnEliminar" name="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>
+
+                        <input id="btnRegresar"  type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantRegMensual')}}';"/>
+                    </td>
+                </tr>
+            </table>    
+        <br><br><br><br>
+
+    {{ form_rest(form) }}
+        </form>
+{% endblock%}
+    

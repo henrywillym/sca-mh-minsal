@@ -46,22 +46,18 @@ class UserDao {
         return $User->getResult();
     }
 
-    public function getUserEspecifico($codigo) {
-        $usuario = $this->repositorio->find($codigo);
+    public function getUserEspecifico($id) {
+        $usuario = $this->repositorio->find($id);
         return $usuario;
     }
 
-    public function editUserSinRol($codigoUser, $idRol) {
-        $user = new User();
-        $user = $this->getUserEspecifico($codigoUser);
-
-        $rolDao = new RolDao($this->doctrine);
-        $rol[0] = $rolDao->getRolEspecifico($idRol);
+    public function updateUsuario($user, $auditUser) {
+        $user->setAuditUserUpd($auditUser);
+        $user->setAuditDateUpd(new \DateTime());
         
-        $user->setRols($rol);
         $this->em->persist($user);
         $this->em->flush();
-        $matrizMensajes = $codigoUser;
+        $matrizMensajes = $user;
 
         return $matrizMensajes;
     }

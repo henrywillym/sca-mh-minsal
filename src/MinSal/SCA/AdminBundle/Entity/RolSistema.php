@@ -40,9 +40,9 @@ class RolSistema{
     
     
      /**
-     * ORM\OneToMany(targetEntity="MinSal\SCA\UsersBundle\Entity\User", mappedBy="rol")
+     * @ORM\ManyToMany(targetEntity="MinSal\SCA\UsersBundle\Entity\User", mappedBy="rols")
      */
-    //protected $usuarios;
+    protected $usuarios;
     
     /**
      * @ORM\ManyToMany(targetEntity="OpcionSistema")
@@ -110,6 +110,14 @@ class RolSistema{
      *
     private $usuarios;*/
     
+    /**
+     * @ORM\ManyToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\Transicion", inversedBy="rols")
+     * @ORM\JoinTable(name="sca_rol_transicion", 
+     *              joinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")},
+     *              inverseJoinColumns={@ORM\JoinColumn(name="tra_id", referencedColumnName="tra_id")})
+     */
+    protected $transiciones;
+    
     public function __construct()
     {
         $this->usuarios = new ArrayCollection();
@@ -118,8 +126,9 @@ class RolSistema{
         $this->rolProductor = false;
         $this->rolComprador = false;
         $this->rolCompVend = false;
-        $this->rolInterno = true; //No hay razon especial por la cual se le puso true
+        $this->rolInterno = true; //No hay razon especial por la cual se le puso true, es solo por dejar un valor por defecto
         $this->rolInternoTipo = null;
+        $this->transiciones = new ArrayCollection();
     }
 
     
@@ -183,12 +192,12 @@ class RolSistema{
     /**
      * Add usuarios
      *
-     * @param MinSal\SCA\UsersBundle\Entity\User $usuarios
+     * @param MinSal\SCA\UsersBundle\Entity\User $usuario
      */
-    /*public function addUsuarios(\MinSal\SCA\UsersBundle\Entity\User $usuarios)
+    public function addUsuario(\MinSal\SCA\UsersBundle\Entity\User $usuario)
     {
-        $this->usuarios[] = $usuarios;
-    }*/
+        $this->usuarios[] = $usuario;
+    }
 
     /**
      * Get usuarios
@@ -246,6 +255,8 @@ class RolSistema{
     {
         $this->opcionesSistema[] = $opcionesSistema;
     }
+    
+    
     
     public function getRolImportador() {
         return $this->rolImportador;
@@ -306,6 +317,15 @@ class RolSistema{
         $this->rolInternoTipo = $rolInternoTipo;
     }
     
+    public function getTransiciones() {
+        return $this->transiciones;
+    }
+
+    public function setTransiciones($transiciones) {
+        $this->transiciones = $transiciones;
+    }
+
+        
     /**
      * Aca se determina el texto que se presenta en el grid
      */
@@ -387,5 +407,10 @@ class RolSistema{
         }else if($this->getRolTipo() == User::$DIGITADOR){
             return User::$DIGITADOR_TEXT;
         }
+    }
+    
+    public function addTransicion(\MinSal\SCA\ProcesosBundle\Entity\Transicion $transicion)
+    {
+        $this->transiciones[] = $transicion;
     }
 }

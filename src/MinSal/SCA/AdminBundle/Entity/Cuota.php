@@ -17,6 +17,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity(fields={"entidad","alcohol","cuoYear","cuoTipo", "cuoGrado","cuoNombreEsp"},message="Ya existe un registro similar")
  */
 class Cuota {
+    public static $cuoTipoImportacion = 'I';
+    public static $cuoTipoLocal = 'L';
     
     public function __construct() {
         //$this->alcohol = new ArrayCollection();

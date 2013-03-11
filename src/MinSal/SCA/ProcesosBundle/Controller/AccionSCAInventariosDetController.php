@@ -77,6 +77,8 @@ class AccionSCAInventariosDetController extends Controller {
                "rows":' . $datos . '}';
 
         $response = new Response($jsonresponse);
+        
+        $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
 
@@ -248,7 +250,7 @@ class AccionSCAInventariosDetController extends Controller {
         
         if( !$inventarioDet ){
             $inventarioDet = new InventarioDet();
-        }else{
+            $inventarioDet->setInvDetComentario('Inventario Inicial');
         }
         
         $form = $this->createForm(new InventarioDetType($this->getDoctrine()), $inventarioDet);
@@ -267,7 +269,7 @@ class AccionSCAInventariosDetController extends Controller {
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    private function eliminarAction(InventarioDet $inventarioDet){
+    public function eliminarAction(InventarioDet $inventarioDet){
         $auditUser = $this->container->get('security.context')->getToken()->getUser();
         
         $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
@@ -275,14 +277,26 @@ class AccionSCAInventariosDetController extends Controller {
         
         //Buscamos el encabezado para quitarle la cantidad a eliminar
         $inventarioOld = $inventarioDao->findInventario(
-                            $auditUser->getEntidad()->getEntId(), 
+                            $inventarioDet->getInventario()->getEntidad()->getEntId(), 
                             $inventarioDet->getAlcId(), 
                             $inventarioDet->getInvGrado(), 
                             $inventarioDet->getInvNombreEsp()
                         );
         //$inventarioOld = $inventarioDet->getInventario();
         $invLitros = $inventarioOld->getInvLitros();
-        $inventarioOld->setInvLitros($invLitros - $inventarioDet->getInvDetLitros());
+        $invReservado = $inventarioOld->getInvReservado();
+        
+        if($inventarioDet->getInvDetAccion() == '+'){
+            $inventarioOld->setInvLitros($invLitros - $inventarioDet->getInvDetLitros());
+        
+        }else if($inventarioDet->getInvDetAccion() == 'R'){
+            //$inventarioOld->setInvLitros($invLitros - $inventarioDet->getInvDetLitros());
+            $inventarioOld->setInvReservado($invReservado - $inventarioDet->getInvDetLitros());
+            
+        }else if($inventarioDet->getInvDetAccion() == '-'){
+            $inventarioOld->setInvLitros($invLitros + $inventarioDet->getInvDetLitros());
+        }
+        
         $inventarioOld->setAuditUserUpd($auditUser->getUsername());
         $inventarioOld->setAuditDateUpd(new \DateTime());
         

@@ -3,7 +3,7 @@ namespace MinSal\SCA\AdminBundle\Form\Type;
 
 use MinSal\SCA\AdminBundle\Form\Type\CuotaType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -31,7 +31,7 @@ class EntidadType extends AbstractType {
         );
     }
     
-    public function buildForm(FormBuilder $builder, array $opciones){
+    public function buildForm(FormBuilderInterface $builder, array $opciones){
         $builder->add('entId', 'hidden');
         /*$builder->add('entVenc', 'date', array(
             'label' => 'Vencimiento del Permiso', 

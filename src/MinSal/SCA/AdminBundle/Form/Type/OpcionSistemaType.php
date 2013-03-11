@@ -29,11 +29,11 @@
 namespace MinSal\SCA\AdminBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 
 class OpcionSistemaType extends AbstractType {
     
-    public function buildForm(FormBuilder $builder, array $opciones)
+    public function buildForm(FormBuilderInterface $builder, array $opciones)
     {
         $builder->add('nombreOpcion',  'text');
         $builder->add('descripcionOpcion', 'text');

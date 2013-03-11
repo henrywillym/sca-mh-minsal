@@ -1,21 +1,32 @@
+# app/config/security.yml
+#jms_security_extra:
+#    secure_controllers:  true
+#    secure_all_services: false
+#    expressions: true
+
 security:
+    encoders:
+        FOS\UserBundle\Model\UserInterface: sha512
+
+    
     providers:
         fos_userbundle:
-            id: fos_user.user_manager
+            id: fos_user.user_provider.username
 
     firewalls:
         main:
-            pattern: .*
+            pattern: ^/
             form_login:
-               provider:       fos_userbundle
-               login_path:     fos_user_security_login
-               use_forward:    true
-               check_path:     fos_user_security_check
-               failure_path:   null
-               always_use_default_target_path: true
-               default_target_path:            /SCA
-               target_path_parameter:          _target_path
-               use_referer:                    true
+                provider: fos_userbundle
+                #csrf_provider: form.csrf_provider
+                login_path:     fos_user_security_login
+                use_forward:    true
+                check_path:     fos_user_security_check
+                failure_path:   null
+                always_use_default_target_path: false
+                default_target_path:            /SCA
+                target_path_parameter:          _target_path
+                use_referer:                    true
             logout:
                path: fos_user_security_logout
                target: /login
@@ -28,11 +39,13 @@ security:
         - { path: ^/SCA/empresa*, role: ROLE_USER }
         - { path: ^/SCA/DNM*, role: ROLE_USER }
         - { path: ^/SCA/inventario*, role: ROLE_USER }
+        - { path: ^/SCA/Solicitud*, role: ROLE_USER }
         - { path: ^/SCA/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: /admin/*, role: ROLE_ADMIN }
         - { path: /SCA/admin/*, role: ROLE_ADMIN }
-
+        - { path: ^/SCA/*, role: ROLE_USER }
+        
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: ROLE_ADMIN
-
+        

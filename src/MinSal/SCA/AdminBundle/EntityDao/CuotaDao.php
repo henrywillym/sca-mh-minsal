@@ -29,7 +29,7 @@ class CuotaDao {
                                             AND E.cuoTipo = :cuoTipo
                                             AND E.cuoYear = :cuoYear
                                             AND E.auditDeleted = false
-                                          order by E.auditDateUpd DESC, E.auditDateIns DESC")
+                                          order by E.cuoNombreEsp ASC")
                 ->setParameter('entId',$entId)
                 ->setParameter('cuoTipo',$cuoTipo)
                 ->setParameter('cuoYear',$cuoYear);
