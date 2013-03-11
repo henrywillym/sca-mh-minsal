@@ -17,6 +17,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity
  * @ORM\Table(name="sca_entidades_ctg")
  * @UniqueEntity(fields="entNit",message="Ya existe otra empresa con este número de NIT")
+ * @UniqueEntity(fields="entNrc",message="Ya existe otra empresa con este número de NRC")
  */
 class Entidad {
     public static $SI = 'Si';

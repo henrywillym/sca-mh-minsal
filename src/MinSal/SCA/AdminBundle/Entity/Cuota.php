@@ -37,7 +37,7 @@ class Cuota {
      * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
      */
     protected $entidad;
- 
+    
     
     /**
      * @var integer $cuoId

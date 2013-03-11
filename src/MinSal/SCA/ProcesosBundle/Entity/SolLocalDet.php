@@ -4,9 +4,12 @@ namespace MinSal\SCA\ProcesosBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
+use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
+use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDao;
+use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
+use MinSal\SCA\ProcesosBundle\EntityDao\SolLocalDao;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -17,20 +20,49 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SolLocalDet {
     
     public function __construct() {
-        //$this->auditDateIns = new \DateTime();
+        $this->localDetLitrosLib = 0;
+        $this->solLocal = new SolLocal();
+        $this->cuota = new Cuota();
+        $this->inventariosDet = new ArrayCollection();
     }
     
     /**
      * Se encarga de validar que el valor de los grados se encuentre dentro del rango
      */
-    public function isValid(){
+    public function isValid($doctrine, $entidad, $invId){
         $msg = array();
-        if($this->getImpDetLitros()){
-            if($this->getImpDetLitros()+0 <=0 ){
-                $msg[]='- Los litros ingresdos"'.$this->getInvGrado().'" debe ser mayor a 0';
+        if($this->getLocalDetLitros() && $invId){
+            if($this->getLocalDetLitros()+0 <=0 ){
+                $msg[]='- La cantidad en litros ingresados "'.$this->getLocalDetLitros().'" debe ser mayor a 0';
+            }else{
+                $solLocalDao = new SolLocalDao($doctrine);
+                $inventarioDetDao = new InventarioDetDao($doctrine);
+                $inventarioDao = new InventarioDao($doctrine);
+
+                $litrosInventario = $inventarioDetDao->getLitrosInventarioXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
+                $litrosSolicitudesPendientes = $solLocalDao->getLitrosSolicitudXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
+                
+                $disponible = $this->getCuota()->getCuoLitros() - $litrosInventario - $litrosSolicitudesPendientes;
+                
+                if( $this->getLocalDetLitros() > $disponible ){
+                    $msg[]='- La cantidad en litros ingresados "'.$this->getLocalDetLitros().'" es mayor al saldo disponible de la cuota "'.$disponible.'"';
+                }
+                
+                $inventario = $inventarioDao->getInventario($invId);
+                $litrosDisponiblesProveedor = $inventario->getInvLitros() - $inventario->getInvReservado();
+                
+                if( $this->getLocalDetLitros() > $litrosDisponiblesProveedor ){
+                    $msg[]='- No se puede ingresar la solicitud debido a que las existencias del proveedor no pueden cubrir la cantidad a solicitar';
+                }
             }
         }else{
-            $msg[]='- El campo "Litros" se encuentra vacio';
+            if(!$this->getLocalDetLitros()){
+                $msg[]='- El campo "Cantidad" se encuentra vacio';
+            }
+            
+            if(!$invId){
+                $msg[]='- Debe seleccionar un proveedor';
+            }
         }
         
         return $msg;
@@ -42,15 +74,15 @@ class SolLocalDet {
      * @ORM\JoinColumn(name="cuo_id", referencedColumnName="cuo_id")
      */
     protected $cuota;
-        
+            
     /**
-     * ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolicitudLocal", inversedBy="solLocalesDet")
-     * ORM\JoinColumn(name="sollocal_id", referencedColumnName="sollocal_id")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", inversedBy="solLocalesDet", cascade={"persist"})
+     * @ORM\JoinColumn(name="sollocal_id", referencedColumnName="sollocal_id")
      */
     protected $solLocal;
     
     /**
-     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\InventarioDet", mappedBy="solLocalDet")
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\InventarioDet", mappedBy="solLocalDet", cascade={"persist"})
      */
     protected $inventariosDet;
     
@@ -80,6 +112,14 @@ class SolLocalDet {
      * @ORM\Column(name="localdet_uso", type="text", nullable=false)
      */
     private $localDetUso;
+    
+    /**
+     * @var numeric $impDetLitrosLib
+     *
+     * @ORM\Column(name="localdet_litros_lib", type="decimal", nullable=true)
+     * @Assert\Min(limit="0", message="Los litros liberados ingresados {{value}} deben ser mayor a 0")
+     */
+    private $localDetLitrosLib;
     
     
     
@@ -130,8 +170,15 @@ class SolLocalDet {
     public function setInventariosDet($inventariosDet) {
         $this->inventariosDet = $inventariosDet;
     }
-
     
+    public function getLocalDetLitrosLib() {
+        return $this->localDetLitrosLib;
+    }
+
+    public function setLocalDetLitrosLib($localDetLitrosLib) {
+        $this->localDetLitrosLib = $localDetLitrosLib;
+    }
+        
     /******  CUSTOM SET/GET *******/
     public function addInventarioDet($inventarioDet) {
         $this->inventariosDet[] = $inventarioDet;

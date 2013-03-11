@@ -52,7 +52,7 @@ class User extends BaseUser {
      * @ORM\Column(name="usuario_codigo", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $idUsuario;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad", inversedBy="users", cascade={"persist"})
@@ -61,10 +61,13 @@ class User extends BaseUser {
     protected $entidad;
 
     /**
-     * @ORM\ManyToMany(targetEntity="MinSal\SCA\AdminBundle\Entity\RolSistema")
+     * Bidireccional - Ver comentario abajo para saber porque se dejo especificado joincolumns
+     * @ORM\ManyToMany(targetEntity="MinSal\SCA\AdminBundle\Entity\RolSistema", inversedBy="usuarios")
      * @ORM\JoinTable(name="sca_usuario_rol", 
      *              joinColumns={@ORM\JoinColumn(name="usuario_codigo", referencedColumnName="usuario_codigo")},
      *              inverseJoinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")})
+     * 
+     * A mapped superclass cannot be an entity, it is not query-able and persistent relationships defined by a mapped superclass must be unidirectional (with an owning side only). This means that One-To-Many assocations are not possible on a mapped superclass at all. Furthermore Many-To-Many associations are only possible if the mapped superclass is only used in exactly one entity at the moment. For further support of inheritance, the single or joined table inheritance features have to be used.
      */
     protected $rols;
         
@@ -248,30 +251,16 @@ class User extends BaseUser {
    
 
     /**
-     * Get idUsuario
-     *
-     * @return integer 
-     */
-    public function getIdUsuario() {
-        return $this->idUsuario;
-    }
-
-    /**
-     * Set idUsuario
-     *
-     * @param integer $idUsuario
-     */
-    public function setIdUsuario($idUsuario) {
-        $this->idUsuario= $idUsuario;
-    }
-
-    /**
      * Get username
      *
      * @return string 
      */
     public function getUsername() {
         return $this->username;
+    }
+    
+    public function setUsername($username) {
+        return $this->username = $username;
     }
 
     
@@ -416,6 +405,15 @@ class User extends BaseUser {
         $this->auditDeleted = $auditDeleted;
     }
     
+    public function getId() {
+        return parent::getId();
+    }
+
+    public function setId($id) {
+        $this->id = $id;
+    }
+
+        
     public function getUserInternoTipoText() {
     	//ACA SE FILTRA CUAL ES EL TIPO DE MINISTERIO AL QUE PERTENECE
         if($this->userInternoTipo == User::$MINSAL){
@@ -442,5 +440,10 @@ class User extends BaseUser {
         }else if($this->userTipo == User::$DIGITADOR){
             return User::$DIGITADOR_TEXT;
         }
+    }
+    
+    public function addRol(\MinSal\SCA\AdminBundle\Entity\RolSistema $rol)
+    {
+        $this->rols[] = $rol;
     }
 }

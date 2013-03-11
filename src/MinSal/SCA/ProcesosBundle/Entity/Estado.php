@@ -37,6 +37,13 @@ class Estado {
     private $estNombre;
     
     /**
+     * @var string $estNombreBoton
+     *
+     * @ORM\Column(name="est_nombre_boton", type="string", length=50, nullable=false)
+     */
+    private $estNombreBoton;
+    
+    /**
      * @var string $estDesc
      *
      * @ORM\Column(name="est_desc", type="text", nullable=false)
@@ -142,5 +149,13 @@ class Estado {
 
     public function setAuditDeleted($auditDeleted) {
         $this->auditDeleted = $auditDeleted;
+    }
+    
+    public function getEstNombreBoton() {
+        return $this->estNombreBoton;
+    }
+
+    public function setEstNombreBoton($estNombreBoton) {
+        $this->estNombreBoton = $estNombreBoton;
     }
 }

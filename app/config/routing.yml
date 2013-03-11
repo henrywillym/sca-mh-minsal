@@ -24,7 +24,7 @@ MinSalSCAUsersBundle:
     prefix:   /SCA/users
 
 
-#Para seguridad
+# FOSUSERBUNDLE
 fos_user_security:
     resource: "@FOSUserBundle/Resources/config/routing/security.xml"
 
@@ -45,7 +45,6 @@ fos_user_change_password:
     prefix: /change-password
 
 
-    
 #************************
 #***  Reset Clave  ****
 #************************

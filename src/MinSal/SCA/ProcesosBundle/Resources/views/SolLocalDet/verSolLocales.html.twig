@@ -1,0 +1,316 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{# Muestra todas las solicitudes de Compra Local asociadas a la empresa del usuario#}
+
+{% block body %}
+    <script type="text/javascript">
+        var searchOptionNumber = ['eq',
+                                'le','ge',
+                                'bw','bn','ew','en','cn','nc'];
+                            
+        var searchOptionText = ['eq',
+                                'bw','bn','ew','en','cn','nc'];
+                            
+        var searchOptionDate = ['eq',
+                                'le','ge'];
+        gridURLSolXEtapas = '{{ urlJSONSolXEtapas }}';
+        gridURLSolXEntidad ='{{ urlJSONSolXEntidad }}';
+        
+        function verSolxEtapa(etpId, etpNombre){
+            if(etpId==0){
+                $("#theGrid").jqGrid('setGridParam',{
+                        url: gridURLSolXEntidad,
+                        datatype:'json',
+                        loadonce: true
+                }).trigger('reloadGrid')
+                .jqGrid('setCaption', etpNombre);
+            }else{
+                $("#theGrid").jqGrid('setGridParam',{
+                        url: gridURLSolXEtapas.replace(/etpId/g, etpId),
+                        datatype:'json',
+                        loadonce: true
+                }).trigger('reloadGrid')
+                .jqGrid('setCaption', 'Compras Locales - Etapa: "' + etpNombre+'"');
+            }
+            
+            $('[name=transiciones]').css({'background-color':'', 'color':''});
+            $('#tra'+etpId).css({'background-color': global_color, 'color':'white'});
+            
+            cargarEtapas();
+        }
+        
+        var global_i = 0;
+        var global_color = 'navy';
+        function cargarEtapas(){
+            $.getJSON('{{ url('MinSalSCAProcesosBundle_getEtapasLocal') }}', function (json) {
+                // Falta programar que se llame recurrentemente cada cierto tiempo para mantener actualizado el contador
+                // y el grid con las solicitudes.
+                
+                var selectedTab = $('[name=transiciones]').filter(function(a, b){
+                    if(b.style.backgroundColor == global_color){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }).attr('id');
+                
+                $('#etapas').html('<b>Etapas:</b> ');
+                
+                
+                $.each(json.registros, function (i, fb) {
+                    $('#etapas').html($('#etapas').html()+
+                        '<span id="tra'+fb.id+'" name="transiciones" class="etapa" ' +
+                        ' onclick="verSolxEtapa('+ fb.id +', \''+ fb.nombre +'\');"> ' + (fb.cantidad>0?'<b>':'') + fb.nombre +' ('+ fb.cantidad +')' + (fb.cantidad>0?'</b>':'') +'</span>'
+                    );
+                    
+                    if(selectedTab == null && global_i == 0){
+                        global_i = 1;
+                        verSolxEtapa(fb.id, fb.nombre);
+                    }
+                });
+                
+                if(selectedTab != null){
+                    $('#'+selectedTab).css({'background-color': global_color, 'color':'white'});
+                }
+
+            });
+        }
+        
+        $(document).ready(function(){
+            $('#agregarRegistro').button();
+            //$('#eliminarEntidad').button();
+            $('#editarRegistro').button();
+      
+            var myGrid = $('#theGrid');
+            
+            
+            myGrid.jqGrid({ 
+                url: gridURLSolXEtapas.replace(/etpId/g,'0'),
+                width: 1000,
+                height: 300,
+                datatype:'local',
+                altRows:true,            
+                rowNum:10,
+                rowList:[10,20,30],
+                multiselect: false,
+                loadonce:false,
+                jsonReader: {
+                    root:'rows',
+                    page:'page',
+                    total:'total',
+                    records:'records',
+                    repeatitems: false,     /**/
+                    id:"0"                 /**/
+                },
+                pager: jQuery('#pager'),
+                viewrecords: true, 
+                caption: 'Compras Locales',
+                colModel:[{
+                        key:true,
+                        label:'ID',
+                        name:'localDetId', 
+                        index: 'localDetId', 
+                        //hidden: true,
+                        width:30,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{
+                        label:'Nombre Alcohol',
+                        name:'cuoNombreEsp', 
+                        index: 'cuoNombreEsp',
+                        width:120,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{ 
+                        label:'Grado',
+                        name:'cuoGrado', 
+                        index: 'cuoGrado', 
+                        width:60,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{ 
+                        label:'Cantidad (Ltr)',
+                        name:'localDetLitros', 
+                        index: 'localDetLitros', 
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{ 
+                        label:'Fecha Ingreso',
+                        name:'solLocalFechaText', 
+                        index: 'solLocalFechaText', 
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionDate,
+                            dataInit:  function (elem) {
+                                $(elem).datepicker();
+                            }
+                        }
+                    },{
+                        label:'Etapa',
+                        name: 'etpNombre', 
+                        index: 'etpNombre',
+                        stype:'select',
+                        //width:100,
+                        searchoptions:{
+                            dataUrl: '{{ url('MinSalSCAProcesosBundle_getSearchEtapasLocal') }}',
+                            searchhidden: false,
+                            sopt: ['in','ni']
+                        }
+                    },{
+                        label:'Estado',
+                        name:'estNombre', 
+                        index: 'estNombre',
+                        width:70,
+                        search:true,
+                        stype:'select',
+                        searchoptions:{
+                            dataUrl: '{{ url('MinSalSCAProcesosBundle_getSearchEstadosLocal') }}',
+                            searchhidden: false,
+                            sopt: ['in','ni']
+                        }
+                    },{
+                        label:'Nombre Proveedor',
+                        name:'entNombComercial', 
+                        index: 'entNombComercial',
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'Ltr. Liberados',
+                        name:'localDetLitrosLib', 
+                        index: 'localDetLitrosLib',
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{
+                        label:'Auditoría',
+                        name:'auditUserIns', 
+                        index: 'auditUserIns',
+                        width:80,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'Hora Auditoría',
+                        name:'auditDateInsText', 
+                        index: 'auditDateInsText',
+                        //width:90,
+                        searchoptions:{
+                            sopt: searchOptionDate,
+                            dataInit:  function (elem) {
+                                $(elem).datepicker();
+                            }
+                        }
+                    }
+                ],
+                ondblClickRow: function(){$("#editarRegistro").click()},
+                ignoreCase: true,
+                shrinkToFit: false
+            });
+            
+            myGrid.jqGrid('navGrid','#pager',{
+                edit:false,
+                add:false,
+                del:false,
+                beforeRefresh: function() {
+                    $("#theGrid").jqGrid('setGridParam',{
+                            datatype:'json',
+                            loadonce:true
+                    });//.trigger('reloadGrid');
+                }
+            });
+            
+            cargarEtapas();
+            
+            $("#agregarRegistro").click(function(){
+                location.href = '{{ url('MinSalSCAProcesosBundle_mantSolLocalIngreso')}}';
+            });
+
+
+             //editar
+            $("#editarRegistro").click(function(){
+                var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+
+                if( gr != null ){
+                    location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarSolLocal', {'localDetId':'localDetId'})}}'.replace(/localDetId/g, gr);
+                }else{ 
+                    alert("Por favor seleccione una fila para editar!"); 
+                }
+            });
+      //fin
+       
+      });
+    </script>
+    
+    <style>
+            .etapa{
+                cursor: pointer; 
+                text-decoration:underline; 
+                color: navy; 
+                padding: 5px 10px; 
+                border: #000000 1px solid; 
+                background: #d0e5f5;
+                margin-right: -1px;
+            }
+    </style>
+      
+    <form action="" method="post">
+        <table align="center">
+            <tr><td align="center">
+                    {% if entNombComercial %}
+                        <h1>Compras Locales de "{{entNombComercial}}"</h1>
+                    {% else %}
+                        <h1>Evaluacion de Registro de Compras Locales</h1>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    {% if app.session.hasFlash('notice') %}
+                        <div class="flash-notice">
+                            {{ app.session.flash('notice') }}
+                        </div><br/>
+                    {% endif %}
+                    
+                    <div style="width: 105%; text-align: left; margin-bottom: 7px; font-family:'Lucida Sans Unicode'; font-size: 11px;">
+                        
+                        {% if entNombComercial %}
+                        <span id="solicitudesIngresadas">
+                            <span id="tra0" name="transiciones" class="etapa"
+                                  onclick="verSolxEtapa(0, 'Compras Locales Ingresadas');">
+                                Ver Compras Locales
+                            </span>
+                        </span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        
+                        <span id="etapas">
+                        </span>
+                        <br/>
+                    </div>
+                    
+                    <table id="theGrid" class="scroll">
+                    </table> 
+
+                    <div id="pager" class="scroll" style="text-align:center;">
+                    </div> 
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <!--<input type="button" value="Agregar" id="agregarRegistro" />-->
+                    <input type="button" value="Ver" id="editarRegistro" />
+                </td>
+            </tr>
+        </table>        
+    </form>
+    <br></br>
+    <br></br>
+    
+{% endblock %}

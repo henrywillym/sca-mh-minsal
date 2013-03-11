@@ -7,6 +7,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
+use MinSal\SCA\ProcesosBundle\Entity\SolLocalDet;
+use MinSal\SCA\ProcesosBundle\Entity\Transicion;
 
 /**
  * @ORM\Entity
@@ -17,12 +19,13 @@ class SolLocal {
     public function __construct() {
         $this->entidad = new Entidad();
         $this->solLocalesDet = new ArrayCollection();
+        $this->transicion = new Transicion();
         $this->solLocalFecha = new \DateTime();
         $this->auditDateIns = new \DateTime();
     }
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad", inversedBy="inventarios")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad")
      * @ORM\JoinColumn(name="ent_id", referencedColumnName="ent_id")
      */
     protected $entidad;
@@ -34,7 +37,7 @@ class SolLocal {
     protected $transicion;
     
     /**
-     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocalDet", mappedBy="solLocal", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocalDet", mappedBy="solLocal")
      */
     protected $solLocalesDet;
     
@@ -58,15 +61,15 @@ class SolLocal {
     
     
     /**
-     * @var DateTime $solLocalFecha
+     * @var \DateTime $solLocalFecha
      *
-     * @ORM\Column(name="sollocal_fecha", type="datetime", nullable=false)
+     * @ORM\Column(name="sollocal_fecha", type="date", nullable=false)
      */
     private $solLocalFecha;
     
     
     /**
-     * @var DateTime $auditDateIns
+     * @var \DateTime $auditDateIns
      *
      * @ORM\Column(name="audit_date_ins", type="datetime")
      */
@@ -81,7 +84,7 @@ class SolLocal {
     private $auditUserIns;
     
     /**
-     * @var DateTime $auditDateUpd
+     * @var \DateTime $auditDateUpd
      *
      * @ORM\Column(name="audit_date_upd", type="datetime", nullable=true)
      */
@@ -179,7 +182,24 @@ class SolLocal {
         
 
     //*********** CUSTOM SET/GET ******************
-    public function addSolLocalDet($solLocalDet) {
+    public function addSolLocalDet(SolLocalDet $solLocalDet) {
         $this->solLocalesDet[] = $solLocalDet;
+    }
+    
+    
+    public function getAuditDateUpdText() {
+        if($this->auditDateUpd){
+            return $this->auditDateUpd->format('Y-m-d H:i:s');
+        }else{
+            return '';
+        }
+    }
+    
+    public function getAuditDateInsText() {
+        return $this->auditDateIns->format('Y-m-d H:i:s');
+    }
+    
+    public function getSolLocalFechaText() {
+        return $this->solLocalFecha->format('Y-m-d');
     }
 }

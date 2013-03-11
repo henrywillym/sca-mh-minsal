@@ -18,7 +18,6 @@ class InventarioDet {
     public function __construct() {
         $this->inventario = new Inventario();
         $this->invDetAccion = '+';
-        $this->invDetComentario = 'Inventario Inicial';
         $this->auditDeleted = false;
     }
     
@@ -65,7 +64,7 @@ class InventarioDet {
     protected $solImportacionDet;
     
     /**
-     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocalDet", inversedBy="inventariosDet")
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocalDet", inversedBy="inventariosDet", cascade={"persist"})
      * @ORM\JoinColumn(name="localdet_id", referencedColumnName="localdet_id")
      */
     protected $solLocalDet;
@@ -179,11 +178,11 @@ class InventarioDet {
     }
 
     public function getSolImportacionDet() {
-        return $this->solImportacion;
+        return $this->solImportacionDet;
     }
 
     public function setSolImportacionDet($solImportacionDet) {
-        $this->solImportacion = $solImportacionDet;
+        $this->solImportacionDet = $solImportacionDet;
     }
 
     public function getSolLocalDet() {
