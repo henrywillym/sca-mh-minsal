@@ -5,7 +5,7 @@ use Doctrine\ORM\EntityRepository;
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\Form\Type\AlcoholType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 
@@ -29,7 +29,7 @@ class RegVentaType extends AbstractType {
      * 
      * @param \Symfony\Component\OptionsResolver\OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions1(OptionsResolverInterface $resolver){
+    public function setDefaultOptions(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
             'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\RegVenta'
         ));
@@ -46,7 +46,7 @@ class RegVentaType extends AbstractType {
         );
     }
     
-    public function buildForm(FormBuilder $builder, array $opciones){
+    public function buildForm(FormBuilderInterface $builder, array $opciones){
         $builder->add('RegVentaId', 'hidden');
         
         /*$builder->add('alcohol', 'entity', array(
@@ -72,7 +72,7 @@ class RegVentaType extends AbstractType {
         $builder->add('regveMinsal', null, array('label' => 'Registro Usuario (MINSAL)'));
         $builder->add('regvedgii', null, array('label' => 'Numero Registro DGII'));
         $builder->add('regveLitros', null, array('label' => 'lts'));
-        $builder->add('regveGrado',  null, array('label' => 'Grado','attr' => array('readonly' => 'readonly')));
+        $builder->add('regveGrado',  null, array('label' => 'Grado'/*,'attr' => array('readonly' => 'readonly'*/));
         
     }
 
@@ -84,7 +84,8 @@ class RegVentaType extends AbstractType {
         
         $registros = $this->em->createQuery("SELECT E
                                           FROM MinSalSCAAdminBundle:Cuota E
-                                          WHERE E.entidad = :entid ")
+                                          WHERE E.entidad = :entid 
+                                          AND E.auditDeleted = FALSE")
                 ->setParameter('entid',$this->entid);
         $result= $registros->getArrayResult();
         

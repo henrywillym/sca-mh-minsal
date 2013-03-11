@@ -19,7 +19,7 @@ MinSalSCAProcesosBundle_mantCargarInventarioDet:
     
     
 #****************************
-#*** Registro Ventas ***
+#***    Registro Ventas   ***
 #****************************
 MinSalSCAProcesosBundle_mantRegVenta:
     pattern:  /RegVenta/mantRegVenta
@@ -40,9 +40,9 @@ MinSalSCAProcesosBundle_getGradoRV:
     pattern:  /RegVenta/getGradoRV/{CuoId}
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:getGradoRV } 
     
-#****************************
+#********************************
 #*** Registro Detalle Menusal ***
-#****************************
+#********************************
 MinSalSCAProcesosBundle_mantRegMensual:
     pattern:  /RegMensual/mantRegMensual
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:mantRegMensual } 
@@ -171,13 +171,3 @@ MinSalSCAProcesosBundle_getEtapasLocal:
     pattern:  /Solicitud/Local/getEtapas
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getEtapas }
     
-    
-    
-    
-MinSalSCAProcesosBundle_mantRegVenta:
-    pattern:  /Solicitud/Local/getEtapas
-    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getEtapas }
-    
-MinSalSCAProcesosBundle_mantRegMensual:
-    pattern:  /Solicitud/Local/getEtapas
-    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getEtapas }
