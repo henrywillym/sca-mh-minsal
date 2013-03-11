@@ -1,0 +1,155 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{# Muestra todos los Productores, Importadores y Compradores Locales Registrados#}
+
+{% block body %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#agregarRegistro').button();
+            //$('#eliminarEntidad').button();
+            $('#editarRegistro').button();
+      
+            var myGrid = $('#theGrid');
+            
+            myGrid.jqGrid({ 
+                url: '{{ url('MinSalSCAProcesosBundle_consultarRegVentaJSON') }}',
+                width: 1000,
+                height: 300,
+                datatype:'json',
+                altRows:true,            
+                rowNum:10,
+                rowList:[10,20,30],
+                multiselect: false,
+                loadonce:true,
+                jsonReader: {
+                    root:'rows',
+                    page:'page',
+                    total:'total',
+                    records:'records',
+                    repeatitems: false,     /**/
+                    id:"0"                 /**/
+                },
+                pager: jQuery('#pager'),
+                viewrecords: true, 
+                caption: 'Registro de Ventas Mensuales',
+                colModel:[{
+                        key:true,
+                        label:'ID',
+                        name:'RegVentaId', 
+                        index: 'RegVentaId', 
+                        hidden: true,
+                        width:20
+                    },{ label:'NIT',
+                        name:'regveNIT', 
+                        index: 'nit',
+                        width:65
+                    },{
+                        label:'Nombre Cliente',
+                        name:'regveNombre', 
+                        index: 'Nombre',
+                        width:75
+                    },{ 
+                        label:'Cantidad (Ltr)',
+                        name:'regveLitros', 
+                        index: 'regveLitros', 
+                        width:50
+                    },{ 
+                        label:'Nombre Alcohol',
+                        name:'cuoNombreEsp', 
+                        index: 'alcohol', 
+                        width:90
+                    },{ 
+                        label:'Fecha',
+                        name:'regveFecha', 
+                        index: 'regveFecha', 
+                        width:60
+                    },{ 
+                        label:'Registro de Usuario(MINSAL)',
+                        name:'regveMinsal', 
+                        index: 'regveMinsal', 
+                        width:90
+                    },{ 
+                        label:'Numero Resolucion DGII',
+                        name:'regvedgii', 
+                        index: 'regvedgii', 
+                        width:90
+                    }
+                ],
+                ondblClickRow: function(){$("#editarRegistro").click()}
+            });
+            
+            myGrid.jqGrid('navGrid','#pager',{
+                edit:false,
+                add:false,
+                del:false,
+                beforeRefresh: function() {
+                    $("#theGrid").jqGrid('setGridParam',{
+                            datatype:'json',
+                            loadonce:true
+                    }).trigger('reloadGrid');
+                }
+            }
+        );
+       
+        function despuesAgregarEditar() {
+            $("#theGrid").jqGrid('setGridParam',{
+                datatype:'json',
+                loadonce:true
+            }).trigger('reloadGrid');
+            
+            return[true,'']; //no error
+        }
+        
+        $("#agregarRegistro").click(function(){
+            location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarRegVenta', {'RegVentaId':'RegVentaId'})}}'.replace(/RegVentaId/g, '-1');
+        });
+        
+    
+         //editar
+        $("#editarRegistro").click(function(){
+            var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+            
+            if( gr != null ){
+                location.href = '{{ url('MinSalSCAProcesosBundle_mantCargarRegVenta', {'RegVentaId':'RegVentaId'})}}'.replace(/RegVentaId/g, gr);
+            }else{ 
+                alert("Por favor seleccione una fila para editar!"); 
+            }
+        });
+
+  //fin
+       
+      });
+    </script>
+      
+    <form action="" method="post">
+        <table align="center">
+            <tr><td align="center">
+                    <h1>Ingreso de Registro Mensual de Ventas de Importadores y Compradores Locales <br>Empresa "{{entNombComercial}}"</h1>
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    {% if app.session.hasFlash('notice') %}
+                        <div class="flash-notice">
+                            {{ app.session.flash('notice') }}
+                        </div><br/>
+                    {% endif %}
+                    
+                    <table id="theGrid" class="scroll">
+                    </table> 
+
+                    <div id="pager" class="scroll" style="text-align:center;">
+                    </div> 
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <input type="button" value="Agregar" id="agregarRegistro" />
+                    <input type="button" value="Editar" id="editarRegistro" />
+                </td>
+            </tr>
+        </table>        
+    </form>
+    <br></br>
+    <br></br>
+    
+{% endblock %}

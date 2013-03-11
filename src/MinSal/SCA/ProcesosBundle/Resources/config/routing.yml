@@ -18,6 +18,50 @@ MinSalSCAProcesosBundle_mantCargarInventarioDet:
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAInventariosDet:mantCargarInventarioDet } 
     
     
+#****************************
+#*** Registro Ventas ***
+#****************************
+MinSalSCAProcesosBundle_mantRegVenta:
+    pattern:  /RegVenta/mantRegVenta
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:mantRegVenta } 
+    
+MinSalSCAProcesosBundle_consultarRegVentaJSON:
+    pattern:  /RegVenta/consultarRegVentaJSON
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:consultarRegVentaJSON } 
+
+MinSalSCAProcesosBundle_mantRegVentaEdicion:
+    pattern:  /RegVenta/mantRegVentaEdicion
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:mantRegVentaEdicion }
+
+MinSalSCAProcesosBundle_mantCargarRegVenta:
+    pattern:  /RegVenta/mantCargarRegVenta/{RegVentaId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:mantCargarRegVenta } 
+MinSalSCAProcesosBundle_getGradoRV:
+    pattern:  /RegVenta/getGradoRV/{CuoId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegVenta:getGradoRV } 
+    
+#****************************
+#*** Registro Detalle Menusal ***
+#****************************
+MinSalSCAProcesosBundle_mantRegMensual:
+    pattern:  /RegMensual/mantRegMensual
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:mantRegMensual } 
+    
+MinSalSCAProcesosBundle_consultarRegMensualJSON:
+    pattern:  /RegMensual/consultarRegMensualJSON
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:consultarRegMensualJSON } 
+
+MinSalSCAProcesosBundle_mantRegMensualEdicion:
+    pattern:  /RegMensual/mantRegMensualEdicion
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:mantRegMensualEdicion }
+
+MinSalSCAProcesosBundle_mantCargarRegMensual:
+    pattern:  /RegMensual/mantCargarRegMensual/{RegMenId}
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCARegMensual:mantCargarRegMensual } 
+    
+        
+    
+    
 #*****************************
 #*** Solicitud Importacion ***
 #*****************************
