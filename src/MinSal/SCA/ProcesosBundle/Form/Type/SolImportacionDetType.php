@@ -4,7 +4,7 @@ namespace MinSal\SCA\ProcesosBundle\Form\Type;
 use Doctrine\ORM\EntityRepository;
 //use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
@@ -16,7 +16,7 @@ use MinSal\SCA\AdminBundle\Entity\Entidad;
  */
 class SolImportacionDetType extends AbstractType {
     private $doctrine;
-    private $entId;
+    //private $entId;
     
     public function __construct($doctrine){
         $this->doctrine = $doctrine;
@@ -28,7 +28,7 @@ class SolImportacionDetType extends AbstractType {
      * 
      * @param \Symfony\Component\OptionsResolver\OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions1(OptionsResolverInterface $resolver){
+    public function setDefaultOptions(OptionsResolverInterface $resolver){
         $resolver->setDefaults(array(
             'data_class' => 'MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet'
         ));
@@ -45,7 +45,7 @@ class SolImportacionDetType extends AbstractType {
         );
     }
     
-    public function buildForm(FormBuilder $builder, array $opciones){
+    public function buildForm(FormBuilderInterface $builder, array $opciones){
         $builder->add('impDetId', 'hidden');
         
         $builder->add('arancel', 'entity', array(
@@ -93,20 +93,24 @@ class SolImportacionDetType extends AbstractType {
             //'em'=> 'doctrine.orm.entity_manager'
         ));/**/
         
-        $builder->add('cuota.cuoId', 'hidden', array(
+        $builder->add('cuoId', 'hidden', array(
             'label'=>'Nombre del Alcohol',
-            //'property_path'=>false
+            'property_path'=> 'cuota.cuoId'
         ));/**/
             
-        $builder->add('impDetFactCom', 'text', array('label' => 'No. Factura Comercial','required'=>true));
+        $builder->add('impDetFactCom', 'text', array('label' => 'No. Factura Comercial','required'=>true, 'attr' => array('autocomplete' => 'off'),));
         $builder->add('impDetProvNom', 'text', array('label' => 'Nombre Empresa Proveedora','required'=>true));
         $builder->add('impDetPaisProc',  null, array('label' => 'País de Procedencia'));
         $builder->add('impDetPaisOri',  null, array('label' => 'País de Origen'));
-        $builder->add('impDetProvDirec',  null, array('label' => 'Dirección Proveedor (Exterior)'));
-        $builder->add('impDetLitros',  null, array('label' => 'Cantidad (Lts)'));
+        $builder->add('impDetProvDirec',  'text', array('label' => 'Dirección Proveedor (Exterior)','required'=>true));
+        $builder->add('impDetLitros',  null, array('label' => 'Cantidad (Lts)', 'attr' => array('autocomplete' => 'off'),));
         $builder->add('impDetUso',  null, array('label' => 'Uso del Alcohol'));
         
-        //$builder->add('solImpComentario',  null, array('label' => 'Comentarios'));
+        //$builder->add('solImportacion.solImpComentario',  'hidden', array('label' => 'Comentarios'));
+        $builder->add('impDetLitrosLib',  null, array(
+            'label' => 'Litros Liberados',
+            'attr' => array('readonly' => 'readonly'),
+        ));
     }
 
     public function getName(){

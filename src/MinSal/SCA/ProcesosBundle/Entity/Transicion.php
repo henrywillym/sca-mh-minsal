@@ -14,9 +14,12 @@ class Transicion {
     
     public function __construct() {
         $this->auditDateIns = new \DateTime();
+        $this->traComentario = false;
+        $this->traLitrosLibera = false;
+        $this->traNotificaEmpresa = false;
         
         $this->solImportaciones = new ArrayCollection();
-        //$this->solLocales = new ArrayCollection();
+        $this->solLocales = new ArrayCollection();
         $this->parentsTransicion = new ArrayCollection();
         $this->childrenTransicion = new ArrayCollection();
     }
@@ -56,9 +59,9 @@ class Transicion {
     protected $solImportaciones;
     
     /**
-     * ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", mappedBy="transicion")
+     * @ORM\OneToMany(targetEntity="MinSal\SCA\ProcesosBundle\Entity\SolLocal", mappedBy="transicion")
      */
-    //protected $solLocales;
+    protected $solLocales;
     
     /**
      * Many to Many Self-Reference
@@ -74,6 +77,11 @@ class Transicion {
      * )
      **/
     protected $childrenTransicion;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="MinSal\SCA\AdminBundle\Entity\RolSistema", mappedBy="transiciones")
+     */
+    protected $rols;
 
     
     
@@ -85,6 +93,34 @@ class Transicion {
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $traId;
+    
+    /**
+     * @var boolean $traComentario
+     *
+     * @ORM\Column(name="tra_comentario", type="boolean", nullable=false)
+     */
+    private $traComentario;
+    
+    /**
+     * @var boolean $traLitrosLibera
+     *
+     * @ORM\Column(name="tra_litros_libera", type="boolean", nullable=false)
+     */
+    private $traLitrosLibera;
+    
+    /**
+     * @var boolean $traNotificaEmpresa
+     *
+     * @ORM\Column(name="tra_notifica_empresa", type="boolean", nullable=false)
+     */
+    private $traNotificaEmpresa;
+    
+    /**
+     * @var boolean $traLiberaTotal
+     *
+     * @ORM\Column(name="tra_libera_total", type="boolean", nullable=false)
+     */
+    private $traLiberaTotal;
     
     /**
      * @var DateTime $auditDateIns
@@ -242,11 +278,64 @@ class Transicion {
     public function setChildrenTransicion($childrenTransicion) {
         $this->childrenTransicion = $childrenTransicion;
     }
+    
+    public function getTraComentario() {
+        return $this->traComentario === 'true' || $this->traComentario === true;
+    }
 
-        
+    public function setTraComentario($traComentario) {
+        $this->traComentario = $traComentario;
+    }
+    
+    public function getTraLitrosLibera() {
+        return $this->traLitrosLibera === 'true' || $this->traLitrosLibera === true;
+    }
+
+    public function setTraLitrosLibera($traLitrosLibera) {
+        $this->traLitrosLibera = $traLitrosLibera;
+    }
+    
+    public function getTraLiberaTotal() {
+        return $this->traLiberaTotal=== 'true' || $this->traLiberaTotal === true;
+    }
+
+    public function setTraLiberaTotal($traLiberaTotal) {
+        $this->traLiberaTotal = $traLiberaTotal;
+    }
+    
+    public function getRols() {
+        return $this->rols;
+    }
+
+    public function setRols($rols) {
+        $this->rols = $rols;
+    }
+    
+    public function getTraNotificaEmpresa() {
+        return $this->traNotificaEmpresa=== 'true' || $this->traNotificaEmpresa === true;
+    }
+
+    public function setTraNotificaEmpresa($traNotificaEmpresa) {
+        $this->traNotificaEmpresa = $traNotificaEmpresa;
+    }
+    
+    public function getSolLocales() {
+        return $this->solLocales;
+    }
+
+    public function setSolLocales($solLocales) {
+        $this->solLocales = $solLocales;
+    }
+    
+    
+    
     //*********** CUSTOM SET/GET ******************
     public function addSolImportacion($solImportacion) {
         $this->solImportaciones[] = $solImportacion;
+    }
+    
+    public function addSolLocal($solLocal) {
+        $this->solLocales[] = $solLocal;
     }
     
     public function addParentTransicion($transicion) {
@@ -255,5 +344,10 @@ class Transicion {
     
     public function addChildTransicion($transicion) {
         $this->childrenTransicion[] = $transicion;
+    }
+    
+    public function addRol(\MinSal\SCA\AdminBundle\Entity\RolSistema $rol)
+    {
+        $this->rols[] = $rol;
     }
 }

@@ -1,5 +1,9 @@
 {% extends 'MinSalSCABundle:Default:index.html.twig' %}
 
 {% block body %}
-    <h2> Su usuario ({{user.username}}) ha sido activado satisfactoriamente. Ya puede utilizar el sistema SCA.</h2>
+    <h2> Su usuario ({{user.username}}) ha sido activado satisfactoriamente. En unos momentos sera redireccionada al sistema SCA. 
+    Si lo prefiere, también puede hacer click en el boton "Inicio"</h2>
+    <script type="text/javascript">
+        location.href = '{{url('root')}}';
+    </script>
 {% endblock body%}

@@ -26,7 +26,7 @@ class ChangePasswordController extends BaseController{
         
         return $this->container->get('templating')->renderResponse('MinSalSCAUsersBundle:ChangePassword:changePassword.html.twig', array(
             'form' => $form->createView(),
-            'theme' => $this->container->getParameter('fos_user.template.theme'),
+            //'theme' => $this->container->getParameter('fos_user.template.theme'),
             'opciones' => $opciones
         ));
     }
@@ -56,7 +56,7 @@ class ChangePasswordController extends BaseController{
             'MinSalSCAUsersBundle:ChangePassword:changePassword.html.'.$this->container->getParameter('fos_user.template.engine'),
             array(
                 'form' => $form->createView(), 
-                'theme' => $this->container->getParameter('fos_user.template.theme'),
+                //'theme' => $this->container->getParameter('fos_user.template.theme'),
                 'opciones' => $opciones
             )
         );

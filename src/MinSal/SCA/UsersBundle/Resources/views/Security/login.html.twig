@@ -18,7 +18,7 @@
                 <label for="username">{{ 'Usuario:'|trans({}, 'FOSUserBundle') }}</label>
             </td>
             <td>
-                <input type="text" id="username" name="_username" value="{{ last_username }}" />
+                <input type="text" id="username" name="_username" autocomplete="off" value="{{ last_username }}" />
             </td>
         </tr>
         
@@ -39,12 +39,40 @@
         <tr>
             <td colspan="2" style=" font-size: 12px; font-family: Verdana, Geneva, sans-serif; color: red " >
                 {% if error %}
-                 {% if error=='Bad credentials' %}
-                    <div>NO EXISTE ESE USUARIO</div>
-                 {% endif %}
-                 {% if error=='The presented password is invalid.' %}
-                    <div>PASSWORD EQUIVOCADO VUELVA A DIGITARLO</div>
-                 {% endif %}
+                    {% if error=='Bad credentials' %}
+                       <div>NO EXISTE ESE USUARIO</div>
+                    {% elseif error=='The presented password is invalid.' %}
+                       <div>USUARIO/PASSWORD INCORRECTOS</div>
+                    {% elseif error=='User account is disabled.' %}
+                       <div id="msgDialogComentario" title="Notificación" style="display:none">
+                           LA CUENTA NO SE ENCUENTRA CONFIRMADA AUN. PARA ACTIVARLA ES NECESARIO SEGUIR LAS INSTRUCCIONES QUE SE PROPORCIONARON EN EL CORREO DE ACTIVACION
+                       </div>
+                       <script type="text/javascript"> 
+                           $("#msgDialogComentario").dialog({
+                                modal: true,
+                                resizable: false,
+                                draggable: false,
+                                position: 'center',
+                                dialogClass: "no-close",
+                                buttons:[
+                                    {
+                                        text: "OK",
+                                        click: function() {
+                                            $( this ).dialog( "close" );
+                                        }
+                                    }
+                                ]
+                            });
+                       </script>
+                       
+                    {% else %}
+                       {{ error }}
+                    {% endif %}
+                {% endif %}
+                {% if app.request.session.get('notice') %}
+                    <div class="flash-notice">
+                        {{ app.request.session.get('notice') }}
+                    </div><br/>
                 {% endif %}
             </td>
         </tr>

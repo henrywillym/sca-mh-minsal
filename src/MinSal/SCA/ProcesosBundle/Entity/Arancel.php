@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Arancel {
     
     public function __construct() {
-        
+        $this->auditDateIns = new \DateTime();
     }
     
     public function __toString() {

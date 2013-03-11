@@ -30,7 +30,7 @@ class AccionSCARegVentaController extends Controller {
         $user = $this->get('security.context')->getToken()->getUser();
         
         if($user->getEntidad()==null){
-            return $this->render('MinSalSCAProcesosBundle:RegVenta:mantRegVentaNoEntidad.html.twig', array(
+            return $this->render('MinSalSCAProcesosBundle:Default:mantNoEntidad.html.twig', array(
                         'opciones' => $opciones
                     )
             );

@@ -228,7 +228,7 @@ class RolDao {
                     $where = $where.' OR ';
                 }
 
-                $where = $where.'    (R.rolComprador = :rolComprador AND R.rolCompVend = :rolCompVend )';
+                $where = $where.'    (R.rolComprador = :rolComprador OR R.rolCompVend = :rolCompVend )';
                 $query = $query->setParameter('rolComprador',$entComprador === true?1:0 );
                 $query = $query->setParameter('rolCompVend',$entVendedorLocal === true?1:0 );
             }

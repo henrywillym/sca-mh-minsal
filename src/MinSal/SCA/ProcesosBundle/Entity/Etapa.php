@@ -12,6 +12,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Etapa {
     
+    //La codificacion de etapas se utiliza para filtrar las consultas de solicitudes y determinar cuota reservada o utilizada
+    public static $FINALIZADA_OBS = 9;
+    public static $RECEPCION_TOTAL_INV = 6;
+    
     public function __construct() {
         $this->auditDateIns = new \DateTime();
     }

@@ -17,7 +17,7 @@
                 return true;
             }else{
                 $.getJSON('{{ path('MinSalSCAUsersBundle_verificaCreacion') }}'+
-                        '?idUsuario='+ $('#fos_user_registration_form_idUsuario').val() +
+                        '?idUsuario='+ $('#fos_user_registration_form_id').val() +
                         '&username='+$("#fos_user_registration_form_username").get(0).value+
                         '&email='+$("#fos_user_registration_form_email").get(0).value, 
                     function(data) {
@@ -60,10 +60,11 @@
     });
     
     function AcomodarFormulario(){
-        if($('#fos_user_registration_form_idUsuario').val() ==''){
+        if($('#fos_user_registration_form_id').val() ==''){
             $('#eliminarUsuario').hide();
         }else{
             $('#eliminarUsuario').show();
+            $('#update').val('true');
         }
         
         var userInterno = getUserInterno();
@@ -124,6 +125,7 @@
             if(!confirm('!Desea abortar la eliminacion??')){
                 $('#valido').val(true);
                 $('#eliminar').val(true);
+                $('#update').val(false);
                 $('#formUsuario').submit();
                 return true;
             }
@@ -142,8 +144,9 @@
     {# LA URL DICE QUE ES PARA USUARIOS EXTERNOS, PERO LA VERDAD ES QUE POR LA ESTRUCTURA DE LOS PARAMETROS, FUNCIONA PARA USUARIOS INTERNOS #}
     {# ************************************************** #}
     <form id="formUsuario" action="{{ path('MinSalSCAUsersBundle_registerUsuarioExterno', {'userInterno':userInterno, 'entId':entId}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_registration_register">
-        <input type="hidden" id="valido" value=false/>
-        <input type="hidden" id="eliminar" name="eliminar" value=false/>
+        <input type="hidden" id="valido" value="false" />
+        <input type="hidden" id="eliminar" name="eliminar" value="false" />
+        <input type="hidden" id="update" name="update" value="false" />
         
             <table align='center' style="border: 1px solid;" >
                 <tr>
@@ -170,6 +173,7 @@
                         {{ form_widget(form.plainPassword.first) }}
                         <div class="flash-notice">
                             {{ form_errors(form.plainPassword) }}
+                            {{ form_errors(form.plainPassword.first) }}
                         </div>
                     </td>
                 </tr>   

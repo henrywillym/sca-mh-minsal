@@ -1,0 +1,421 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{% form_theme form 'MinSalSCAUsersBundle:ChangePassword/Form:fields.html.twig' %}
+
+{% block body %}
+    <script type="text/javascript">
+        function CambiarEstado(traId, traComentario, traLitrosLibera, tmpVar){
+            var url = '';
+            
+            if(traComentario == true || traLitrosLibera==true){
+                var enviar = false;
+                
+                if(traComentario == true){
+                    $('#comentario').removeAttr('readonly');
+                    $("#msgDialogComentario").dialog({
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        position: 'center',
+                        dialogClass: "no-close",
+                        buttons:[
+                            {
+                                text: "Continuar",
+                                click: function() {
+                                    if($('#comentario').val()==''){
+                                        alert('Debe ingresar un comentario');
+                                    }else{
+                                        $('#solLocalComentario').val($('#comentario').val());
+                                        $( this ).dialog( "close" );
+                                        CambiarEstado(traId, false, traLitrosLibera, 2);
+                                    }
+                                }
+                            },{
+                                text: "Cancelar",
+                                click: function() {
+                                    enviar = false;
+                                    $( this ).dialog( "close" );
+                                }
+                            }
+                        ]
+                    });
+                }else{
+                    if(!tmpVar){
+                        tmpVar = 2;
+                    }
+                }
+                
+                if(traLitrosLibera == true && tmpVar == 2){
+                    $('#litrosLibera').removeAttr('readonly');
+                    $("#msgDialogLitrosLibera").dialog({
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        position: 'center',
+                        dialogClass: "no-close",
+                        buttons:[
+                            {
+                                text: "Continuar",
+                                click: function() {
+                                    if(isNaN(Number($('#litrosLibera').val()))){
+                                        alert('Debe ingresar un número valido');
+                                    }else if($('#litrosLibera').val()==''){
+                                        alert('Debe ingresar los litros a liberar');
+                                    }else if( (Number($('#litrosLibera').val()) + Number($('#SolLocalDet_localDetLitrosLib').val())) >= Number($('#SolLocalDet_localDetLitros').val())){
+                                        alert('No puede liberar parcialmente una cantidad igual o mayor a la especificada en la solicitud. Debe ingresar una cantidad menor ');
+                                    }else if( Number($('#litrosLibera').val()) <= 0){
+                                        alert('Debe ingresar una cantidad mayor a 0');
+                                    }else{  
+                                        $('#localDetLitrosLib').val($('#litrosLibera').val());
+                                        $(this).dialog( "close" );
+                                        CambiarEstado(traId, false, false, 3);
+                                    }
+                                }
+                            },{
+                            text: "Cancelar",
+                            click: function() {
+                                enviar = false;
+                                $( this ).dialog( "close" );
+                            }
+                          }
+                        ]
+                    });
+                }
+            } else{
+                enviar = true;
+            }
+            
+            if(enviar){
+                url = '{{ path('MinSalSCAProcesosBundle_cambiarEstadoLocal',{'localDetId':'localDetId', 'traId':'traId'})}}';
+                url = url.replace(/traId/g, traId).replace(/localDetId/g,localDetId);
+                $('#formulario').attr('action',url);
+                $('#formulario').submit();
+            }
+        }
+        
+        function calcularSaldo(){
+            $('#saldo').val($('#disponible').val() - $('#SolLocalDet_localDetLitros').val());
+        }
+        
+        function validarFormulario(){
+            var msg ='';
+            
+            if(localDetId == '0' && $('#saldo').val() <0){
+                msg += '- La cantidad de litros ingresada, sobrepasa la cuota disponible\n';
+            }
+            
+            if(localDetId == '0' && $('#invId').val() == ''){
+                msg += '- No se puede ingresar la solicitud debido a que no existen proveedores con existencias\n';
+            }
+            
+            if(localDetId == '0' && $('#disponibleProv').val() - $('#SolLocalDet_localDetLitros').val() < 0){
+                msg += '- No se puede ingresar la solicitud debido a que las existencias del proveedor no pueden cubrir la cantidad a solicitar\n';
+            }
+            
+            return msg;
+        }
+        
+        function enviarFormulario(){
+            var msg = validarFormulario();
+            
+            if(msg != ''){
+                alert(msg);
+                return false;
+            }else{
+                $('#btnGuardar').attr('disabled','disabled');
+                return true;
+            }
+        }
+        
+        var localDetId = '0';
+        
+        $(document).ready(function(){
+            $('#btnGuardar').button();
+            $('#btnEliminar').button();
+            $('#btnRegresar').button();
+            
+            
+            //Si localDetId es vacio, quiere decir que es ingreso de solicitud
+            //Pero si tiene ya un ID asignado es debido a que se desea ver la solicitud y evaluarla si tiene los permisos
+            if($('[id="SolLocalDet_localDetId"]').val() !='' ){
+                $('[name="verSolicitud"]').hide();
+                $('#btnGuardar').hide();
+                $('#btnRegresar').show();
+                $('#cuota,#invId').prop("disabled",true);
+                $('input[type="text"]').attr('readonly','readonly');
+                $('textarea').attr('readonly','readonly');
+                localDetId = $('[id="SolLocalDet_localDetId"]').val();
+            }else{
+                $('[name="ingresaSolicitud"]').hide();
+            }
+            
+            $.ajax({
+                url:'{{url('MinSalSCAProcesosBundle_getCuotasLocal')}}?localDetId='+localDetId,
+                type: 'POST',
+                cache: false,
+                success: function(data, textStatus, jqXHR){
+                    $('#cuota')[0].innerHTML = data;
+                    //$('#cuota>select').attr('id','cuota');
+                    
+                    if($('[id="SolLocalDet_cuoId"]').val() !='' ){
+                        $('#cuota').val($('[id="SolLocalDet_cuoId"]').val());
+                    }
+                    
+                    $('#cuota').change(function(){
+                        $('#grado').val($('#cuota').children("option").filter("[value='"+ $('#cuota').val() +"']").attr('grado'));
+                        $('#disponible').val($('#cuota').children("option").filter("[value='"+ $('#cuota').val() +"']").attr('disponible'));
+                        calcularSaldo();
+                        $('[id="SolLocalDet_cuoId"]').val($('#cuota').val());
+                        getProveedores();
+                    });
+                    
+                    $('#cuota').change();
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                }
+            });
+            
+            $('#SolLocalDet_localDetLitros').change(function(){
+                calcularSaldo();
+            });
+
+            //Hoja de estilo a tabla
+           $('td>label').parent().attr('align','right');
+           $('#SolLocalDet_arancel').css('width','250px');
+           $('#SolLocalDet_localDetLitros').keyfilter(/[0-9.}]/i);
+           $('#litrosLibera').keyfilter(/[0-9.}]/i);
+           /*if($('#InventarioDet_invDetId').val()=='' || $('#InventarioDet_invDetId').val()==-1){
+               $('#btnEliminar').hide();
+           }/**/
+        });
+
+        
+        function getProveedores(){
+            $.ajax({
+                url:'{{url('MinSalSCAProcesosBundle_getProveedoresLocal')}}?localDetId='+localDetId+'&cuoId='+$('#cuota').val(),
+                type: 'POST',
+                cache: false,
+                success: function(data, textStatus, jqXHR){
+                    $('#invId')[0].innerHTML = data;
+                    
+                    {% if invId %}
+                        $('#invId').val( {{invId}} );
+                    {% endif %}
+                    
+                    $('#invId').change(function(){
+                        $('#provDireccion').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('provDireccion'));
+                        $('#gradoProv').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('grado'));
+                        $('#disponibleProv').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('disponible'));
+                        $('[id="SolLocalDet_invId"]').val($('#invId').val());
+                    });
+                    
+                    $('#invId').change();
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                }
+            });
+        }
+    </script>
+    
+    <form id="formulario" action="{{ path('MinSalSCAProcesosBundle_mantSolLocalEdicion') }}" {{ form_enctype(form) }} 
+           onsubmit="return enviarFormulario();" method="POST" class="SolLocalDetTypeForm">
+        
+        <input type="hidden" id="valido" value=false />
+        <input type="hidden" id="eliminar" name="eliminar" value=false />
+        <input type="hidden" id="solLocalComentario" name="solLocalComentario" />
+        <input type="hidden" id="localDetLitrosLib" name="localDetLitrosLib" />
+        <input type="hidden" id="disponibleProv" name="disponibleProv" />
+        <input type="hidden" id="gradoProv" name="gradoProv" />
+
+            <table align='center' style="border: 1px solid;">
+                <tr>
+                    <td align='center' colspan="2">
+                        <h1>
+                            {% if transiciones %}
+                                Registro de Compra Local #{{ localDetId }} de "{{entNombComercial}}"
+                            {% else %}
+                                Ingreso de Registro de Compra Local de "{{entNombComercial}}"
+                            {% endif %}
+                        </h1>
+                        {% if app.session.hasFlash('notice') %}
+                            <div class="flash-notice">
+                                {{ app.session.flash('notice') }}
+                                    {{ form_errors(form)}}
+                            </div><br/>
+                        {% endif %}
+                    </td>
+                </tr>
+                
+                {% if transiciones %}
+                <tr>
+                    <td colspan="2" align="center"><label>
+                        Etapa Actual: <span style="font-weight: bold; color: #00F; background-color: #EEE; border: 1px #AAA solid ;width: 75px; padding: 2px;">{{ etapa }}</span>
+                        
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        
+                        Estado Actual: <span style="font-weight: bold; color: #00F; background-color: #EEE; border: 1px #AAA solid ;width: 75px; padding: 2px;">{{ estado }}</span>
+                        <br/><hr/></label>
+                    </td>
+                </tr>
+                {% endif %}
+                
+                <tr>
+                    <td>
+                        <label>Nombre del Alcohol:</label>
+                    </td>
+                    <td>
+                        <select id="cuota" name="cuota"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label >
+                            Grados:
+                        </label>
+                    </td>
+                    <td>
+                        <input id="grado" type="text" readonly="readonly" disabled="disabled"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Nombre del Proveedor:</label>
+                    </td>
+                    <td>
+                        <select id="invId" name="invId"></select>
+                    </td>                
+                </tr>
+                <tr>
+                    <td>
+                        <label >
+                            Dirección del Proveedor:
+                        </label>
+                    </td>
+                    <td>
+                        <textarea id="provDireccion" rows="4" columns="6" disabled="disabled" style="max-height: 50px; max-width: 200px;" readonly="readonly"> </textarea>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <br/><br/>
+                    </td>
+                </tr>
+                
+                <tr name="verSolicitud">
+                    <td>
+                        <label >
+                            Cuota Disponible:
+                        </label>
+                    </td>
+                    <td>
+                        <input id="disponible" type="text" readonly="readonly" disabled="disabled"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label >
+                            {{ form_label(form.localDetLitros) }}:
+                        </label>
+                    </td>
+                    <td>
+                        {{ form_widget(form.localDetLitros) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.localDetLitros) }}
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr name="ingresaSolicitud">
+                    <td>
+                        <label >
+                            {{ form_label(form.localDetLitrosLib) }}:
+                        </label>
+                    </td>
+                    <td>{{ form_widget(form.localDetLitrosLib) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.localDetLitrosLib) }}
+                        </div>
+                    </td>                
+                </tr>
+                
+                <tr name="verSolicitud">
+                    <td>
+                        <label >
+                            Saldo de Cuota:
+                        </label>
+                    </td>
+                    <td>
+                        <input id="saldo" type="text" readonly="readonly" disabled="disabled"/>
+                    </td>
+                </tr>
+                
+                <tr name="verSolicitud">
+                    <td>
+                        <br/><br/>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <label >
+                            {{ form_label(form.localDetUso) }}:
+                        </label>
+                    </td>
+                    <td>
+                        {{ form_widget(form.localDetUso) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.localDetUso) }}
+                        </div>
+                    </td>                
+                </tr>
+                
+                
+                <tr>
+                    <td colspan="2"><hr/></td>
+                </tr> 
+                
+                
+                {% if comentario %}
+                <tr name="ingresaSolicitud">
+                    <td><label >Comentarios:</label></td>
+                    <td>
+                        <textarea rows="4" style="width:97%" readonly="readonly" style="max-height: 50px; max-width: 200px;"> {{ comentario }} </textarea>
+                    </td>                
+                </tr>
+                {% endif %}
+                
+                <tr>
+                    <td align='center' colspan=2 >
+                        <div id="msgDialogComentario" title="Comentarios" style="display:none">
+                            Es necesario detallar comentarios en la solicitud para pasar a la siguiente etapa<br/><br/>
+                            <textarea id="comentario" rows="4" style="width:97%"></textarea>
+                        </div>
+                        <div id="msgDialogLitrosLibera" title="Litros a liberar" style="display:none">
+                            Es necesario detallar la cantidad de litros a liberar en la solicitud para pasar a la siguiente etapa<br/><br/>
+                            <input id="litrosLibera" type="text" />
+                        </div>
+                        <br>
+                        
+                        <input id="btnGuardar" type="submit" value="Ingresar" />
+                        
+                        {% if transiciones|length > 0 %}
+                            {% for reg in transiciones %}
+                                <input id="tra{{ reg['id'] }}" name="transiciones" type="button" value="{{ reg['nombre'] }}" onclick="CambiarEstado({{ reg['id'] }}, {{ reg['comentario'] }}, {{ reg['litrosLibera'] }} );"/>
+                            {% endfor %}
+                                
+                                <script type="text/javascript">
+                                    $("[name='transiciones']").button();
+                                </script>
+                        {% endif %}
+                        
+                        {#<input id="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>#}
+
+                        <input id="btnRegresar" style="display:none" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantSolLocalVerSolicitudes')}}';"/>
+                        {#  #}
+                    </td>
+                </tr>
+            </table>    
+
+    {{ form_rest(form) }}
+        </form>
+{% endblock%}

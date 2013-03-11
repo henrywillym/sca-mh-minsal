@@ -1,6 +1,7 @@
 <?php
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
+use Doctrine\ORM\Query;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
@@ -41,5 +42,44 @@ class TransicionDao {
         return $registros->getSingleResult();
     }
     
+    /**
+     * Devuelve las transicion posibles a realizar, a partir de una transicion dada.
+     * 
+     * @param integer $traId
+     * @return Object[] Transicion
+     */
+    public function getTransicionesSiguientes($traId) {
+        $registros = $this->em->createQuery("SELECT E, A
+                                          FROM MinSalSCAProcesosBundle:Transicion E 
+                                            JOIN E.parentsTransicion B
+                                            LEFT JOIN E.childrenTransicion A
+                                            LEFT JOIN A.estado C
+                                          WHERE B.traId = :traId
+                                          ORDER BY C.estId ASC") //No se utiliza "AND E.auditDeleted = false" porque si se cambia el flujo, las solicitudes en proceso finalizan con el flujo que ya habian iniciado. Y las nuevas siguen con el que se configuro.
+                ->setParameter('traId',$traId);
+        return $registros->getResult();
+    }
+    
+    
+    
+    public function getEmailsXTransicion($entId, $traId, $provEntId=-1){
+        $registros = $this->em->createQuery("SELECT distinct C.email
+                                          FROM MinSalSCAProcesosBundle:Transicion E 
+                                            LEFT JOIN E.childrenTransicion A
+                                            LEFT JOIN A.parentsTransicion AA
+                                            LEFT JOIN A.rols B
+                                            LEFT JOIN B.usuarios C
+                                            LEFT JOIN C.entidad D
+                                          WHERE AA.traId = :traId
+                                            AND ((D.entId = :entId and AA.traNotificaEmpresa = true) OR D.entId = ".$provEntId." OR C.userInterno = true)
+                                            AND C.auditDeleted = false")
+                ->setParameter('traId',$traId)
+                ->setParameter('entId',$entId);
+        $result = array();
+        foreach($registros->getResult() as $reg){
+            $result[] = $reg['email'];
+        }
+        return $result;
+    }
 }
 ?>

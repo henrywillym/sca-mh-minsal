@@ -4,6 +4,7 @@ namespace MinSal\SCA\ProcesosBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+
 use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
 use MinSal\SCA\ProcesosBundle\Entity\Transicion;
@@ -180,5 +181,21 @@ class SolImportacion {
     //*********** CUSTOM SET/GET ******************
     public function addSolImportacionDet(SolImportacionDet $solImportacionDet) {
         $this->solImportacionesDet[] = $solImportacionDet;
+    }
+    
+    public function getAuditDateUpdText() {
+        if($this->auditDateUpd){
+            return $this->auditDateUpd->format('Y-m-d H:i:s');
+        }else{
+            return '';
+        }
+    }
+    
+    public function getAuditDateInsText() {
+        return $this->auditDateIns->format('Y-m-d H:i:s');
+    }
+    
+    public function getSolImpFechaText() {
+        return $this->solImpFecha->format('Y-m-d');
     }
 }

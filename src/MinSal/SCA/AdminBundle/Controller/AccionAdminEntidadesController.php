@@ -104,6 +104,30 @@ class AccionAdminEntidadesController extends Controller {
         $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
         
         $user = $this->get('security.context')->getToken()->getUser();
+        $errores = null;
+        
+        //Validaciones de NIT de Representante y Empresa
+        $tmpEntidad = $entidadDao->getRepresentanteByNIT($entidadTmp->getEntRepNit(), $entidadTmp->getEntId());
+        if($tmpEntidad != null){
+            $errores = 'ERROR: El NIT del representante "'.$entidadTmp->getEntRepNit().'" ya existe como representante de la empresa con nombre comercial "'.$tmpEntidad->getEntNombComercial().'".';
+        }
+        
+        $tmpEntidad = $entidadDao->getRepresentanteByNIT($entidadTmp->getEntNit(), $entidadTmp->getEntId());
+        if($tmpEntidad != null){
+            $errores = 'ERROR: El NIT de la empresa "'.$entidadTmp->getEntNit().'" ya existe como representante de la empresa con nombre comercial "'.$tmpEntidad->getEntNombComercial().'"';
+        }
+        
+        $tmpEntidad = $entidadDao->getEntidadByNIT($entidadTmp->getEntRepNit(), $entidadTmp->getEntId());
+        if($tmpEntidad != null){
+            $errores = 'ERROR: El NIT del representante "'.$entidadTmp->getEntRepNit().'" ya existe como NIT de la empresa con nombre comercial "'.$tmpEntidad->getEntNombComercial().'".';
+        }
+        /*
+        $tmpEntidad = $entidadDao->getEntidadByNIT($entidadTmp->getEntNit(), $entidadTmp->getEntId());
+        if($tmpEntidad != null){
+            $errores = 'ERROR: El NIT de la empresa "'.$entidadTmp->getEntNit().'" ya existe como representante de la empresa con nombre comercial "'.$tmpEntidad->getEntNombComercial().'"';
+        }/**/
+        
+        /**********************/
         
         if( $entidadTmp->getEntId() ){
             $entidad = $entidadDao->getEntidad($entidadTmp->getEntId());
@@ -127,7 +151,7 @@ class AccionAdminEntidadesController extends Controller {
         $form = $this->createForm(new EntidadType(),$entidad);
         
         $form->bindRequest($request);
-        if($form->isValid()){
+        if($form->isValid() && $errores == null){
             $entidad->setEntYear($entidad->getEntVenc()->format("Y"));
 
             //Eliminar cuotas de importación y compras locales
@@ -176,7 +200,11 @@ class AccionAdminEntidadesController extends Controller {
                         array('entId'=>$entidad->getEntId()))
                 );
         }else{
-            $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
+            if($errores == null){
+                $errores = '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados';
+            }
+            
+            $this->get('session')->setFlash('notice', $errores);
             
             $opciones = $this->getRequest()->getSession()->get('opciones');
                 return $this->render('MinSalSCAAdminBundle:Entidad:showEntidad.html.twig', array(

@@ -30,11 +30,11 @@
 namespace MinSal\SCA\AdminBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 
 
 class RolSistemaType extends AbstractType {
-   public function buildForm(FormBuilder $builder, array $opciones)
+   public function buildForm(FormBuilderInterface $builder, array $opciones)
     {
         $builder->add('nombreRol',  'text');
         $builder->add('funcionesRol', 'text');        
