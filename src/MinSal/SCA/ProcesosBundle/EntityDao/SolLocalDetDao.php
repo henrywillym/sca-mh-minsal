@@ -22,7 +22,8 @@ class SolLocalDetDao {
                         D.etpId, D.etpNombre,
                         F.solLocalFecha,
                         H.cuoNombreEsp, H.cuoGrado,
-                        AA.entNombComercial";
+                        AA.entNombComercial,
+                        A.entHabilitado, A.entComentario";
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;
@@ -49,7 +50,12 @@ class SolLocalDetDao {
     }
     
     public function getSolLocalesDetByEntidad($entId) {
-        $registros = $this->em->createQuery("SELECT ".$this->sqlSelect."
+        $registros = $this->em->createQuery("SELECT ".$this->sqlSelect.", 
+                                                    (SELECT count(K) 
+                                                       FROM MinSalSCAAdminBundle:ListadoDNM K 
+                                                      WHERE H.cuoYear = K.ldnm_year
+                                                        AND A.entNit = K.ldnm_nit
+                                                        AND A.entNrc = K.ldnm_nrc) AS HAB
                                           FROM MinSalSCAProcesosBundle:SolLocalDet E 
                                             JOIN E.cuota H
                                             JOIN E.solLocal F
@@ -78,7 +84,12 @@ class SolLocalDetDao {
      * @return Array
      */
     public function getSolLocalesDetByEtapa($etpId, $entId = null) {
-        $sql = "SELECT  ".$this->sqlSelect."
+        $sql = "SELECT  ".$this->sqlSelect.", 
+                    (SELECT count(K) 
+                       FROM MinSalSCAAdminBundle:ListadoDNM K 
+                      WHERE H.cuoYear = K.ldnm_year
+                        AND A.entNit = K.ldnm_nit
+                        AND A.entNrc = K.ldnm_nrc) AS HAB
                 FROM MinSalSCAProcesosBundle:SolLocalDet E 
                     JOIN E.cuota H
                     JOIN E.solLocal F
@@ -168,6 +179,7 @@ class SolLocalDetDao {
                                             AND ProvEE.invGrado >= E.cuoGrado
                                             
                                             AND B.entComprador = TRUE
+                                            AND ProvBB.entHabilitado = true
                                           ORDER by ProvEE.invNombreEsp ASC")
                 ->setParameter('entId',$entId)
                 ->setParameter('cuoId',$cuoId);

@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @author Henry Willy Melara
- */
 
 namespace MinSal\SCA\ProcesosBundle\Controller;
 
@@ -11,6 +8,7 @@ use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SCA\AdminBundle\EntityDao\EntidadDao;
+use MinSal\SCA\AdminBundle\EntityDao\ListadoDNMDao;
 use MinSal\SCA\ProcesosBundle\Entity\Etapa;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
@@ -31,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
 * Mantenimineto de Ingreso de Solicitudes de Importacion...
-* 
+* @author Henry Willy Melara
 */
 class AccionSCASolImportacionController extends Controller {
 
@@ -55,12 +53,30 @@ class AccionSCASolImportacionController extends Controller {
                     )
             );
         }else{
+            $entidad = $user->getEntidad();
+            
+            $year = new \DateTime();
+            $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
+            
+            $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
+            $autorizadoDNMText = null;
+            if(!$autorizadoDNM){
+                $autorizadoDNMText = ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH;
+            }
+            
+            if( !$entidad->getEntHabilitado()){
+                $this->get('session')->setFlash('notice', EntidadDao::$NO_HABILITADA. ' debido a: '. $entidad->getEntComentario());
+            }
+
             return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:ingresarSolImportacionDet.html.twig', array(
                         'form' => $form->createView(),
                         'opciones' => $opciones,
                         'entNombComercial'=> $user->getEntidad()->getEntNombComercial(),
                         'comentario' => null,
-                        'transiciones' => null
+                        'transiciones' => null,
+                        'autorizadoDNM' => $autorizadoDNM,
+                        'autorizadoDNMText' => $autorizadoDNMText,
+                        'entHabilitado' => $entidad->getEntHabilitado()
                     )
             );
         }
@@ -133,6 +149,10 @@ class AccionSCASolImportacionController extends Controller {
                 $solImportacion->setSolImpFecha($ent['solImpFecha']);
                 $solImportacion->setAuditDateIns($ent['auditDateIns']);
                 
+                if($ent['entHabilitado'] == false || $ent['HAB'] == 0){
+                    $registros[$i]['estNombre']= SolImportacion::$BLOQUEADA;
+                }
+                
                 $registros[$i]['solImpFechaText']= $solImportacion->getSolImpFechaText();
                 $registros[$i]['auditDateInsText']= $solImportacion->getAuditDateInsText();
                 $i=$i+1;
@@ -175,6 +195,10 @@ class AccionSCASolImportacionController extends Controller {
             foreach ($registros as $ent) {
                 $solImportacion->setSolImpFecha($ent['solImpFecha']);
                 $solImportacion->setAuditDateIns($ent['auditDateIns']);
+                
+                if($ent['entHabilitado'] == false || $ent['HAB'] == 0){
+                    $registros[$i]['estNombre']= SolImportacion::$BLOQUEADA;
+                }
                 
                 $registros[$i]['solImpFechaText']= $solImportacion->getSolImpFechaText();
                 $registros[$i]['auditDateInsText']= $solImportacion->getAuditDateInsText();
@@ -263,7 +287,7 @@ class AccionSCASolImportacionController extends Controller {
         return $response;
     }
     
-    public function getEtapasAction(Request $request) {
+    public function getEtapasAction() {
         $user = $this->get('security.context')->getToken()->getUser();
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
         
@@ -308,9 +332,12 @@ class AccionSCASolImportacionController extends Controller {
         return $response;
     }
     
-    public function getSearchEstadosAction(Request $request) {
+    public function getSearchEstadosAction() {
         $user = $this->get('security.context')->getToken()->getUser();
-        $entId = $user->getEntidad()->getEntId();
+        $entId =null;
+        if($user->getEntidad() != null){
+            $entId = $user->getEntidad()->getEntId();
+        }
         
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
         
@@ -324,6 +351,7 @@ class AccionSCASolImportacionController extends Controller {
             foreach($registros as $reg){
                 if($i == 0){
                     $htmlResponse = $htmlResponse. "<option value='' >Seleccione</option>";
+                    $htmlResponse = $htmlResponse. "<option value='".SolImportacion::$BLOQUEADA."' >".SolImportacion::$BLOQUEADA."</option>";
                 }
                 $htmlResponse = $htmlResponse. "<option value='" . $reg['estNombre'] . "' >" . $reg['estNombre'] . "</option>";
                 $i++;
@@ -342,9 +370,12 @@ class AccionSCASolImportacionController extends Controller {
         return $response;
     }
     
-    public function getSearchEtapasAction(Request $request) {
+    public function getSearchEtapasAction() {
         $user = $this->get('security.context')->getToken()->getUser();
-        $entId = $user->getEntidad()->getEntId();
+        $entId = null;
+        if($user->getEntidad() != null){
+            $entId = $user->getEntidad()->getEntId();
+        }
         
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
         
@@ -379,7 +410,6 @@ class AccionSCASolImportacionController extends Controller {
     /*
      * Se encarga de ejecutar las acciones de ingresar las solicitudes de importacion
      * del mantenimiento
-     * pendiente TODA LA FUNCION
      */
     public function mantSolImportacionEdicionAction(Request $request) {
         $solImportacionDetTmp = new SolImportacionDet();
@@ -400,7 +430,14 @@ class AccionSCASolImportacionController extends Controller {
         
         $errores = $solImportacionDetTmp->isValid($this->getDoctrine(), $user->getEntidad());
         
-        if(($form->isValid() && count($errores)==0)){
+        $entidad = $user->getEntidad();
+            
+        $year = new \DateTime();
+        $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
+
+        $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
+
+        if(($form->isValid() && count($errores)==0 && $autorizadoDNM == true && $entidad->getEntHabilitado() == true)){
             if( $solImportacionDetTmp->getImpDetId() ){
                 $solImportacionDet = $solImportacionDao->getSolImportacionDet($solImportacionDetTmp->getImpDetId());
 
@@ -440,16 +477,25 @@ class AccionSCASolImportacionController extends Controller {
             
             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolImportacionIngreso'));
         }else{
-            $listaErrores = '';
-            
-            foreach($errores as $error){
-                $listaErrores = $listaErrores.$error;
+            $autorizadoDNMText = null;
+            if(!$autorizadoDNM){
+                $autorizadoDNMText = ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH;
             }
             
-            if($listaErrores != ''){
-                $this->get('session')->setFlash('notice', $listaErrores);
+            if( !$entidad->getEntHabilitado()){
+                $this->get('session')->setFlash('notice', EntidadDao::$NO_HABILITADA. ' debido a: '. $entidad->getEntComentario());
             }else{
-                $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
+                $listaErrores = '';
+
+                foreach($errores as $error){
+                    $listaErrores = $listaErrores . $error;
+                }
+
+                if($listaErrores != ''){
+                    $this->get('session')->setFlash('notice', $listaErrores);
+                }else{
+                    $this->get('session')->setFlash('notice', '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados');
+                }
             }
             
             $opciones = $this->getRequest()->getSession()->get('opciones');
@@ -458,7 +504,10 @@ class AccionSCASolImportacionController extends Controller {
                     'form' => $form->createView(), 
                     'entNombComercial'=> $user->getEntidad()->getEntNombComercial(),
                     'comentario' => null,
-                    'transiciones' => null
+                    'transiciones' => null,
+                    'autorizadoDNM' => $autorizadoDNM,
+                    'autorizadoDNMText' => $autorizadoDNMText,
+                    'entHabilitado' => $entidad->getEntHabilitado()
                 )
             );
         }
@@ -518,6 +567,21 @@ class AccionSCASolImportacionController extends Controller {
         $etapa = $solImportacionDet->getSolImportacion()->getTransicion()->getEtpFin()->getEtpNombre();
         $estado = $solImportacionDet->getSolImportacion()->getTransicion()->getEstado()->getEstNombre();
         
+        $entidad = $solImportacionDet->getSolImportacion()->getEntidad();
+            
+        $year = new \DateTime();
+        $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
+
+        $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
+        $autorizadoDNMText = null;
+        if(!$autorizadoDNM){
+            $autorizadoDNMText = ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH;
+        }
+
+        if( !$entidad->getEntHabilitado()){
+            $this->get('session')->setFlash('notice', EntidadDao::$NO_HABILITADA. ' debido a: '. $entidad->getEntComentario());
+        }
+
         return $this->render('MinSalSCAProcesosBundle:SolImportacionDet:ingresarSolImportacionDet.html.twig', array(
             'form' => $form->createView(),
             'opciones' => $opciones,
@@ -526,7 +590,10 @@ class AccionSCASolImportacionController extends Controller {
             'transiciones' => $result,
             'comentario' => $comentario,
             'etapa' => $etapa,
-            'estado' => $estado
+            'estado' => $estado,
+            'autorizadoDNM' => $autorizadoDNM,
+            'autorizadoDNMText' => $autorizadoDNMText,
+            'entHabilitado' => $entidad->getEntHabilitado()
         ));
     }
     
@@ -562,53 +629,65 @@ class AccionSCASolImportacionController extends Controller {
             foreach($transicionesRol as $transicionRol){
                 foreach($nextTransiciones as $reg){
                     if($reg->getFlujo()->getFluId() == Flujo::$IMPORTACION && $transicionRol->getTraId() == $reg->getTraId() && $traId == $reg->getTraId()){
-                        if($reg->getTraComentario()){
-                            $solImpComentario = $request->get('solImpComentario');
-                            if($solImpComentario==null || $solImpComentario==''){
-                                $errorList = $errorList.'- Es necesario detallar un comentario para pasar a la siguiente etapa';
-                            }else{
-                                $solImportacionDet->getSolImportacion()->setSolImpComentario($solImpComentario);
-                            }
-                        }
+                        $entidad = $solImportacionDet->getSolImportacion()->getEntidad();
 
-                        if($reg->getTraLitrosLibera() || $reg->getTraLiberaTotal()){
-                            $impDetLitrosLib = $solImportacionDet->getImpDetLitrosLib();
-                            $impDetLitros = $solImportacionDet->getImpDetLitros();
-                            $litrosLib = $request->get('impDetLitrosLib');
+                        $year = new \DateTime();
+                        $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
 
-                            if($reg->getTraLiberaTotal()){
-                                $solImportacionDet->setImpDetLitrosLib($impDetLitros);
-                                $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $impDetLitros - $impDetLitrosLib);
+                        $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
 
-                                $inventarioDet->setSolImportacionDet($solImportacionDet);
-                                $solImportacionDet->addInventarioDet($inventarioDet);
-
-                            }else if($reg->getTraLitrosLibera()){
-
-                                try{
-                                    $litrosLib = (float) $litrosLib;
-                                    $impDetLitrosLib = (float) $impDetLitrosLib;
-                                    $impDetLitros = (float) $impDetLitros;
-
-                                    if($litrosLib ==null || $litrosLib ==''){
-                                        $errorList = $errorList.'- Debe ingresar los litros a liberar';
-                                    }else if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
-                                        $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
-                                    }else if($litrosLib <=0){
-                                        $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
-                                    }else{
-                                        $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
-
-                                        $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $litrosLib);
-
-                                        $inventarioDet->setSolImportacionDet($solImportacionDet);
-                                        $solImportacionDet->addInventarioDet($inventarioDet);
-                                    }
-                                }  catch (Exception $e){
-                                    $errorList = $errorList.'- Debe ingresar un número valido';
+                        if( $autorizadoDNM == true && $entidad->getEntHabilitado() == true){
+                        
+                            if($reg->getTraComentario()){
+                                $solImpComentario = $request->get('solImpComentario');
+                                if($solImpComentario==null || $solImpComentario==''){
+                                    $errorList = $errorList.'- Es necesario detallar un comentario para pasar a la siguiente etapa';
+                                }else{
+                                    $solImportacionDet->getSolImportacion()->setSolImpComentario($solImpComentario);
                                 }
                             }
 
+                            if($reg->getTraLitrosLibera() || $reg->getTraLiberaTotal()){
+                                $impDetLitrosLib = $solImportacionDet->getImpDetLitrosLib();
+                                $impDetLitros = $solImportacionDet->getImpDetLitros();
+                                $litrosLib = $request->get('impDetLitrosLib');
+
+                                if($reg->getTraLiberaTotal()){
+                                    $solImportacionDet->setImpDetLitrosLib($impDetLitros);
+                                    $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $impDetLitros - $impDetLitrosLib);
+
+                                    $inventarioDet->setSolImportacionDet($solImportacionDet);
+                                    $solImportacionDet->addInventarioDet($inventarioDet);
+
+                                }else if($reg->getTraLitrosLibera()){
+
+                                    try{
+                                        $litrosLib = (float) $litrosLib;
+                                        $impDetLitrosLib = (float) $impDetLitrosLib;
+                                        $impDetLitros = (float) $impDetLitros;
+
+                                        if($litrosLib ==null || $litrosLib ==''){
+                                            $errorList = $errorList.'- Debe ingresar los litros a liberar';
+                                        }else if($impDetLitros - $impDetLitrosLib - $litrosLib <= 0){
+                                            $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($impDetLitros - $impDetLitrosLib);
+                                        }else if($litrosLib <=0){
+                                            $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
+                                        }else{
+                                            $solImportacionDet->setImpDetLitrosLib($impDetLitrosLib + $litrosLib);
+
+                                            $inventarioDet = $this->agregarInventario($solImportacionDet->getCuota(), $litrosLib);
+
+                                            $inventarioDet->setSolImportacionDet($solImportacionDet);
+                                            $solImportacionDet->addInventarioDet($inventarioDet);
+                                        }
+                                    }  catch (Exception $e){
+                                        $errorList = $errorList.'- Debe ingresar un número valido';
+                                    }
+                                }
+
+                            }
+                        }else{
+                            $errorList = ' ';
                         }
 
                         if($errorList == ''){

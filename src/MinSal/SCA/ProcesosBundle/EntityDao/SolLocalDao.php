@@ -158,32 +158,52 @@ class SolLocalDao {
     }
     
     public function getSearchEstados($entId) {
-        $registros = $this->em->createQuery("SELECT DISTINCT C.estId, C.estNombre
-                                          FROM MinSalSCAProcesosBundle:SolLocal E 
-                                            JOIN E.entidad A
-                                            JOIN E.transicion B
-                                            JOIN B.estado C
-                                            JOIN B.flujo G
-                                          WHERE A.entId = :entId
-                                            AND G.fluId = :fluId
-                                          order by C.estNombre ASC")
-                ->setParameter('entId',$entId)
-                ->setParameter('fluId',$this->fluId);
+        $sql = "SELECT DISTINCT C.estId, C.estNombre
+                FROM MinSalSCAProcesosBundle:SolLocal E 
+                  JOIN E.entidad A
+                  JOIN E.transicion B
+                  JOIN B.estado C
+                  JOIN B.flujo G
+                WHERE "; 
+        
+        if($entId != null){
+            $sql = $sql." A.entId = :entId AND ";
+        }
+        
+        $sql = $sql." G.fluId = :fluId
+              order by C.estNombre ASC";
+                
+        $registros = $this->em->createQuery($sql);
+                
+        if($entId != null){
+            $registros->setParameter('entId',$entId);
+        }
+        $registros->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
     
     public function getSearchEtapas($entId) {
-        $registros = $this->em->createQuery("SELECT DISTINCT C.etpId, C.etpNombre
-                                          FROM MinSalSCAProcesosBundle:SolLocal E 
-                                            JOIN E.entidad A
-                                            JOIN E.transicion B
-                                            JOIN B.etpFin C
-                                            JOIN B.flujo G
-                                          WHERE A.entId = :entId
-                                            AND G.fluId = :fluId
-                                          order by C.etpNombre ASC")
-                ->setParameter('entId',$entId)
-                ->setParameter('fluId',$this->fluId);
+        $sql = "SELECT DISTINCT C.etpId, C.etpNombre
+                FROM MinSalSCAProcesosBundle:SolLocal E 
+                  JOIN E.entidad A
+                  JOIN E.transicion B
+                  JOIN B.etpFin C
+                  JOIN B.flujo G
+                WHERE ";
+        
+        if($entId != null){
+            $sql = $sql." A.entId = :entId AND ";
+        }
+        
+        $sql = $sql." G.fluId = :fluId
+                order by C.etpNombre ASC";
+        $registros = $this->em->createQuery($sql);
+        
+        if($entId != null){
+            $registros->setParameter('entId',$entId);
+        }
+        
+        $registros->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
     

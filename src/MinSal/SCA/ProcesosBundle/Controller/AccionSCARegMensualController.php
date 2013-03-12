@@ -111,7 +111,7 @@ class AccionSCARegMensualController extends Controller {
          * Eliminacion logica del registro en la tabla. Se encargada colocar el flag audit_deleted =true
          */
          $RegMensualDao->delRegMensual($id,$user);
-         $this->get('session')->setFlash('notice', 'El registro se Elimino Exitosamente');
+         $this->get('session')->setFlash('notice', 'El registro se elimino exitosamente');
         } else {
            
          //SINO SE SELECCIONO LA OPCION DE ELIMINAR SE ACTUALIZARA O SE AGREGARA UN NUEVO REGISTRO   
@@ -130,14 +130,14 @@ class AccionSCARegMensualController extends Controller {
 
          if ($operacion == 'Guardar') {
             $RegMensualDao->addRegMensual($year,$idEnt,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user);
-            $this->get('session')->setFlash('notice', 'Los datos se han Guardado exitosamente');
+            $this->get('session')->setFlash('notice', 'Los datos se han guardado exitosamente');
             
         }
         
         if ($operacion == 'Actualizar') {
             $RegMensualDao->editRegMensual($id,$idEnt,$year,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user);
         
-            $this->get('session')->setFlash('notice', 'Los datos se han Actualizado exitosamente');
+            $this->get('session')->setFlash('notice', 'Los datos se han actualizado exitosamente');
         }
 
        

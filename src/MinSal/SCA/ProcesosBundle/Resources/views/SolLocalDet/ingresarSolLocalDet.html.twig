@@ -237,9 +237,15 @@
                             {% endif %}
                         </h1>
                         {% if app.session.hasFlash('notice') %}
-                            <div class="flash-notice">
+                            <div class="flash-notice" style="max-width: 600px;">
                                 {{ app.session.flash('notice') }}
                                     {{ form_errors(form)}}
+                            </div><br/>
+                        {% endif %}
+                            
+                        {% if autorizadoDNM == false %}
+                            <div class="flash-notice" style="max-width: 600px;">
+                                {{autorizadoDNMText}}
                             </div><br/>
                         {% endif %}
                     </td>
@@ -395,21 +401,22 @@
                             <input id="litrosLibera" type="text" />
                         </div>
                         <br>
-                        
-                        <input id="btnGuardar" type="submit" value="Ingresar" />
-                        
-                        {% if transiciones|length > 0 %}
-                            {% for reg in transiciones %}
-                                <input id="tra{{ reg['id'] }}" name="transiciones" type="button" value="{{ reg['nombre'] }}" onclick="CambiarEstado({{ reg['id'] }}, {{ reg['comentario'] }}, {{ reg['litrosLibera'] }} );"/>
-                            {% endfor %}
-                                
-                                <script type="text/javascript">
-                                    $("[name='transiciones']").button();
-                                </script>
-                        {% endif %}
-                        
-                        {#<input id="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>#}
+                        {% if autorizadoDNM == true and entHabilitado == true %}
+                            <input id="btnGuardar" type="submit" value="Ingresar" />
 
+                            {% if transiciones|length > 0 %}
+                                {% for reg in transiciones %}
+                                    <input id="tra{{ reg['id'] }}" name="transiciones" type="button" value="{{ reg['nombre'] }}" onclick="CambiarEstado({{ reg['id'] }}, {{ reg['comentario'] }}, {{ reg['litrosLibera'] }} );"/>
+                                {% endfor %}
+
+                                    <script type="text/javascript">
+                                        $("[name='transiciones']").button();
+                                    </script>
+                            {% endif %}
+
+                            {#<input id="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>#}
+                        {% endif %}
+                                
                         <input id="btnRegresar" style="display:none" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantSolLocalVerSolicitudes')}}';"/>
                         {#  #}
                     </td>
