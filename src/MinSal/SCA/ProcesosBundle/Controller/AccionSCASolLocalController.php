@@ -305,7 +305,6 @@ class AccionSCASolLocalController extends Controller {
         $cuoId = $request->get('cuoId');
         
         $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
-        $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
         $solLocalDao = new SolLocalDao($this->getDoctrine());
         $solLocalDet = $solLocalDao->getSolLocalDet($localDetId);
         
@@ -313,13 +312,16 @@ class AccionSCASolLocalController extends Controller {
         
         if($verSolicitud){
             $entId = $solLocalDet->getSolLocal()->getEntidad()->getEntId();
+            
+            if(!empty($cuoId)){
+                $registros = $solLocalDetDao->getProveedorSolicitud($localDetId, $entId, $cuoId);
+            }
         }else{
             $entId = $user->getEntidad()->getEntId();
-        }
-        
-        $registros = array();
-        if(!empty($cuoId)){
-            $registros = $solLocalDetDao->getProveedores($entId, $cuoId);
+            
+            if(!empty($cuoId)){
+                $registros = $solLocalDetDao->getProveedores($entId, $cuoId);
+            }
         }
         
         $numfilas = count($registros);
@@ -337,13 +339,14 @@ class AccionSCASolLocalController extends Controller {
                     throw new Exception("El detalle de inventario (".round($reg['invLitros']+0, 2).")no coincide con el total de inventario invId -> ".$reg['invId']." almacenado (".round($litrosSolicitudesPendientes, 2).")");
                 }*/
                 $disponible = $reg['invLitros'];// - $litrosSolicitudesPendientes;
+                $habilitadoDNM = $reg['HAB']>0 && $reg['entHabilitado'] ==true;
                 
                 //$debug[$i]['$litrosInventario']=$litrosInventario;
                 //$debug[$i]['$litrosSolicitudesPendientes']=$litrosSolicitudesPendientes;
                 $debug[$i]['invLitros']=$reg['invLitros'];
                 $debug[$i]['entId']=$reg['entId'];
                 
-                if($disponible > 0 || $verSolicitud){
+                if(($disponible > 0 && $habilitadoDNM) || $verSolicitud){
                     if($i ==0){
                         $selected = 'selected';
                     }else{
@@ -507,11 +510,14 @@ class AccionSCASolLocalController extends Controller {
         $solLocalDao = new SolLocalDao($this->getDoctrine());
         $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
         $transicionDao = new TransicionDao($this->getDoctrine());
+        $inventarioDao = new InventarioDao($this->getDoctrine());
         
         $transicion = null;
         
         $errores = $solLocalDetTmp->isValid($this->getDoctrine(), $user->getEntidad(), $request->get('invId'));
         
+        
+        //Validacion DNM y Habilitado de Empresa que ingresa solicitud
         $entidad = $user->getEntidad();
             
         $year = new \DateTime();
@@ -519,7 +525,21 @@ class AccionSCASolLocalController extends Controller {
 
         $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
 
-        if(($form->isValid() && count($errores)==0 && $autorizadoDNM == true && $entidad->getEntHabilitado() == true)){
+        //###### Validacion de empresa seleccionada como proveedor
+        $provEntidad = $inventarioDao->getInventario($request->get('invId'))->getEntidad();
+        $autorizadoDNMProv = true;
+        $autorizadoDNMProvText = '';
+
+        if($provEntidad == null){
+            $provEntidad = true;
+        }else{
+            $autorizadoDNMProv = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $provEntidad->getEntNrc(), $provEntidad->getEntNit());
+        }
+        
+        if($form->isValid() && count($errores)==0 && 
+                $autorizadoDNM == true && $entidad->getEntHabilitado() == true &&
+                $autorizadoDNMProv == true && $provEntidad->getEntHabilitado() == true
+          ){
             if( $solLocalDetTmp->getLocalDetId() ){
                 $solLocalDet = $solLocalDao->getSolLocalDet($solLocalDetTmp->getLocalDetId());
 
@@ -561,26 +581,16 @@ class AccionSCASolLocalController extends Controller {
             
             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolLocalIngreso'));
         }else{
-            $provEntidad = $user->getEntidad();
-            $autorizadoDNMProv = true;
-            $autorizadoDNMProvText = '';
+            if(!$autorizadoDNMProv || !$provEntidad->getEntHabilitado()){
+                $autorizadoDNMProvText = 'Problema con el Proveedor ->';
 
-            if($provEntidad == null){
-                $provEntidad = true;
-            }else{
-                $autorizadoDNMProv = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $provEntidad->getEntNrc(), $provEntidad->getEntNit());
+                if(!$autorizadoDNMProv){
+                    $autorizadoDNMProvText = $autorizadoDNMProvText . ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH;
+                }
 
-                if(!$autorizadoDNMProv || !$provEntidad->getEntHabilitado()){
-                    $autorizadoDNMProvText = 'Problema con el Proveedor ->';
-
-                    if(!$autorizadoDNMProv){
-                        $autorizadoDNMProvText = $autorizadoDNMProvText . ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH;
-                    }
-
-                    if(!$provEntidad->getEntHabilitado()){
-                        $autorizadoDNMProvText = $autorizadoDNMProvText . EntidadDao::$NO_HABILITADA;
-                        $autorizadoDNMProv = true;
-                    }
+                if(!$provEntidad->getEntHabilitado()){
+                    $autorizadoDNMProvText = $autorizadoDNMProvText . EntidadDao::$NO_HABILITADA;
+                    $autorizadoDNMProv = false;
                 }
             }
             
@@ -680,27 +690,14 @@ class AccionSCASolLocalController extends Controller {
         
         $inventarioDetTmp = $solLocalDet->getInventariosDet();
         $inventarioDetTmp = $inventarioDetTmp[0];
+        $provEntidad = $inventarioDetTmp->getInventario()->getEntidad();
         
+        //Validacion de la empresa que ingresa la solicitud
         $entidad = $solLocalDet->getSolLocal()->getEntidad();
             
         $year = new \DateTime();
         $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
         
-        $provEntidad = $user->getEntidad();
-        $autorizadoDNMProv = true;
-        $autorizadoDNMProvText = null;
-        
-        if($provEntidad == null){
-            $provEntidad = true;
-        }else{
-            $autorizadoDNMProv = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $provEntidad->getEntNrc(), $provEntidad->getEntNit());
-            
-            if(!$autorizadoDNMProv){
-                $autorizadoDNMProvText = 'Problema con el Proveedor ->'.ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH;
-            }
-            $provEntidad = $autorizadoDNMProv && $provEntidad->getEntHabilitado();
-        }
-
         $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
         $autorizadoDNMText = null;
         if(!$autorizadoDNM){
@@ -709,6 +706,29 @@ class AccionSCASolLocalController extends Controller {
 
         if( !$entidad->getEntHabilitado()){
             $this->get('session')->setFlash('notice', EntidadDao::$NO_HABILITADA. ' debido a: '. $entidad->getEntComentario());
+        }
+        
+        //###### Validacion de empresa seleccionada como proveedor
+        $autorizadoDNMProv = true;
+        $autorizadoDNMProvText = '';
+
+        if($provEntidad == null){
+            $provEntidad = true;
+        }else{
+            $autorizadoDNMProv = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $provEntidad->getEntNrc(), $provEntidad->getEntNit());
+        }
+        
+        if(!$autorizadoDNMProv || !$provEntidad->getEntHabilitado()){
+            $autorizadoDNMProvText = 'Problema con el Proveedor ->';
+
+            if(!$autorizadoDNMProv){
+                $autorizadoDNMProvText = $autorizadoDNMProvText . ListadoDNMDao::$MSG_ERROR_DNM_NOAUTH. '. ';
+            }
+
+            if(!$provEntidad->getEntHabilitado()){
+                $autorizadoDNMProvText = $autorizadoDNMProvText . EntidadDao::$NO_HABILITADA;
+                $autorizadoDNMProv = false;
+            }
         }
         
         return $this->render('MinSalSCAProcesosBundle:SolLocalDet:ingresarSolLocalDet.html.twig', array(
@@ -771,20 +791,27 @@ class AccionSCASolLocalController extends Controller {
             foreach($transicionesRol as $transicionRol){
                 foreach($nextTransiciones as $reg){
                     if($reg->getFlujo()->getFluId() == Flujo::$LOCAL && $transicionRol->getTraId() == $reg->getTraId() && $traId == $reg->getTraId()){
+                        //Validacion de empresa que ingresa la solicitud
                         $entidad = $solLocalDet->getSolLocal()->getEntidad();
                         $year = new \DateTime();
                         $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
-                        $provEntidad = $auditUser->getEntidad();
                         
+                        $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
+                        
+                        //Validacion de la empresa seleccionada como proveedor
+                        $autorizadoDNMProv = true;
+
+                        $inventarioDetTmp = $solLocalDet->getInventariosDet();
+                        $inventarioDetTmp = $inventarioDetTmp[0];
+                        $provEntidad = $inventarioDetTmp->getInventario()->getEntidad();
+
                         if($provEntidad == null){
                             $provEntidad = true;
                         }else{
                             $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $provEntidad->getEntNrc(), $provEntidad->getEntNit());
                             $provEntidad = $autorizadoDNM && $provEntidad->getEntHabilitado();
                         }
-
-                        $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
-
+                        
                         if( $autorizadoDNM == true && $entidad->getEntHabilitado() == true && $provEntidad == true){
                         
                             if($reg->getTraComentario()){

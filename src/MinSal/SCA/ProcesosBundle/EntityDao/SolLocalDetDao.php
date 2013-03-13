@@ -159,8 +159,13 @@ class SolLocalDetDao {
     }
     
     public function getProveedores($entId, $cuoId){
-        $cuotas = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,
-                                                ProvEE.invId, ProvEE.invLitros - ProvEE.invReservado as invLitros, ProvEE.invGrado, ProvEE.invNombreEsp
+        $cuotas = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado,
+                                                ProvEE.invId, ProvEE.invLitros - ProvEE.invReservado as invLitros, ProvEE.invGrado, ProvEE.invNombreEsp, 
+                                                (SELECT count(K) 
+                                                   FROM MinSalSCAAdminBundle:ListadoDNM K 
+                                                  WHERE E.cuoYear = K.ldnm_year
+                                                    AND ProvBB.entNit = K.ldnm_nit
+                                                    AND ProvBB.entNrc = K.ldnm_nrc) AS HAB
                                           FROM MinSalSCAAdminBundle:Cuota E
                                             JOIN E.alcohol A
                                             JOIN E.entidad B
@@ -179,9 +184,41 @@ class SolLocalDetDao {
                                             AND ProvEE.invGrado >= E.cuoGrado
                                             
                                             AND B.entComprador = TRUE
-                                            AND ProvBB.entHabilitado = true
                                           ORDER by ProvEE.invNombreEsp ASC")
                 ->setParameter('entId',$entId)
+                ->setParameter('cuoId',$cuoId);
+        
+        return $cuotas->getArrayResult();
+    }
+    
+    public function getProveedorSolicitud($localDetId, $entId, $cuoId){
+        $cuotas = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado,
+                                                ProvEE.invId, ProvEE.invLitros - ProvEE.invReservado as invLitros, ProvEE.invGrado, ProvEE.invNombreEsp,
+                                                -1 as HAB
+                                          FROM MinSalSCAAdminBundle:Cuota E
+                                            JOIN E.alcohol A
+                                            JOIN E.entidad B
+                                            , MinSalSCAProcesosBundle:Inventario ProvEE
+                                            JOIN ProvEE.alcohol ProvAA
+                                            JOIN ProvEE.entidad ProvBB
+                                            JOIN ProvEE.inventariosDet ProvCC
+                                            JOIN ProvCC.solLocalDet ProvDD
+                                          WHERE B.entId = :entId
+                                            AND E.cuoId = :cuoId
+                                            AND E.auditDeleted = false
+                                            
+                                            AND ProvBB.entId <> B.entId
+                                            AND ProvAA.alcId = A.alcId
+                                            AND (ProvBB.entImportador = TRUE 
+                                                OR ProvBB.entProductor = TRUE 
+                                                OR ProvBB.entCompVend = TRUE)
+                                            AND ProvEE.invGrado >= E.cuoGrado
+                                            
+                                            AND B.entComprador = TRUE
+                                            AND ProvDD.localDetId = :localDetId
+                                          ORDER by ProvEE.invNombreEsp ASC")
+                ->setParameter('entId',$entId)
+                ->setParameter('localDetId',$localDetId)
                 ->setParameter('cuoId',$cuoId);
         
         return $cuotas->getArrayResult();

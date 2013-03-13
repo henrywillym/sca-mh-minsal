@@ -248,6 +248,13 @@
                                 {{autorizadoDNMText}}
                             </div><br/>
                         {% endif %}
+                            <br/>
+                        {% if autorizadoDNMProv == false %}
+                            
+                            <div class="flash-notice" style="max-width: 600px;">
+                                {{autorizadoDNMProvText}}
+                            </div><br/>
+                        {% endif %}
                     </td>
                 </tr>
                 
@@ -401,7 +408,7 @@
                             <input id="litrosLibera" type="text" />
                         </div>
                         <br>
-                        {% if autorizadoDNM == true and entHabilitado == true %}
+                        {% if autorizadoDNM == true and entHabilitado == true and autorizadoDNMProv == true%}
                             <input id="btnGuardar" type="submit" value="Ingresar" />
 
                             {% if transiciones|length > 0 %}
