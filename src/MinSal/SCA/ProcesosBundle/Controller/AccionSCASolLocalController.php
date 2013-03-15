@@ -3,7 +3,6 @@
 
 namespace MinSal\SCA\ProcesosBundle\Controller;
 
-use DateTime;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
@@ -234,7 +233,7 @@ class AccionSCASolLocalController extends Controller {
     public function getCuotasAction(Request $request) {
         $user = $this->get('security.context')->getToken()->getUser();
         $entId = 0;
-        $year = new DateTime();
+        $year = new \DateTime();
         $localDetId = $request->get('localDetId');
         
         $cuotaDao = new CuotaDao($this->getDoctrine());
@@ -551,9 +550,9 @@ class AccionSCASolLocalController extends Controller {
                 $solLocalDet->setSolLocal($solLocal);
                 $solLocalDet->getSolLocal()->setEntidad($user->getEntidad());
                 $solLocalDet->getSolLocal()->setTransicion($transicion);
-                $solLocalDet->getSolLocal()->setSolLocalFecha(new DateTime());
+                $solLocalDet->getSolLocal()->setSolLocalFecha(new \DateTime());
                 $solLocalDet->getSolLocal()->setAuditUserIns($user->getUsername());
-                $solLocalDet->getSolLocal()->setAuditDateIns(new DateTime());
+                $solLocalDet->getSolLocal()->setAuditDateIns(new \DateTime());
                 
                 //## Detalle de solicitud
                 $solLocal->addSolLocalDet($solLocalDet);
@@ -883,7 +882,11 @@ class AccionSCASolLocalController extends Controller {
                                     }
                                 }
                             }
+                        }else{
+                            $errorList = ' ';
+                        }
 
+                        if($errorList == ''){
                             if($reg->getEtpFin()->getEtpId() == Etapa::$FINALIZADA_OBS 
                                     && ($reg->getEstado()->getEstId() == Estado::$CANCELADO
                                     || $reg->getEstado()->getEstId() == Estado::$RECHAZADO)
@@ -894,21 +897,15 @@ class AccionSCASolLocalController extends Controller {
                                     $inventarioDetTmp = $inventarioDetDao->findInventarioDet($inventarioProv->getInvId(), $localDetId, 'R');
                                     $inventarioDetTmp = $this->eliminarInventarioDetProveedorAction($inventarioDetTmp);
                             }
-                        }else{
-                            $errorList = ' ';
-                        }
-
-                        if($errorList == ''){
+                            
                             $solLocalDet->getSolLocal()->setTransicion($reg);
 
                             $solLocalDet->getSolLocal()->setAuditUserUpd($auditUser->getUsername());
-                            $solLocalDet->getSolLocal()->setAuditDateUpd(new DateTime());
-                            
-                            
-                            
-                            $this->generarEmailEtapaNotificacion($solLocalDet, $reg, $inventarioProv->getEntidad()->getEntId());
+                            $solLocalDet->getSolLocal()->setAuditDateUpd(new \DateTime());
                             
                             $solLocalDetDao->editSolLocalDet($solLocalDet);
+                            
+                            $this->generarEmailEtapaNotificacion($solLocalDet, $reg, $inventarioProv->getEntidad()->getEntId());
 
                             $this->get('session')->setFlash('notice', '#### El registro paso a etapa "'. $reg->getEtpFin()->getEtpNombre() .'" con estado "'.$reg->getEstado()->getEstNombre().'" ####');
                             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolLocalVerSolicitudes'));
@@ -955,7 +952,7 @@ class AccionSCASolLocalController extends Controller {
             $invLitros = $inventario->getInvLitros();
             $inventario->setInvLitros( $invLitros + $litros);
             $inventario->setAuditUserUpd($user->getUsername());
-            $inventario->setAuditDateUpd(new DateTime());
+            $inventario->setAuditDateUpd(new \DateTime());
             $inventarioDet->setInventario($inventario);
         }else{
             //#### Encabezado de Inventario
@@ -964,18 +961,18 @@ class AccionSCASolLocalController extends Controller {
             $inventarioDet->getInventario()->setAlcohol($alcoholDao->getAlcohol($cuota->getAlcohol()->getAlcId()));
             $inventarioDet->getInventario()->setInvLitros($litros);
             $inventarioDet->getInventario()->setAuditUserIns($user->getUsername());
-            $inventarioDet->getInventario()->setAuditDateIns(new DateTime());
+            $inventarioDet->getInventario()->setAuditDateIns(new \DateTime());
             $inventarioDet->getInventario()->setInvGrado($cuota->getCuoGrado());
             $inventarioDet->getInventario()->setInvNombreEsp($cuota->getCuoNombreEsp());
         }
 
         //## Detalle de inventario
         $inventarioDet->getInventario()->addInventarioDet($inventarioDet);
-        $inventarioDet->setInvDetFecha(new DateTime());
+        $inventarioDet->setInvDetFecha(new \DateTime());
 
         //#### Auditoría 
         $inventarioDet->setAuditUserIns($user->getUsername());
-        $inventarioDet->setAuditDateIns(new DateTime());
+        $inventarioDet->setAuditDateIns(new \DateTime());
         
         $inventarioDet->setInvDetAccion("+");
         $inventarioDet->setInvDetLitros($litros);
@@ -1009,10 +1006,10 @@ class AccionSCASolLocalController extends Controller {
                 $inventario->setInvReservado($invReservado + $litros*$grados/$invGrado);
                 
                 $inventarioDet = new InventarioDet();
-                $inventarioDet->setInvDetFecha(new DateTime());
+                $inventarioDet->setInvDetFecha(new \DateTime());
                 
                 $inventarioDet->setAuditUserIns($user->getUsername());
-                $inventarioDet->setAuditDateIns(new DateTime());
+                $inventarioDet->setAuditDateIns(new \DateTime());
                 
                 $inventarioDet->setInvDetLitros($litros*$grados/$invGrado);
                 $inventarioDet->setInvDetAccion("R");
@@ -1023,14 +1020,14 @@ class AccionSCASolLocalController extends Controller {
                 $inventarioDet = $inventarioDetDao->findInventarioDet($invId, $localDetId, 'R');
                 
                 $inventarioDet->setAuditUserUpd($user->getUsername());
-                $inventarioDet->setAuditDateUpd(new DateTime());
+                $inventarioDet->setAuditDateUpd(new \DateTime());
                 
                 if($liberarParcial){
                     $inventarioDetParcial = new InventarioDet();
-                    $inventarioDetParcial->setInvDetFecha(new DateTime());
+                    $inventarioDetParcial->setInvDetFecha(new \DateTime());
 
                     $inventarioDetParcial->setAuditUserIns($user->getUsername());
-                    $inventarioDetParcial->setAuditDateIns(new DateTime());
+                    $inventarioDetParcial->setAuditDateIns(new \DateTime());
 
                     $inventarioDetParcial->setInvDetLitros($litros*$grados/$invGrado);
                     $inventarioDetParcial->setInvDetAccion("-");
@@ -1046,7 +1043,7 @@ class AccionSCASolLocalController extends Controller {
             }
             
             $inventario->setAuditUserUpd($user->getUsername());
-            $inventario->setAuditDateUpd(new DateTime());
+            $inventario->setAuditDateUpd(new \DateTime());
             
             $inventarioDet->setInventario($inventario);
             

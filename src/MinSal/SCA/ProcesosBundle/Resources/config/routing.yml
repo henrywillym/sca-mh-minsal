@@ -171,3 +171,10 @@ MinSalSCAProcesosBundle_getEtapasLocal:
     pattern:  /Solicitud/Local/getEtapas
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:getEtapas }
     
+#*********************************************
+#***    Procesos Automatizados Publicos    ***
+#*********************************************
+MinSalSCAProcesosBundle_mantCargarInventarioDet:
+    pattern:  /Scheduled/Anon/Process/ExpiracionSolicitudes
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASchAnonProcess:expiracionSolicitudes } 
+    

@@ -18,6 +18,8 @@ class SolLocalDao {
     var $em;
     
     var $fluId;
+    
+    private $expDias = 30; //Cantidad de dias que esta vigente un Registro de Compra Local antes de realizar la compra
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;
@@ -236,6 +238,26 @@ class SolLocalDao {
         }else{
             return 0;
         }
+    }
+    
+    
+    public function getSolicitudesExpiradas(){
+        $etapas = Etapa::$EVAL_PROVEEDOR;
+        $sql = "SELECT E, A, F, G, C
+                FROM MinSalSCAProcesosBundle:SolLocal E 
+                    JOIN E.entidad A
+                    JOIN E.transicion F
+                    JOIN F.flujo B
+                    JOIN F.estado C
+                    JOIN F.etpFin G
+                WHERE G.etpId in (".$etapas.")
+                  AND B.fluId = :fluId
+                  AND CURRENT_DATE() - E.solLocalFecha > :expDias";
+        
+        $registros = $this->em->createQuery($sql)
+                ->setParameter('expDias', $this->expDias)
+                ->setParameter('fluId', $this->fluId);
+        return $registros->getResult();
     }
 }
 ?>

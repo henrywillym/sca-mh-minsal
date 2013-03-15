@@ -43,6 +43,7 @@ security:
         - { path: ^/SCA/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: /admin/*, role: ROLE_ADMIN }
         - { path: /SCA/admin/*, role: ROLE_ADMIN }
+        - { path: ^/SCA/Scheduled/Anon/Process/*, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/SCA/*, role: ROLE_USER }
         
     role_hierarchy:

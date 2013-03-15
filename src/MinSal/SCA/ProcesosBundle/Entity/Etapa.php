@@ -16,6 +16,12 @@ class Etapa {
     public static $FINALIZADA_OBS = 9;
     public static $RECEPCION_TOTAL_INV = 6;
     
+    //La codificacion de etapas se utiliza para filtrar solicitudes que se encuentran en estas etapas y que se tiene validar su vigencia
+    public static $EVAL_MINSAL = 1;
+    public static $EVAL_DNM = 2;
+    public static $IMPORT_ALCOCHOL = 3;
+    public static $EVAL_PROVEEDOR = 7;
+    
     public function __construct() {
         $this->auditDateIns = new \DateTime();
     }
