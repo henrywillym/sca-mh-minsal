@@ -4,6 +4,7 @@
     <script type="text/javascript">
         $(document).ready(function(){
             $('#btnGuardar').button();
+            $('#btnActualizar').button();
             $('#btnEliminar').button();
             $('#btnRegresar').button();
 
@@ -11,6 +12,9 @@
            $('td>label').parent().attr('align','right');
            if($('#RegVenta_RegVentaId').val()=='' || $('#RegVenta_RegVentaId').val()==-1){
                $('#btnEliminar').hide();
+               $('#btnActualizar').hide();
+           }else{
+               $('#btnGuardar').hide();
            }
            $('#RegVenta_regveFecha').datepicker();
            
@@ -161,13 +165,8 @@ $.post('{{ url('MinSalSCAProcesosBundle_getGradoRV',{'CuoId':'CuoId'})}}'.replac
                         <div id="msgDialog">
                         </div>
                         <br>
-                        {% if  RegVentaId==-1 %}
                         <input id="btnGuardar" name="btnGuardar" type="submit" value="Guardar" />
-                        {% endif %}
-                         {% if  RegVentaId!=-1 %}
-                        
-                        <input id="btnGuardar" name="btnGuardar" type="submit" value="Actualizar" />
-                        {% endif %}
+                        <input id="btnActualizar" name="btnGuardar" type="submit" value="Actualizar" />
                         <input id="btnEliminar" name="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>
 
                         <input id="btnRegresar"  type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantRegVenta')}}';"/>

@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="sca_sol_imp")
  */
 class SolImportacion {
+    public static $BLOQUEADA = '** BLOQUEADA **';
     
     public function __construct() {
         $this->entidad = new Entidad();

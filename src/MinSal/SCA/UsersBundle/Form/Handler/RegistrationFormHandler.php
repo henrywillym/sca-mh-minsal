@@ -45,7 +45,7 @@ class RegistrationFormHandler extends BaseHandler{
             //var_dump($this->form->getErrorsAsString(10));die;
             if ($this->form->isValid()) {
                 
-                $tmp = $user->getIdUsuario();
+                $tmp = $user->getId();
                 
                 
                 //Si es update
@@ -65,7 +65,7 @@ class RegistrationFormHandler extends BaseHandler{
                     $userDao = new UserDao($this->container->get("doctrine"));
                     
                     //Se obtiene el registro de la BD
-                    $tmp = $userDao->getUserEspecifico($user->getIdUsuario());
+                    $tmp = $userDao->getUserEspecifico($user->getId());
                     
                     //Se le asigna al Formulario
                     $this->form->setData($tmp);
@@ -122,7 +122,8 @@ class RegistrationFormHandler extends BaseHandler{
         
         if ($confirmation) {
             $user->setEnabled(false);
-            $user->generateConfirmationToken();
+            $tokenGenerator = $this->container->get('fos_user.util.token_generator');
+            $user->setConfirmationToken($tokenGenerator->generateToken());
             $this->mailer->sendConfirmationEmailMessage($user);
         } else {
             $user->setConfirmationToken(null);

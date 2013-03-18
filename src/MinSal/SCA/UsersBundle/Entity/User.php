@@ -45,6 +45,7 @@ class User extends BaseUser {
         $this->auditDeleted = false;
         $this->userInternoTipo = null;
         $this->auditDateIns = new \DateTime();
+        $this->algorithm = 'sha512';
     }
     
     /**
@@ -248,7 +249,12 @@ class User extends BaseUser {
      */
     private $auditDeleted;
     
-   
+    /**
+     * @var string $algorithm
+     *
+     * @ORM\Column(name="algorithm", type="string", length=10, nullable=false)
+     */
+    private $algorithm;
 
     /**
      * Get username
@@ -412,8 +418,17 @@ class User extends BaseUser {
     public function setId($id) {
         $this->id = $id;
     }
+    
+    
+    public function getAlgorithm() {
+        return $this->algorithm;
+    }
 
-        
+    public function setAlgorithm($algorithm) {
+        $this->algorithm = $algorithm;
+    }
+
+            
     public function getUserInternoTipoText() {
     	//ACA SE FILTRA CUAL ES EL TIPO DE MINISTERIO AL QUE PERTENECE
         if($this->userInternoTipo == User::$MINSAL){

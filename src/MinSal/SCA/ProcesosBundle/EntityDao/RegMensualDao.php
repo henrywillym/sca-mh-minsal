@@ -74,8 +74,6 @@ class RegMensualDao {
           $RegMensual->setRegmenperdida($regmen_perd);
                 $RegMensual->setAudituserins($user->getUsername());
                 $RegMensual->setAuditdateins(new \DateTime());
-                $RegMensual->setAudituserupd($user->getUsername());
-                $RegMensual->setAuditdateupd(new \DateTime());
                 $RegMensual->setAuditDeleted("false");
                 
                 
@@ -148,13 +146,21 @@ class RegMensualDao {
             return $matrizMensajes;
         }
     
-    /*
-    public function existeRegMensual($entId) {
-        $result = $this->em->createQuery("SELECT count(e) 
-                                          FROM MinSalSCAProcesosBundle:RegMensuale
-                                          WHERE e.entId = :entId")
-                 ->setParameter('entId',$entId);
+    
+    public function existeRegMensual($idReg, $entId, $year, $mes) {
+        $result = $this->em->createQuery("SELECT count(E) 
+                                          FROM MinSalSCAProcesosBundle:RegMensual E 
+                                          WHERE E.entidad = :entId 
+                                            AND E.RegMenId <> :RegMenId
+                                            AND E.regmen_year = :year 
+                                            AND E.regmen_mes = :mes 
+                                            AND E.auditDeleted= false ")
+                ->setParameter('RegMenId', $idReg)
+                ->setParameter('year', $year)
+                ->setParameter('mes', $mes)
+                ->setParameter('entId', $entId);
+        
         return $result->getSingleScalarResult();
-    }/**/
+    }
 }
 ?>

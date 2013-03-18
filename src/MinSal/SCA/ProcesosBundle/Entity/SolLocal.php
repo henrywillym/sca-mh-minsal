@@ -15,6 +15,7 @@ use MinSal\SCA\ProcesosBundle\Entity\Transicion;
  * @ORM\Table(name="sca_sol_local")
  */
 class SolLocal {
+    public static $BLOQUEADA = '** BLOQUEADA **';
     
     public function __construct() {
         $this->entidad = new Entidad();
