@@ -6,20 +6,22 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
 use Symfony\Component\Validator\Constraints as Assert;
-/**
- * RepositoryClass de RegMensual
- *
- * @author Daniel E. Diaz
- */
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
+ * RepositoryClass de RegMensual
+ * @author Daniel E. Diaz
+ * 
  * @ORM\Entity
  * @ORM\Table(name="sca_registro_mensual")
  */
 class RegMensual {
     
     public function __construct() {
-
+        $year = date("Y", strtotime("-1 month"));
+        $month = date("m", strtotime("-1 month"));
+        $this->regmen_year = $year;
+        $this->regmen_mes = $month+0;
         $this->auditDeleted = false;
     }
     
@@ -29,7 +31,7 @@ class RegMensual {
     
     public function isValid(){
         $msg = array();
-        if($this->getInvGrado()){
+        if($this->getInvGrado() != null && $this->getInvGrado()!=''){
             if($this->getInvGrado()+0 <=0 || $this->getInvGrado()+0 >100 ){
                 $msg[]='- El grado ingresado "'.$this->getInvGrado().'" debe ser mayor a 0 y menor a 100';
             }

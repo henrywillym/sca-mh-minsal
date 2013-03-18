@@ -32,11 +32,22 @@ class RegVenta {
     public function isValid(){
         $msg = array();
         
-        if($this->getregveGrado()){
+        if($this->getRegveGrado() != null && $this->getRegveGrado() != ''){
+          
+            if($this->getRegveGrado()+0 <=0 || $this->getRegveGrado()+0 >100 ){
+                $msg[]='- El grado ingresado "'.$this->getRegveGrado().'" debe ser mayor a 0 y menor a 100';
+            }
+        }else{
+            $msg[]='- Debe especificar el grado del alcohol';
+        }
+        
+        if($this->getRegveFecha() != null && $this->getRegveFecha()!= ''){
           
             if($this->getregveGrado()+0 <=0 || $this->getregveGrado()+0 >100 ){
                 $msg[]='- El grado ingresado "'.$this->getregveGrado().'" debe ser mayor a 0 y menor a 100';
             }
+        }else{
+            $msg[]='- Debe especificar la fecha de la transacción';
         }
          
         return $msg;
