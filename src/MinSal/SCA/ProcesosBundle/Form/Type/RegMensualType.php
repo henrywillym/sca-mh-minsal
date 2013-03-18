@@ -47,7 +47,6 @@ class RegMensualType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $opciones){
         $builder->add('RegMenId', 'hidden');
         
-        $year = date("Y", strtotime("-1 month"));
         
         $builder->add('regmen_mes', 'choice', array(
             'choices' => $this->getMeses(),
@@ -56,7 +55,7 @@ class RegMensualType extends AbstractType {
             'multiple' => false,
             'empty_value' => 'Debe Seleccionar un Mes'
         ));
-        $builder->add('regmen_year', null, array('data' => $year,'attr' => array('readonly' => 'readonly'),'label' => 'A&ntilde;o'));
+        $builder->add('regmen_year', null, array('attr' => array('readonly' => 'readonly'),'label' => 'A&ntilde;o'));
         $builder->add('regmen_excedente_ant', null, array('label' => 'Excedente'));
         $builder->add('regmen_prod', null, array('label' => 'Produccion'));
         $builder->add('regmen_imp', null, array('label' => 'Importacion'));
