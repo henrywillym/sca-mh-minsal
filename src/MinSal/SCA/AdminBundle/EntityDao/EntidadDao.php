@@ -12,6 +12,8 @@ class EntidadDao {
     var $doctrine;
     var $repositorio;
     var $em;
+    
+    public static $NO_HABILITADA ='**** NOTA **** La empresa se encuentra deshabilitada por MH/MINSAL y bloqueada para realizar transacciones';
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;

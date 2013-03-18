@@ -285,7 +285,7 @@ class DefaultController extends BaseController {
         $form->bindRequest($request);
         
         $userDao = new UserDao($this->container->get("doctrine"));
-        $user = $userDao->eliminarUsuario($user->getIdUsuario(), $auditUser->getUsername());
+        $user = $userDao->eliminarUsuario($user->getId(), $auditUser->getUsername());
 
         $this->setFlash('fos_user_success', '#### El usuario "'.$user->getUsername().'" ha sido eliminado ####');
 
@@ -379,7 +379,6 @@ class DefaultController extends BaseController {
        if ($confirmation) {
             $user->setEnabled(false);
             
-            $this->container->get('fos_user.user_manager');
             $tokenGenerator = $this->container->get('fos_user.util.token_generator');
             $user->setConfirmationToken($tokenGenerator->generateToken());
             
