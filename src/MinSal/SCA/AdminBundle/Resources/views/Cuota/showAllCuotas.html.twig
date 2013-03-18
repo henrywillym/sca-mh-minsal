@@ -21,10 +21,10 @@
         
         $(document).ready(function(){
             var myGrid = $('#theGrid');
-            
+            //$.fn.jqm = null;
             myGrid.jqGrid({ 
                 url: '{{ url('MinSalSCAAdminBundle_consultarCuotasJSON',{'entId': entId, 'cuoTipo':cuoTipo})}}',
-                height: 200,
+                height: 200,jqModal: false,
                 datatype:'json',
                 altRows:true,            
                 rowNum:10,
@@ -186,7 +186,7 @@
                     $("#theGrid").jqGrid('setGridParam',{
                             datatype:'json',
                             loadonce:true
-                    }).trigger('reloadGrid');
+                    })//.trigger('reloadGrid');
                 }
             }
         );
@@ -194,19 +194,27 @@
         function despuesAgregarEditar(response, postdata) {
             //alert("datos guardados con exito!");
             
-            $("#theGrid").jqGrid('setGridParam',{
-                datatype:'json',
-                loadonce:true
-            }).trigger('reloadGrid');
-            
             json   = response.responseText; // response text is returned from server.
             
             try{
                 var result = JSON.parse(json); // convert json object into javascript object
                 if(result.status){
-                    alert("Datos guardados con exito!");
+                    alert("Datos guardados con éxito!");
                 }
-                return [result.status,result.msg,null];
+                
+                $('#loadingDiv').dialog( "close" );
+                setTimeout(function(){
+                    try{
+                        $('#cData').click();
+                    }catch(ee){;}
+                },1000);
+                
+                $("#theGrid").jqGrid('setGridParam',{
+                    datatype:'json',
+                    loadonce:true
+                }).trigger('reloadGrid');
+
+                return [result.status, result.msg, 0];
             }catch(e){
                 return [false,'Ocurrio un error interno en el servidor',null];
             }
@@ -215,7 +223,6 @@
         
         $("#agregarCuota").click(function(){
             jQuery('#theGrid').jqGrid('editGridRow',"new",{
-                //addCaption: "Agregar Cuota",
                 width:550,
                 height:220,
                 bottominfo:"Campos marcados con (*) son obligatorios",
@@ -223,7 +230,7 @@
                     despuesAgregarEditar(response, postdata);
                 },
                 closeAfterAdd:true,
-                closeOnEscape: true,
+                closeOnEscape: false,
                 align:'center'
             });
             
@@ -242,12 +249,11 @@
                     closeAfterEdit : true,
                     editCaption: "Editar Cuota",
                     bottominfo:"Campos marcados con (*) son obligatorios",
-                    closeAfterEdit:true,
                     afterSubmit: function(response, postdata){
                         despuesAgregarEditar(response, postdata);
                     },
-                    reloadAfterSubmit:true,
-                    closeOnEscape: true,
+                    reloadAfterSubmit:false,
+                    closeOnEscape: false,
                     align:'center'
                 });
                 

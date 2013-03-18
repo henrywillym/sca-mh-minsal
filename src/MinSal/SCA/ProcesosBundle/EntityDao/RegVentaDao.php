@@ -69,11 +69,8 @@ class RegVentaDao {
 		$RegVenta->setRegveLitros($RegVentaLitros);
                 $RegVenta->setRegveGrado($RegVentaGrado);
                 $RegVenta->setEntidad($idEnt);
-                $RegVenta->setAuditDeleted("false");
                     $RegVenta->setAudituserins($user->getUsername());
                     $RegVenta->setAuditdateins(new \DateTime());
-                    $RegVenta->setAudituserupd($user->getUsername());
-                    $RegVenta->setAuditdateupd(new \DateTime());
                     $RegVenta->setAuditDeleted("false");
   
             $this->em->persist($RegVenta);

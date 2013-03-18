@@ -16,11 +16,13 @@ class SolImportacionDetDao {
     
     var $fluId;
     
-    private $sqlSelect = " E.impDetId, E.impDetProvNom, E.impDetPaisProc, E.impDetPaisOri, E.impDetLitros, E.impDetLitrosLib, E.impDetFactCom, F.auditUserIns, F.auditDateIns,
+    private $sqlSelect = " E.impDetId, E.impDetProvNom, E.impDetPaisProc, E.impDetPaisOri, E.impDetLitros, E.impDetLitrosLib, E.impDetFactCom, 
+                        F.auditUserIns, F.auditDateIns,
                         C.estId, C.estNombre, 
                         D.etpId, D.etpNombre,
                         F.solImpFecha,
-                        H.cuoNombreEsp, H.cuoGrado ";
+                        H.cuoNombreEsp, H.cuoGrado,
+                        A.entHabilitado, A.entComentario ";
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;
@@ -48,7 +50,12 @@ class SolImportacionDetDao {
     }
     
     public function getSolImportacionesDetByEntidad($entId) {
-        $registros = $this->em->createQuery("SELECT ".$this->sqlSelect."
+        $registros = $this->em->createQuery("SELECT ".$this->sqlSelect.", 
+                                                    (SELECT count(K) 
+                                                       FROM MinSalSCAAdminBundle:ListadoDNM K 
+                                                      WHERE H.cuoYear = K.ldnm_year
+                                                        AND A.entNit = K.ldnm_nit
+                                                        AND A.entNrc = K.ldnm_nrc) AS HAB
                                           FROM MinSalSCAProcesosBundle:SolImportacionDet E 
                                             JOIN E.cuota H
                                             JOIN E.solImportacion F
@@ -74,7 +81,12 @@ class SolImportacionDetDao {
      * @return Array
      */
     public function getSolImportacionesDetByEtapa($etpId, $entId = null) {
-        $sql = "SELECT  ".$this->sqlSelect."
+        $sql = "SELECT  ".$this->sqlSelect.", 
+                    (SELECT count(K) 
+                       FROM MinSalSCAAdminBundle:ListadoDNM K 
+                      WHERE H.cuoYear = K.ldnm_year
+                        AND A.entNit = K.ldnm_nit
+                        AND A.entNrc = K.ldnm_nrc) AS HAB
                 FROM MinSalSCAProcesosBundle:SolImportacionDet E 
                     JOIN E.cuota H
                     JOIN E.solImportacion F

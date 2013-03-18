@@ -504,7 +504,7 @@ class Entidad {
     }
 
     public function getEntHabilitado() {
-        return $this->entHabilitado;
+        return $this->entHabilitado === 'true' || $this->entHabilitado === true;
     }
 
     public function setEntHabilitado($entHabilitado) {

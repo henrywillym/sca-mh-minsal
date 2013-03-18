@@ -18,6 +18,8 @@ class SolLocalDao {
     var $em;
     
     var $fluId;
+    
+    private $expDias = 30; //Cantidad de dias que esta vigente un Registro de Compra Local antes de realizar la compra
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;
@@ -158,32 +160,52 @@ class SolLocalDao {
     }
     
     public function getSearchEstados($entId) {
-        $registros = $this->em->createQuery("SELECT DISTINCT C.estId, C.estNombre
-                                          FROM MinSalSCAProcesosBundle:SolLocal E 
-                                            JOIN E.entidad A
-                                            JOIN E.transicion B
-                                            JOIN B.estado C
-                                            JOIN B.flujo G
-                                          WHERE A.entId = :entId
-                                            AND G.fluId = :fluId
-                                          order by C.estNombre ASC")
-                ->setParameter('entId',$entId)
-                ->setParameter('fluId',$this->fluId);
+        $sql = "SELECT DISTINCT C.estId, C.estNombre
+                FROM MinSalSCAProcesosBundle:SolLocal E 
+                  JOIN E.entidad A
+                  JOIN E.transicion B
+                  JOIN B.estado C
+                  JOIN B.flujo G
+                WHERE "; 
+        
+        if($entId != null){
+            $sql = $sql." A.entId = :entId AND ";
+        }
+        
+        $sql = $sql." G.fluId = :fluId
+              order by C.estNombre ASC";
+                
+        $registros = $this->em->createQuery($sql);
+                
+        if($entId != null){
+            $registros->setParameter('entId',$entId);
+        }
+        $registros->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
     
     public function getSearchEtapas($entId) {
-        $registros = $this->em->createQuery("SELECT DISTINCT C.etpId, C.etpNombre
-                                          FROM MinSalSCAProcesosBundle:SolLocal E 
-                                            JOIN E.entidad A
-                                            JOIN E.transicion B
-                                            JOIN B.etpFin C
-                                            JOIN B.flujo G
-                                          WHERE A.entId = :entId
-                                            AND G.fluId = :fluId
-                                          order by C.etpNombre ASC")
-                ->setParameter('entId',$entId)
-                ->setParameter('fluId',$this->fluId);
+        $sql = "SELECT DISTINCT C.etpId, C.etpNombre
+                FROM MinSalSCAProcesosBundle:SolLocal E 
+                  JOIN E.entidad A
+                  JOIN E.transicion B
+                  JOIN B.etpFin C
+                  JOIN B.flujo G
+                WHERE ";
+        
+        if($entId != null){
+            $sql = $sql." A.entId = :entId AND ";
+        }
+        
+        $sql = $sql." G.fluId = :fluId
+                order by C.etpNombre ASC";
+        $registros = $this->em->createQuery($sql);
+        
+        if($entId != null){
+            $registros->setParameter('entId',$entId);
+        }
+        
+        $registros->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
     
@@ -216,6 +238,26 @@ class SolLocalDao {
         }else{
             return 0;
         }
+    }
+    
+    
+    public function getSolicitudesExpiradas(){
+        $etapas = Etapa::$EVAL_PROVEEDOR;
+        $sql = "SELECT E, A, F, G, C
+                FROM MinSalSCAProcesosBundle:SolLocal E 
+                    JOIN E.entidad A
+                    JOIN E.transicion F
+                    JOIN F.flujo B
+                    JOIN F.estado C
+                    JOIN F.etpFin G
+                WHERE G.etpId in (".$etapas.")
+                  AND B.fluId = :fluId
+                  AND CURRENT_DATE() - E.solLocalFecha > :expDias";
+        
+        $registros = $this->em->createQuery($sql)
+                ->setParameter('expDias', $this->expDias)
+                ->setParameter('fluId', $this->fluId);
+        return $registros->getResult();
     }
 }
 ?>

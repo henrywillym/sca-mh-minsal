@@ -18,6 +18,8 @@ class SolImportacionDao {
     var $em;
     
     var $fluId;
+    
+    private $expDias = 30; //Cantidad de dias que esta vigente una solicitu de importacion antes de realizar la compra
 
     function __construct($doctrine) {
         $this->doctrine = $doctrine;
@@ -108,7 +110,7 @@ class SolImportacionDao {
     public function editSolImportacion(SolImportacion $solImportacion) {
         $this->em->persist($solImportacion);
         $this->em->flush();
-        $matrizMensajes = array('Se actualizo con éxito', 'SolImportacionDet ' . $solImportacion->getSolImpId());
+        $matrizMensajes = array('Se actualizo con éxito', 'SolImportacion ' . $solImportacion->getSolImpId());
 
         return $matrizMensajes;
     }
@@ -158,32 +160,52 @@ class SolImportacionDao {
     }
     
     public function getSearchEstados($entId) {
-        $registros = $this->em->createQuery("SELECT DISTINCT C.estId, C.estNombre
-                                          FROM MinSalSCAProcesosBundle:SolImportacion E 
-                                            JOIN E.entidad A
-                                            JOIN E.transicion B
-                                            JOIN B.estado C
-                                            JOIN B.flujo G
-                                          WHERE A.entId = :entId
-                                            AND G.fluId = :fluId
-                                          order by C.estNombre ASC")
-                ->setParameter('entId',$entId)
-                ->setParameter('fluId',$this->fluId);
+        $sql = "SELECT DISTINCT C.estId, C.estNombre
+                FROM MinSalSCAProcesosBundle:SolImportacion E 
+                  JOIN E.entidad A
+                  JOIN E.transicion B
+                  JOIN B.estado C
+                  JOIN B.flujo G
+                WHERE ";
+        if($entId != null){
+            $sql = $sql." A.entId = :entId AND ";
+        }
+        
+        $sql = $sql." G.fluId = :fluId
+                order by C.estNombre ASC";
+        
+        $registros = $this->em->createQuery($sql);
+        
+        if($entId != null){
+            $registros->setParameter('entId',$entId);
+        }
+        
+        $registros->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
     
     public function getSearchEtapas($entId) {
-        $registros = $this->em->createQuery("SELECT DISTINCT C.etpId, C.etpNombre
-                                          FROM MinSalSCAProcesosBundle:SolImportacion E 
-                                            JOIN E.entidad A
-                                            JOIN E.transicion B
-                                            JOIN B.etpFin C
-                                            JOIN B.flujo G
-                                          WHERE A.entId = :entId
-                                            AND G.fluId = :fluId
-                                          order by C.etpNombre ASC")
-                ->setParameter('entId',$entId)
-                ->setParameter('fluId',$this->fluId);
+        $sql = "SELECT DISTINCT C.etpId, C.etpNombre
+                FROM MinSalSCAProcesosBundle:SolImportacion E 
+                  JOIN E.entidad A
+                  JOIN E.transicion B
+                  JOIN B.etpFin C
+                  JOIN B.flujo G
+                WHERE ";
+        
+        if($entId != null){
+            $sql = $sql." A.entId = :entId AND ";
+        }
+        
+        $sql = $sql." G.fluId = :fluId
+                order by C.etpNombre ASC";
+        $registros = $this->em->createQuery($sql);
+        
+        if($entId != null){
+            $registros->setParameter('entId',$entId);
+        }
+        
+        $registros->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
     }
     
@@ -212,6 +234,25 @@ class SolImportacionDao {
         }else{
             return 0;
         }
+    }
+    
+    public function getSolicitudesExpiradas(){
+        $etapas = Etapa::$EVAL_MINSAL.','.Etapa::$EVAL_DNM.','.Etapa::$IMPORT_ALCOCHOL;
+        $sql = "SELECT E, A, F, G, C
+                FROM MinSalSCAProcesosBundle:SolImportacion E 
+                    JOIN E.entidad A
+                    JOIN E.transicion F
+                    JOIN F.flujo B
+                    JOIN F.estado C
+                    JOIN F.etpFin G
+                WHERE G.etpId in (".$etapas.")
+                  AND B.fluId = :fluId
+                  AND CURRENT_DATE() - E.solImpFecha > :expDias";
+        
+        $registros = $this->em->createQuery($sql)
+                ->setParameter('expDias', $this->expDias)
+                ->setParameter('fluId', $this->fluId);;
+        return $registros->getResult();
     }
 }
 ?>
