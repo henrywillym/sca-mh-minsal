@@ -52,7 +52,7 @@ class EntidadType extends AbstractType {
             'multiple'=>false,
             'choices'=> array(
                 'N' => 'Natural', 
-                'J'=>'Juridica'
+                'J'=>'Jurídica'
             )
         ));
         

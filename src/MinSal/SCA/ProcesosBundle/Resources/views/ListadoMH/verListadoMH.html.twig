@@ -1,0 +1,164 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{# Muestra todas las solicitudes de importacion asociadas a la empresa del usuario#}
+
+{% block body %}
+    <script type="text/javascript">
+        var searchOptionNumber = ['eq',
+                                'le','ge',
+                                'bw','bn','ew','en','cn','nc'];
+                            
+        var searchOptionText = ['eq',
+                                'bw','bn','ew','en','cn','nc'];
+                            
+        var searchOptionDate = ['eq',
+                                'le','ge'];
+        
+        
+        $(document).ready(function(){
+            $('#agregarRegistro').button();
+            
+            var myGrid = $('#theGrid');
+            
+            
+            myGrid.jqGrid({ 
+                url:  '{{ url('MinSalSCAProcesosBundle_consultarListadoMHJSON') }}',
+                width: 740,
+                height: 230,
+                datatype:'json',
+                altRows:true,            
+                rowNum:10,
+                rowList:[10,20,30],
+                multiselect: false,
+                loadonce:true,
+                jsonReader: {
+                    root:'rows',
+                    page:'page',
+                    total:'total',
+                    records:'records',
+                    repeatitems: false,     /**/
+                    id:"0"                 /**/
+                },
+                pager: jQuery('#pager'),
+                viewrecords: true, 
+                caption: '',
+                colModel:[{
+                        key:true,
+                        label:'ID',
+                        name:'mhId', 
+                        index: 'mhId', 
+                        hidden: true,
+                        width:30,
+                        searchoptions:{
+                            sopt: searchOptionNumber
+                        }
+                    },{
+                        label:'NIT',
+                        name:'mhNIT', 
+                        index: 'mhNIT',
+                        width:140,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'NRC',
+                        name:'mhNRC', 
+                        index: 'mhNRC',
+                        width:60,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{ 
+                        label:'Tipo Persona',
+                        name:'mhTipoPersonaText', 
+                        index: 'mhTipoPersonaText', 
+                        width:60,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{ 
+                        label:'Nombres',
+                        name:'mhNombres', 
+                        index: 'mhNombres', 
+                        width:120,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{ 
+                        label:'Apellidos',
+                        name:'mhApellidos', 
+                        index: 'mhApellidos', 
+                        width:120,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
+                        label:'Razon',
+                        name: 'mhRazon', 
+                        index: 'mhRazon',
+                        width:200,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    }
+                ],
+                ignoreCase: true,
+                shrinkToFit: false
+            });
+            
+            myGrid.jqGrid('navGrid','#pager',{
+                edit:false,
+                add:false,
+                del:false,
+                beforeRefresh: function() {
+                    $("#theGrid").jqGrid('setGridParam',{
+                            datatype:'json',
+                            loadonce:true
+                    }).trigger('reloadGrid');
+                }
+            });
+            
+            $("#agregarRegistro").click(function(){
+                location.href = '{{ url('MinSalSCAProcesosBundle_mantListadoMHIngreso')}}';
+            });
+      //fin
+       
+      });
+    </script>
+    
+    <style>
+            
+    </style>
+      
+    <form action="" method="post">
+        <table align="center">
+            <tr><td align="center">
+                    <h1> Listado de NIT/NRC cargados de MH del año {{year}}</h1>
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    {% if app.session.hasFlash('notice') %}
+                        <div class="flash-notice">
+                            {{ app.session.flash('notice') }}
+                        </div><br/>
+                    {% endif %}
+                    
+                    
+                    <table id="theGrid" class="scroll">
+                    </table> 
+
+                    <div id="pager" class="scroll" style="text-align:center;">
+                    </div> 
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <input type="button" value="Cargar Datos" id="agregarRegistro" />
+                </td>
+            </tr>
+        </table>        
+    </form>
+    <br></br>
+    <br></br>
+    
+{% endblock %}

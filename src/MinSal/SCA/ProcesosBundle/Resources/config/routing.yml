@@ -174,7 +174,26 @@ MinSalSCAProcesosBundle_getEtapasLocal:
 #*********************************************
 #***    Procesos Automatizados Publicos    ***
 #*********************************************
-MinSalSCAProcesosBundle_mantCargarInventarioDet:
+MinSalSCAProcesosBundle_ExpiracionSolicitudes:
     pattern:  /Scheduled/Anon/Process/ExpiracionSolicitudes
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASchAnonProcess:expiracionSolicitudes } 
     
+    
+#*****************************
+#***  Carga de NIT/NRC MH  ***
+#*****************************
+MinSalSCAProcesosBundle_mantListadoMHVer:
+    pattern:  /ListadoMH/mantListadoMHVer
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHVer } 
+
+MinSalSCAProcesosBundle_mantListadoMHIngreso:
+    pattern:  /ListadoMH/mantListadoMHIngreso
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHIngreso } 
+
+MinSalSCAProcesosBundle_consultarListadoMHJSON:
+    pattern:  /ListadoMH/consultarListadoMHJSON
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:consultarListadoMHJSON } 
+
+MinSalSCAProcesosBundle_mantListadoMHEdicion:
+    pattern:  /ListadoMH/mantListadoMHEdicion
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHEdicion } 

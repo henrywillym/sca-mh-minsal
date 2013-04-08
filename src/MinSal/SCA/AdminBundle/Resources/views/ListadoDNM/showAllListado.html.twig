@@ -16,7 +16,7 @@
             { name:'ldnm_year', index: 'ldnm_year', width:50,editable:true,editoptions:{size:40,maxlength:4,dataInit:function(el){$(el).mask("9999",{placeholder:"_"});}},formoptions:{rowpos:1, label: "A&ntilde;o", elmprefix:"(*)"},editrules:{required:true}  },
             { name:'ldnm_nit', index: 'ldnm_nit', width:115,editable:true,editoptions:{size:70,maxlength:20,dataInit:function(el){$(el).mask("9999-999999-999-9",{placeholder:"_"});}},formoptions:{ rowpos:2, label: "NIT",elmprefix:"(*)"},editrules:{required:true}  },
             { name:'ldnm_nrc', index: 'ldnm_nrc', width:100,editable:true,editoptions:{size:70,maxlength:150,dataInit:function(el){$(el).mask("999999-9",{placeholder:"_"});}},formoptions:{ rowpos:3, label: "NRC", elmprefix:"(*)"},editrules:{required:true}  } ,
-            { name:'ldnm_tipo_persona', index: 'ldnm_tipo_persona', width:100,editable:true,edittype:"select",editoptions:{size:40,value:"Natural:Natural;Juridica:Juridica"} ,formoptions:{rowpos:4, label: "Tipo de Persona :"} } ,
+            { name:'ldnm_tipo_persona', index: 'ldnm_tipo_persona', width:100,editable:true,edittype:"select",editoptions:{size:40,value:"Natural:Natural;Jurídica:Jurídica"} ,formoptions:{rowpos:4, label: "Tipo de Persona :"} } ,
            { name:'ldnm_nombres', index: 'ldnm_nombres', width:220,editable:true,editoptions:{size:40} ,formoptions:{rowpos:6, elmprefix:"(*)", label: "Nombre Persona Natural"},editrules:{required:true} } ,
            { name:'ldnm_apellidos', index: 'ldnm_apellidos', width:220,editable:true,editoptions:{size:40} ,formoptions:{rowpos:7, elmprefix:"(*)", label: "Apellido Persona Natural"},editrules:{required:true}} ,
            { name:'ldnm_razon', index: 'ldnm_razon', width:260,editable:true,editoptions:{size:40} ,formoptions:{rowpos:8, elmprefix:"(*)", label: "Raz&oacute;n Social"},editrules:{required:true} } ],
@@ -74,7 +74,7 @@
        		       $('#tr_ldnm_razon').hide();
        		        //limpia 
        		       $('#ldnm_razon').val("-");$('#ldnm_nombres').val("");$('#ldnm_apellidos').val("");
-       		 }else if ($('#ldnm_tipo_persona').val()=="Juridica"){
+       		 }else if ($('#ldnm_tipo_persona').val()=="Jurídica"){
              	   $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
@@ -90,7 +90,7 @@
        		       $('#tr_ldnm_razon').hide();
        		        //limpia 
        		       $('#ldnm_razon').val("-");$('#ldnm_nombres').val("");$('#ldnm_apellidos').val("");
-    			}else if ($(this).val()=="Juridica"){
+    			}else if ($(this).val()=="Jurídica"){
     			 $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
@@ -131,7 +131,7 @@
        		       $('#tr_ldnm_razon').hide();
        		       //limpia 
        		       $('#ldnm_razon').val("-");
-       		 }else if ($('#ldnm_tipo_persona').val()=="Juridica"){
+       		 }else if ($('#ldnm_tipo_persona').val()=="Jurídica"){
              	   $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
@@ -150,7 +150,7 @@
        		       $('#tr_ldnm_razon').hide();
        		       //limpia 
        		       $('#ldnm_razon').val("-");
-       		 }else if ($('#ldnm_tipo_persona').val()=="Juridica"){
+       		 }else if ($('#ldnm_tipo_persona').val()=="Jurídica"){
              	   $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
@@ -167,7 +167,7 @@
        		       $('#tr_ldnm_razon').hide();
        		         //limpia 
        		       $('#ldnm_razon').val("-");
-       		 }else if ($('#ldnm_tipo_persona').val()=="Juridica"){
+       		 }else if ($('#ldnm_tipo_persona').val()=="Jurídica"){
              	   $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
@@ -184,7 +184,7 @@
        		       $('#tr_ldnm_razon').hide();
        		        //limpia 
        		       $('#ldnm_razon').val("-");$('#ldnm_nombres').val("");$('#ldnm_apellidos').val("");
-    			}else if ($(this).val()=="Juridica"){
+    			}else if ($(this).val()=="Jurídica"){
     			 $('#tr_ldnm_nombres').hide();
        		       $('#tr_ldnm_apellidos').hide();
        		       $('#tr_ldnm_razon').show();
