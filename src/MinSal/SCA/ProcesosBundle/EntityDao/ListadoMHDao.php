@@ -72,12 +72,38 @@ class ListadoMHDao {
     }
 
     public function existenRegistros($mhYear) {
-        $sql = "SELECT count(e) 
+        $sql = "SELECT count(E) 
                 FROM MinSalSCAProcesosBundle:ListadoMH E
                 WHERE E.mhYear = :mhYear";
         
         $result = $this->em->createQuery($sql)
                 ->setParameter('mhYear',$mhYear);
+        
+        $valor = $result->getSingleScalarResult();
+        
+        if($valor == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+    
+    public function getEntidadByNITNRC($mhNIT, $mhNRC, $mhTipoPersona){
+        $year = new \DateTime();
+        $year = $year->format('Y')+0;
+                
+        $sql = "SELECT count(E) 
+                FROM MinSalSCAProcesosBundle:ListadoMH E
+                WHERE E.mhYear = :mhYear
+                  AND E.mhNIT = :mhNIT
+                  AND E.mhNRC = :mhNRC
+                  AND E.mhTipoPersona = :mhTipoPersona ";
+        
+        $result = $this->em->createQuery($sql)
+                ->setParameter('mhYear',$year)
+                ->setParameter('mhNIT',$mhNIT)
+                ->setParameter('mhNRC',$mhNRC)
+                ->setParameter('mhTipoPersona',$mhTipoPersona);
         
         $valor = $result->getSingleScalarResult();
         

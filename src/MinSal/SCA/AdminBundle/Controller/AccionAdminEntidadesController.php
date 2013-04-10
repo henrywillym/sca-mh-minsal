@@ -14,6 +14,7 @@ use MinSal\SCA\AdminBundle\EntityDao\EntidadDao;
 use MinSal\SCA\AdminBundle\EntityDao\ListadoDNMDao;
 use MinSal\SCA\AdminBundle\EntityDao\RolDao;
 use MinSal\SCA\AdminBundle\Form\Type\EntidadType;
+use MinSal\SCA\ProcesosBundle\EntityDao\ListadoMHDao;
 use MinSal\SCA\UsersBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -102,6 +103,7 @@ class AccionAdminEntidadesController extends Controller {
         $entidad = new Entidad();
         $entidadDao = new EntidadDao($this->getDoctrine());
         $listadoDNMDao = new ListadoDNMDao($this->getDoctrine());
+        $listadoMHDao = new ListadoMHDao($this->getDoctrine());
         
         $user = $this->get('security.context')->getToken()->getUser();
         $errores = null;
@@ -126,6 +128,12 @@ class AccionAdminEntidadesController extends Controller {
         if($tmpEntidad != null){
             $errores = 'ERROR: El NIT de la empresa "'.$entidadTmp->getEntNit().'" ya existe como representante de la empresa con nombre comercial "'.$tmpEntidad->getEntNombComercial().'"';
         }/**/
+        
+        //Validacion para verificar que el NIT/NRC se encuentran registrados en el listado de MH
+        $tmpEntidad = $listadoMHDao->getEntidadByNITNRC($entidadTmp->getEntNit(), $entidadTmp->getEntNrc(), $entidadTmp->getEntTipoPersona());
+        if($tmpEntidad === false){
+            $errores = 'ERROR: La combinación Tipo Persona-NIT-NRC de la empresa no existe en el listado del Ministerio de Hacienda';
+        }
         
         /**********************/
         
