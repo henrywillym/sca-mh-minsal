@@ -202,11 +202,56 @@ class AccionAdminEntidadesController extends Controller {
             $entidad->setUsers($usuarios);
 
             $entidadDao->editEntidad($entidad);
-            $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
-            return $this->redirect(
-                $this->generateUrl('MinSalSCAAdminBundle_mantCargarEntidad', 
-                        array('entId'=>$entidad->getEntId()))
+            
+            if( $entidadTmp->getEntId()){
+                $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
+            
+                return $this->redirect(
+                    $this->generateUrl('MinSalSCAAdminBundle_mantCargarEntidad', 
+                            array('entId'=>$entidad->getEntId()))
+                    );
+            }else{
+                $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
+            
+                $opciones = $this->getRequest()->getSession()->get('opciones');
+                $formReg = $this->container->get('fos_user.registration.form');//$form = $this->createForm(new RegistrationFormType(), $usuario);
+                $usuario = new User();
+                
+                if($entidad->getEntTipoPersona() ==='N'){
+                    $usuario->setEmail($entidad->getEntEmail());
+                    $usuario->setUserNit($entidad->getEntNit());
+                    $usuario->setUserTelefono($entidad->getEntTel());
+                    
+                    $usuario->setUserPrimerNombre($entidad->getEntNombre());
+                    $usuario->setUserApellidos($entidad->getEntNombre());
+                    $usuario->setUserCargo('Representante');
+                }else{
+                    //$usuario->setEmail($entidad->getEntEmail());
+                    if($entidad->getEntTipoDoc()== 'D'){
+                        $usuario->setUserDui($entidad->getEntRepDoc());
+                    }
+                    
+                    $usuario->setUserNit($entidad->getEntRepNit());
+                    $usuario->setUserTelefono($entidad->getEntTel());
+                    
+                    $usuario->setUserPrimerNombre($entidad->getEntRepNombre());
+                    $usuario->setUserApellidos($entidad->getEntRepNombre());
+                    $usuario->setUserCargo('Representante');
+                }
+                
+                $formReg->setData($usuario);
+                return $this->render('MinSalSCAUsersBundle:Registration:register.html.twig', array(
+                        'opciones' => $opciones, 
+                        'form' => $formReg->createView(), 
+                        'entId'=>$entidad->getEntId(), 
+                        'entHabilitado'=>$entidad->getEntHabilitado(),
+                        'autorizadoDNM' => $autorizadoDNM,
+                        'autorizadoDNMText' => $autorizadoDNMText,
+                        'userInterno' => 'false',
+                        'entNombre' => $entidad->getEntNombComercial()
+                    )
                 );
+            }
         }else{
             if($errores == null){
                 $errores = '**** ERROR **** Existen errores con el formulario, por favor revise los valores ingresados';
@@ -215,15 +260,15 @@ class AccionAdminEntidadesController extends Controller {
             $this->get('session')->setFlash('notice', $errores);
             
             $opciones = $this->getRequest()->getSession()->get('opciones');
-                return $this->render('MinSalSCAAdminBundle:Entidad:showEntidad.html.twig', array(
-                        'opciones' => $opciones, 
-                        'form' => $form->createView(), 
-                        'entId'=>$entidad->getEntId(), 
-                        'entHabilitado'=>$entidad->getEntHabilitado(),
-                        'autorizadoDNM' => $autorizadoDNM,
-                        'autorizadoDNMText' => $autorizadoDNMText
-                    )
-                );
+            return $this->render('MinSalSCAAdminBundle:Entidad:showEntidad.html.twig', array(
+                    'opciones' => $opciones, 
+                    'form' => $form->createView(), 
+                    'entId'=>$entidad->getEntId(), 
+                    'entHabilitado'=>$entidad->getEntHabilitado(),
+                    'autorizadoDNM' => $autorizadoDNM,
+                    'autorizadoDNMText' => $autorizadoDNMText
+                )
+            );
         }
     }
     

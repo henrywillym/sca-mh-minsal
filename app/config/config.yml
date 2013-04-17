@@ -71,7 +71,7 @@ fos_user:
     firewall_name: main
     user_class: MinSal\SCA\UsersBundle\Entity\User
     from_email:
-        address: noreply@sca.gob.sv
+        address: noreplySCA@salud.gob.sv
         sender_name: SCA
     registration:
         form:
@@ -80,7 +80,7 @@ fos_user:
         confirmation:
             enabled: true
             from_email:
-                address: registration@sca.gob.sv
+                address: registrationSCA@salud.gob.sv
                 sender_name: SCA Registro Usuario
             template: MinSalSCAUsersBundle:Registration\Email:register.email.twig
     change_password:
@@ -91,10 +91,10 @@ fos_user:
         email:
             template: MinSalSCAUsersBundle:Resetting\Email:resetting.email.twig
             from_email:
-                address:  reset@sca.gob.sv
+                address:  resetSCA@salud.gob.sv
                 sender_name: SCA Restauracion Clave
     service: 
         mailer: fos_user.mailer.default    #twig_swift
         
 parameters:
-    contact_email: noreply@sca.gob.sv
+    contact_email: noreplySCA@salud.gob.sv

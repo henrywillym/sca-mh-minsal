@@ -135,9 +135,11 @@
 </script>
     
     {% for key, message in app.session.getFlashes() %}
-        <div class="{{ key }}">
-            {{ message|trans({}, 'FOSUserBundle') }}
-        </div>
+        <center>
+            <div class="flash-notice"> <!--{{ key }}-->
+                {{ message|trans({}, 'FOSUserBundle') }}
+            </div>
+        </center>
     {% endfor %}
 
     {# ************************************************** #}
