@@ -9,6 +9,7 @@ use MinSal\SCA\ProcesosBundle\Entity\Arancel;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\SolImportacionDao;
+use MinSal\SCA\ProcesosBundle\EntityDao\SolImportacionDetDao;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -37,9 +38,9 @@ class SolImportacionDet {
                 $msg[]='- La cantidad en litros ingresados "'.$this->getImpDetLitros().'" debe ser mayor a 0';
             }else{
                 $solImportacionDao = new SolImportacionDao($doctrine);
-                $inventarioDetDao = new InventarioDetDao($doctrine);
+                $solImportacionDetDao = new SolImportacionDetDao($doctrine);
 
-                $litrosInventario = $inventarioDetDao->getLitrosInventarioXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
+                $litrosInventario = $solImportacionDetDao->getLitrosInventarioXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
                 $litrosSolicitudesPendientes = $solImportacionDao->getLitrosSolicitudXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
                 
                 $disponible = $this->getCuota()->getCuoLitros() - $litrosInventario - $litrosSolicitudesPendientes;

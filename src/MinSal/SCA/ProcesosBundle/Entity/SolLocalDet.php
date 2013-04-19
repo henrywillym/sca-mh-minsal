@@ -7,9 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use MinSal\SCA\AdminBundle\Entity\Cuota;
 use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\ProcesosBundle\Entity\Inventario;
+use MinSal\SCA\ProcesosBundle\Entity\SolLocal;
 use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\InventarioDetDao;
 use MinSal\SCA\ProcesosBundle\EntityDao\SolLocalDao;
+use MinSal\SCA\ProcesosBundle\EntityDao\SolLocalDetDao;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -36,10 +38,10 @@ class SolLocalDet {
                 $msg[]='- La cantidad en litros ingresados "'.$this->getLocalDetLitros().'" debe ser mayor a 0';
             }else{
                 $solLocalDao = new SolLocalDao($doctrine);
-                $inventarioDetDao = new InventarioDetDao($doctrine);
+                $solLocalDetDao = new SolLocalDetDao($doctrine);
                 $inventarioDao = new InventarioDao($doctrine);
 
-                $litrosInventario = $inventarioDetDao->getLitrosInventarioXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
+                $litrosInventario = $solLocalDetDao->getLitrosInventarioXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
                 $litrosSolicitudesPendientes = $solLocalDao->getLitrosSolicitudXCuota($entidad->getEntId(), $this->getCuota()->getCuoId());
                 
                 $disponible = $this->getCuota()->getCuoLitros() - $litrosInventario - $litrosSolicitudesPendientes;

@@ -44,6 +44,15 @@
             
     {% endblock %} 
             <script type="text/javascript">
+                var searchOptionNumber = ['eq',
+                                'le','ge',
+                                'bw','bn','ew','en','cn','nc'];
+                            
+                var searchOptionText = ['eq',
+                                        'bw','bn','ew','en','cn','nc'];
+
+                var searchOptionDate = ['eq',
+                                        'le','ge'];
                   $(document).ready(function(){
                      {% set nivel = 1 %} 
                      $(function crearMenu() {

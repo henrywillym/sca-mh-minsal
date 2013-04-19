@@ -230,7 +230,7 @@ class AccionSCASolImportacionController extends Controller {
         $impDetId = $request->get('impDetId');
         
         $cuotaDao = new CuotaDao($this->getDoctrine());
-        $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
+        $solImportacionDetDao = new SolImportacionDetDao($this->getDoctrine());
         $solImportacionDao = new SolImportacionDao($this->getDoctrine());
         $solImportacionDet = $solImportacionDao->getSolImportacionDet($impDetId);
         
@@ -252,7 +252,7 @@ class AccionSCASolImportacionController extends Controller {
             $selected ='';
             
             foreach($registros as $reg){
-                $litrosInventario = $inventarioDetDao->getLitrosInventarioXCuota($entId, $reg['cuoId']);
+                $litrosInventario = $solImportacionDetDao->getLitrosInventarioXCuota($entId, $reg['cuoId']);
                 $litrosSolicitudesPendientes = $solImportacionDao->getLitrosSolicitudXCuota($entId, $reg['cuoId']);
                 
                 $disponible = $reg['cuoLitros'] - $litrosInventario - $litrosSolicitudesPendientes;

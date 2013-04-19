@@ -100,37 +100,6 @@ class InventarioDetDao {
     }
     
     /**
-     * Devuelve la cantidad en litros de alcohol ingresados a inventario, a partir de una cuota dada.
-     * Esta funcion es utilizada para obtener los litros disponibles de una cuota
-     * 
-     * @param type $entId
-     * @param type $cuoId
-     * @return type
-     */
-    public function getLitrosInventarioXCuota($entId, $cuoId) {
-        $registros = $this->em->createQuery("SELECT sum(E.invDetLitros)
-                                          FROM MinSalSCAProcesosBundle:InventarioDet E 
-                                                JOIN E.solImportacionDet B
-                                                JOIN B.cuota C
-                                                JOIN C.entidad D
-                                          WHERE D.entId = :entId
-                                            AND C.cuoId = :cuoId
-                                            AND E.invDetAccion = '+'
-                                            AND E.auditDeleted = false")
-                ->setParameter('entId', $entId)
-                ->setParameter('cuoId', $cuoId);
-        
-        $result= $registros->getSingleResult();
-        
-        if($result !=null && count($result)>0 && $result[1] != null){
-            return $result[1];
-        }else{
-            return 0;
-        }
-    }
-    
-    
-    /**
      * Devuelve la cantidad en litros de alcohol descargados o en reserva en el inventario del proveedor, a partir de una cuota dada.
      * Esta funcion es utilizada para obtener los litros disponibles de una cuota
      * 

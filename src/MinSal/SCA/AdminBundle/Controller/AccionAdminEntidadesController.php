@@ -248,7 +248,7 @@ class AccionAdminEntidadesController extends Controller {
                         'autorizadoDNM' => $autorizadoDNM,
                         'autorizadoDNMText' => $autorizadoDNMText,
                         'userInterno' => 'false',
-                        'entNombre' => $entidad->getEntNombComercial()
+                        'entNombre' => $entidad->getEntNombre()
                     )
                 );
             }
