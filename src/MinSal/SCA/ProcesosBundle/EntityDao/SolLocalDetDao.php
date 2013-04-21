@@ -170,7 +170,7 @@ class SolLocalDetDao {
     }
     
     public function getProveedores($entId, $cuoId){
-        $cuotas = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado, 
+        $query = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado, 
                                                 ProvEE.invId, ProvEE.invLitros - ProvEE.invReservado as invLitros, ProvEE.invGrado, ProvEE.invNombreEsp, 
                                                 (SELECT count(K) 
                                                    FROM MinSalSCAAdminBundle:ListadoDNM K 
@@ -195,25 +195,25 @@ class SolLocalDetDao {
                                                 OR ProvBB.entCompVend = TRUE)
                                             AND ProvEE.invGrado >= E.cuoGrado
                                             
-                                            AND B.entComprador = TRUE
-                                          
-                                          UNION
-                                          
-                                          SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado, 
-                                                0, 50000 as invLitros, 0, '',
-                                                (SELECT count(K) 
-                                                   FROM MinSalSCAAdminBundle:ListadoDNM K 
-                                                  WHERE E.cuoYear = K.ldnm_year
-                                                    AND ProvBB.entNit = K.ldnm_nit
-                                                    AND ProvBB.entNrc = K.ldnm_nrc) AS HAB
-                                            FROM MinSalSCAAdminBundle.entidad ProvBB
-                                           WHERE ProvBB.entProductor = TRUE
-                                             AND ProvBB.entHabilitado = TRUE
-                                          ")
+                                            AND B.entComprador = TRUE")
                 ->setParameter('entId',$entId)
                 ->setParameter('cuoId',$cuoId);
+        $result = $query->getArrayResult();
+        $year = date("Y", strtotime("0 month"));
+        $productores = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado, 
+                            0 invId, 50000 as invLitros, 0 invGrado, '' invNombreEsp,
+                            (SELECT count(K) 
+                               FROM MinSalSCAAdminBundle:ListadoDNM K 
+                              WHERE ".$year." = K.ldnm_year
+                                AND ProvBB.entNit = K.ldnm_nit
+                                AND ProvBB.entNrc = K.ldnm_nrc) AS HAB
+                        FROM MinSalSCAAdminBundle:Entidad ProvBB
+                       WHERE ProvBB.entProductor = TRUE
+                         AND ProvBB.entHabilitado = TRUE");
         
-        return $cuotas->getArrayResult();
+        $result = array_merge($result, $productores->getArrayResult());
+        
+        return $result;
     }
     
     public function getProveedorSolicitud($localDetId, $entId, $cuoId){
