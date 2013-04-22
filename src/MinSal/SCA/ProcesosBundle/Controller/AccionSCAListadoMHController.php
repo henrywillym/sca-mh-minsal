@@ -144,7 +144,7 @@ class AccionSCAListadoMHController extends Controller {
                     
                     $listadoMH->setMhYear($year);
                     $listadoMH->setMhNIT($data[0]);
-                    $listadoMH->setMhNRC($data[1]);
+                    $listadoMH->setMhNRC(str_pad($data[1],8,"0",STR_PAD_LEFT));
                     $listadoMH->setMhTipoPersona($data[4]);
                     
                     if($data[4] =='J'){
