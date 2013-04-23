@@ -23,7 +23,7 @@ class SolLocalDetDao {
                         D.etpId, D.etpNombre,
                         F.solLocalFecha,
                         H.cuoNombreEsp, H.cuoGrado,
-                        AA.entNombComercial,
+                        AA.entNombComercial,A.entNombComercial clienteEntNombComercial, 
                         A.entHabilitado, A.entComentario";
 
     function __construct($doctrine) {
@@ -70,8 +70,38 @@ class SolLocalDetDao {
                                             JOIN B.flujo G
                                           WHERE A.entId = :entId
                                             AND G.fluId = :fluId
-                                            AND BB.invDetAccion in ('+','R')
+                                            AND BB.invDetAccion in ('-','R')
                                             ORDER BY E.localDetId DESC")
+                ->setParameter('entId',$entId)
+                ->setParameter('fluId',$this->fluId);
+        return $registros->getArrayResult();
+    }
+    
+    public function getVentasLocalesDetByEntidad($entId) {
+        
+        $sql = "SELECT ".$this->sqlSelect.", 
+                            (SELECT count(K) 
+                               FROM MinSalSCAAdminBundle:ListadoDNM K 
+                              WHERE H.cuoYear = K.ldnm_year
+                                AND A.entNit = K.ldnm_nit
+                                AND A.entNrc = K.ldnm_nrc) AS HAB
+                  FROM MinSalSCAProcesosBundle:Inventario HH
+                    JOIN HH.entidad AA
+                    JOIN HH.inventariosDet BB
+                    JOIN BB.solLocalDet E 
+                    JOIN E.cuota H
+                    JOIN E.solLocal F
+                    JOIN F.entidad A
+                    JOIN F.transicion B
+                    JOIN B.estado C
+                    JOIN B.etpFin D
+                    JOIN B.flujo G
+                  WHERE AA.entId = :entId
+                    AND G.fluId = :fluId
+                    AND BB.invDetAccion in ('-','R')
+                    ORDER BY E.localDetId DESC";
+        
+        $registros = $this->em->createQuery($sql)
                 ->setParameter('entId',$entId)
                 ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();

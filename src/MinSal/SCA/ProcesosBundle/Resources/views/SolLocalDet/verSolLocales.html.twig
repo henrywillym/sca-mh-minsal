@@ -14,11 +14,19 @@
                                 'le','ge'];
         gridURLSolXEtapas = '{{ urlJSONSolXEtapas }}';
         gridURLSolXEntidad ='{{ urlJSONSolXEntidad }}';
+        gridURLVentasXEntidad ='{{ urlJSONVentasXEntidad }}';
         
         function verSolxEtapa(etpId, etpNombre){
             if(etpId==0){
                 $("#theGrid").jqGrid('setGridParam',{
                         url: gridURLSolXEntidad,
+                        datatype:'json',
+                        loadonce: true
+                }).trigger('reloadGrid')
+                .jqGrid('setCaption', etpNombre);
+            }if(etpId==-1){
+                $("#theGrid").jqGrid('setGridParam',{
+                        url: gridURLVentasXEntidad,
                         datatype:'json',
                         loadonce: true
                 }).trigger('reloadGrid')
@@ -189,6 +197,14 @@
                             sopt: searchOptionNumber
                         }
                     },{
+                        label:'Nombre Cliente',
+                        name:'clienteEntNombComercial', 
+                        index: 'clienteEntNombComercial',
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionText
+                        }
+                    },{
                         label:'Auditoría',
                         name:'auditUserIns', 
                         index: 'auditUserIns',
@@ -280,7 +296,7 @@
                     
                     <div style="width: 105%; text-align: left; margin-bottom: 7px; font-family:'Lucida Sans Unicode'; font-size: 11px;">
                         
-                        {% if entNombComercial %}
+                        {% if mostrarCompras %}
                         <span id="solicitudesIngresadas">
                             <span id="tra0" name="transiciones" class="etapa"
                                   onclick="verSolxEtapa(0, 'Compras Locales Ingresadas');">
@@ -292,6 +308,18 @@
                         
                         <span id="etapas">
                         </span>
+                        
+                        {% if mostrarVentas %}
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span id="ventasIngresadas">
+                            <span id="tra-1" name="transiciones" class="etapa"
+                                  onclick="verSolxEtapa(-1, 'Ventas Locales Recibidas');">
+                                Ver Ventas de Emp.
+                            </span>
+                        </span>
+                        
+                        {% endif %}
                         <br/>
                     </div>
                     

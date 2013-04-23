@@ -73,7 +73,7 @@ class TransicionDao {
                                             LEFT JOIN C.entidad D
                                           WHERE AA.traId = :traId
                                             AND ((D.entId = :entId and AA.traNotificaEmpresa = true) OR D.entId = ".$provEntId." OR C.userInterno = true)
-                                            AND B.rolTipo in ('".User::$COMPRADOR."', '".User::$COMPRADOR_VENDEDOR."')
+                                            AND B.rolTipo not in ('".User::$VENDEDOR."')
                                             AND C.auditDeleted = false")
                 ->setParameter('traId',$traId)
                 ->setParameter('entId',$entId);

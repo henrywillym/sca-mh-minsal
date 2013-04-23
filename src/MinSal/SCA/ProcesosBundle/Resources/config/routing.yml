@@ -158,6 +158,10 @@ MinSalSCAProcesosBundle_mantSolLocalVerSolicitudes:
 MinSalSCAProcesosBundle_verSolLocalesJSON:
     pattern:  /Solicitud/Local/VerSolicitudes/Consultar
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:verSolLocalesJSON } 
+    
+MinSalSCAProcesosBundle_verVentasJSON:
+    pattern:  /Solicitud/Local/VerVentas/Consultar
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:verVentasJSON } 
 
 MinSalSCAProcesosBundle_getSearchEstadosLocal:
     pattern:  /Solicitud/Local/getSearchEstados 

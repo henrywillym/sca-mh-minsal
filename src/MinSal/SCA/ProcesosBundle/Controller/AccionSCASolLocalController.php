@@ -120,10 +120,27 @@ class AccionSCASolLocalController extends Controller {
         if($user->getEntidad()!=null){
             $paramArray['entNombComercial']= $user->getEntidad()->getEntNombComercial();
             $paramArray['urlJSONSolXEntidad'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolLocalesJSON');
+            $paramArray['urlJSONVentasXEntidad'] = $this->generateUrl('MinSalSCAProcesosBundle_verVentasJSON');
         }else{
             $paramArray['entNombComercial']= null;
             $paramArray['urlJSONSolXEntidad'] = null;
         }
+        
+        if($user->getUserTipo()== User::$COMPRADOR_VENDEDOR){
+            $paramArray['mostrarVentas']= true;
+            $paramArray['mostrarCompras']= true;
+            
+        }else if($user->getUserTip()== User::$COMPRADOR ){
+            $paramArray['mostrarVentas']= false;
+            $paramArray['mostrarCompras']= true;
+        }else if($user->getUserTip()== User::$VENDEDOR ){
+            $paramArray['mostrarVentas']= true;
+            $paramArray['mostrarCompras']= false;
+        }else{
+            $paramArray['mostrarVentas']= false;
+            $paramArray['mostrarCompras']= false;
+        }
+        
 
         return $this->render('MinSalSCAProcesosBundle:SolLocalDet:verSolLocales.html.twig', $paramArray);
     }
@@ -205,6 +222,54 @@ class AccionSCASolLocalController extends Controller {
         
         if($user->getEntidad() != null){
             $registros = $solLocalDetDao->getSolLocalesDetByEntidad($user->getEntidad()->getEntId());
+        }
+        $numfilas = count($registros);
+        
+        if ($numfilas != 0) {
+            $solLocal = new SolLocal();
+            $i = 0;
+            
+            foreach ($registros as $ent) {
+                $solLocal->setSolLocalFecha($ent['solLocalFecha']);
+                $solLocal->setAuditDateIns($ent['auditDateIns']);
+                
+                if($ent['entHabilitado'] == false || $ent['HAB'] == 0){
+                    $registros[$i]['estNombre']= SolLocal::$BLOQUEADA;
+                }
+                
+                $registros[$i]['solLocalFechaText']= $solLocal->getSolLocalFechaText();
+                $registros[$i]['auditDateInsText']= $solLocal->getAuditDateInsText();
+                $i=$i+1;
+            }
+        }
+        
+        $datos = json_encode($registros);
+        $pages = floor($numfilas / 10) + 1;
+
+        $jsonresponse = '{
+               "page":"1",
+               "total":"' . $pages . '",
+               "records":"' . $numfilas . '", 
+               "rows":' . $datos . '}';
+
+        $response = new Response($jsonresponse);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
+    
+    /**
+     * Devuelve el listado de solicitudes que han sido asignadas a la empresa como parte de las ventas (Proveedores)
+     * 
+     * @return Response
+     */
+    public function verVentasJSONAction() {
+        $user = $this->get('security.context')->getToken()->getUser();
+        
+        $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
+        $registros = array();
+        
+        if($user->getEntidad() != null){
+            $registros = $solLocalDetDao->getVentasLocalesDetByEntidad($user->getEntidad()->getEntId());
         }
         $numfilas = count($registros);
         
