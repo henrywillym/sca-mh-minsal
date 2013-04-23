@@ -146,6 +146,9 @@ class AccionSCASolLocalController extends Controller {
                     $comprador = true;
                 }else if($rolTmp->getRolTipo() == User::$VENDEDOR){
                     $vendedor = true;
+                }else if($rolTmp->getRolTipo() == User::$COMPRADOR_VENDEDOR){
+                    $vendedor = true;
+                    $comprador = true;
                 }
             }
             
@@ -318,6 +321,9 @@ class AccionSCASolLocalController extends Controller {
         $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
         $solLocalDao = new SolLocalDao($this->getDoctrine());
         $solLocalDet = $solLocalDao->getSolLocalDet($localDetId);
+        $cuotaDao = new CuotaDao($this->getDoctrine());
+        $cuota = $cuotaDao->getCuota($cuoId);
+        $grados = $cuota->getCuoGrado();
         
         $verSolicitud =   $localDetId != '0';
         
@@ -349,7 +355,11 @@ class AccionSCASolLocalController extends Controller {
                 /*if(round($reg['invLitros']+0, 2) != round($litrosSolicitudesPendientes+0,2)){
                     throw new Exception("El detalle de inventario (".round($reg['invLitros']+0, 2).")no coincide con el total de inventario invId -> ".$reg['invId']." almacenado (".round($litrosSolicitudesPendientes, 2).")");
                 }*/
-                $disponible = $reg['invLitros'];// - $litrosSolicitudesPendientes;
+                if($reg['invId']==0){
+                    $disponible = round(($reg['invLitros']), 0, PHP_ROUND_HALF_DOWN);
+                }else{
+                    $disponible = round(($reg['invLitros'] * $reg['invGrado']/$grados), 0, PHP_ROUND_HALF_DOWN);// - $litrosSolicitudesPendientes;
+                }
                 $habilitadoDNM = $reg['HAB']>0 && $reg['entHabilitado'] ==true;
                                 
                 //$debug[$i]['$litrosInventario']=$litrosInventario;
@@ -365,9 +375,9 @@ class AccionSCASolLocalController extends Controller {
                     }
                     
                     if($reg['invId']==0){
-                        $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . round($disponible,2) . " provDireccion=\"". $reg['entDireccionMatriz'] ."\" entId= ". $reg['entId'] .">PRODUCTOR: ". $reg['entNombComercial']."</option>"; 
+                        $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . $disponible . " provDireccion=\"". $reg['entDireccionMatriz'] ."\" entId= ". $reg['entId'] .">PRODUCTOR: ". $reg['entNombComercial']."</option>"; 
                     }else{
-                        $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . round($disponible,2) . " provDireccion=\"". $reg['entDireccionMatriz'] ."\">" . $reg['invNombreEsp'] . ' ('. $reg['invGrado'] .'%) - ' . $reg['entNombComercial']. "</option>";
+                        $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . $disponible . " provDireccion=\"". $reg['entDireccionMatriz'] ."\">" . $reg['invNombreEsp'] . ' ('. $reg['invGrado'] .'%) - ' . $reg['entNombComercial']. "</option>";
                     }
                     $i++;
                 }
@@ -407,6 +417,9 @@ class AccionSCASolLocalController extends Controller {
                 $comprador = true;
             }else if($rolTmp->getRolTipo() == User::$VENDEDOR){
                 $vendedor = true;
+            }else if($rolTmp->getRolTipo() == User::$COMPRADOR_VENDEDOR){
+                $vendedor = true;
+                $comprador = true;
             }
         }
         
@@ -719,19 +732,10 @@ class AccionSCASolLocalController extends Controller {
                     foreach($nextTransiciones as $reg){
                         if($transicionRol->getTraId() == $reg->getTraId()){
                             if($reg->getFlujo()->getFluId() == Flujo::$LOCAL && !array_key_exists($reg->getTraId(), $tmpIndex)){
-                                $proseguir = false;
-                                foreach($user->getRols() as $rolTmp){
-                                    
-                                    if(($solLocalDet->getSolLocal()->getEntidad()->getEntId() == $user->getEntidad()->getEntId() && $rolTmp->getRolTipo() == User::$COMPRADOR)
-                                        ||
-                                        ($inventarioProv->getEntidad()->getEntId() == $user->getEntidad()->getEntId() && $rolTmp->getRolTipo() == User::$VENDEDOR)
-                                    ){
-                                        $proseguir = true;
-                                    }
-                                }
-
-                                
-                                if($proseguir){
+                                if(($solLocalDet->getSolLocal()->getEntidad()->getEntId() == $user->getEntidad()->getEntId() && $rol->getRolTipo() == User::$COMPRADOR)
+                                    ||
+                                    ($inventarioProv->getEntidad()->getEntId() == $user->getEntidad()->getEntId() && $rol->getRolTipo() == User::$VENDEDOR)
+                                ){
                                     $arrayTrans = array();
 
                                     $arrayTrans['id'] = $reg->getTraId();

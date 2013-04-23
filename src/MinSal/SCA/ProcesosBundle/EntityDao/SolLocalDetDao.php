@@ -18,7 +18,7 @@ class SolLocalDetDao {
     
     var $fluId;
     
-    private $sqlSelect = " distinct E.localDetId, E.localDetLitros, E.localDetLitrosLib, F.auditUserIns, F.auditDateIns,
+    private $sqlSelect = " DISTINCT E.localDetId, E.localDetLitros, E.localDetLitrosLib, F.auditUserIns, F.auditDateIns,
                         C.estId, C.estNombre, 
                         D.etpId, D.etpNombre,
                         F.solLocalFecha,
@@ -70,6 +70,7 @@ class SolLocalDetDao {
                                             JOIN B.flujo G
                                           WHERE A.entId = :entId
                                             AND G.fluId = :fluId
+                                            AND BB.invDetAccion in ('+','R')
                                             ORDER BY E.localDetId DESC")
                 ->setParameter('entId',$entId)
                 ->setParameter('fluId',$this->fluId);
@@ -102,7 +103,8 @@ class SolLocalDetDao {
                     JOIN B.estado C
                     JOIN B.etpFin D
                     JOIN B.flujo G
-                WHERE D.etpId = :etpId ";
+                WHERE D.etpId = :etpId 
+                  AND BB.invDetAccion in ('R') ";
         
         if($entId != null){
             $sql = $sql." AND (false = true ";
@@ -191,7 +193,6 @@ class SolLocalDetDao {
                                             AND ProvBB.entId <> B.entId
                                             AND ProvAA.alcId = A.alcId
                                             AND (ProvBB.entImportador = TRUE 
-                                                OR ProvBB.entProductor = TRUE 
                                                 OR ProvBB.entCompVend = TRUE)
                                             AND ProvEE.invGrado >= E.cuoGrado
                                             
@@ -199,6 +200,8 @@ class SolLocalDetDao {
                 ->setParameter('entId',$entId)
                 ->setParameter('cuoId',$cuoId);
         $result = $query->getArrayResult();
+        
+        //Query para agregar todos los Productores
         $year = date("Y", strtotime("0 month"));
         $productores = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado, 
                             0 invId, 50000 as invLitros, 0 invGrado, '' invNombreEsp,

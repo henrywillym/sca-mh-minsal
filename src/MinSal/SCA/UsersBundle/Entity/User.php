@@ -29,13 +29,15 @@ class User extends BaseUser {
     
     public static $COMPRADOR = 'COMPRADOR';
     public static $VENDEDOR = 'VENDEDOR';
+    public static $COMPRADOR_VENDEDOR = 'COMPRADOR_VENDEDOR';
     public static $DIGITADOR= 'DIGITADOR';
     public static $APROBADOR = 'APROBADOR';
     
     public static $COMPRADOR_TEXT = 'Comprador';
     public static $VENDEDOR_TEXT = 'Vendedor';
-    public static $DIGITADOR_TEXT = 'Digitador de Empresas y Cuotas';
-    public static $APROBADOR_TEXT = 'Autorizador en Proceso Solicitud de Import.';
+    public static $COMPRADOR_VENDEDOR_TEXT = 'Comprador y Vendedor';
+    public static $DIGITADOR_TEXT = 'Digitador/Ingreso datos';
+    public static $APROBADOR_TEXT = 'Autorizador';
     
     public function __construct() {
         parent::__construct();
@@ -454,6 +456,8 @@ class User extends BaseUser {
             return User::$APROBADOR_TEXT;
         }else if($this->userTipo == User::$DIGITADOR){
             return User::$DIGITADOR_TEXT;
+        }else if($this->userTipo == User::$COMPRADOR_VENDEDOR){
+            return User::$COMPRADOR_VENDEDOR_TEXT;
         }
     }
     

@@ -120,7 +120,7 @@ class EntidadDao {
                                             JOIN E.users C
                                             JOIN C.rols D
                                           WHERE E.entId = :entId
-                                            AND D.rolTipo = '".User::$COMPRADOR."'
+                                            AND D.rolTipo in ('".User::$COMPRADOR."', '".User::$COMPRADOR_VENDEDOR."')
                                             AND C.auditDeleted = false")
                 ->setParameter('entId',$entId);
         $result = array();
