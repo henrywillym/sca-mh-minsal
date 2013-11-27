@@ -193,5 +193,70 @@ class AccionSCAListadoMHController extends Controller {
     }
     
     
+    
+    public function mantListadoMHEdicionRowAction() {
+        $request = $this->getRequest();
+		
+ 	$mhId = $request->get('id');//aunque tenga ldnm_id siempre tomara lo que retornara del jqgrid id
+        $mhYear = $request->get('mhYear');
+	$mhNIT = $request->get('mhNIT');
+        $mhNRC = $request->get('mhNRC');
+        $mhTipoPersona = $request->get('mhTipoPersona');       
+        $mhNombres = $request->get('mhNombres');
+        $mhApellidos = $request->get('mhApellidos');
+	$mhRazon = $request->get('mhRazon');
+	$operacion = $request->get('oper');
+        
+        $listadoMH = new ListadoMH();
+        $listadoMHDao = new ListadoMHDao($this->getDoctrine());
+        
+        $user = $this->get('security.context')->getToken()->getUser();
+
+        if ($operacion == 'edit' || $operacion == 'del') {
+            $listadoMH = $listadoMHDao->getRegMH($mhId);
+        }else{
+            $mhId = null;
+            $mhYear = date("Y", strtotime("+1 month"));
+        }
+        
+        if ($operacion != 'del') {
+            
+            $listadoMH->setMhNIT($mhNIT);
+            $listadoMH->setMhNRC($mhNRC);
+            $listadoMH->setMhYear($mhYear);
+            $listadoMH->setMhTipoPersona($mhTipoPersona);
+            $listadoMH->setMhNombres($mhNombres);
+            $listadoMH->setMhApellidos($mhApellidos);
+            $listadoMH->setMhRazon($mhRazon);
+            
+            $cantidad = $listadoMHDao->existeReg($mhId, $mhYear, $mhNIT, $mhNRC);
+            if( $cantidad>0 ){
+                $resp = new Response('{"status":false,"msg":"Registro duplicado, ya existe(n) '.$cantidad.' registro(s) con estos datos de NIT o NRC."}');
+                return $resp;
+            }
+        }
+        
+        if ($operacion == 'edit') {
+            //#### Auditoría 
+            $listadoMH->setAuditUserUpd($user->getUsername());
+            $listadoMH->setAuditDateUpd(new \DateTime());
+            $listadoMHDao->editRegMH($listadoMH);
+
+        }else if ($operacion == 'del') {
+            //#### Auditoría 
+            $listadoMH->setAuditUserUpd($user->getUsername());
+            $listadoMH->setAuditDateUpd(new \DateTime());
+
+            $listadoMHDao->deleteRegMH($listadoMH);
+            
+        }else if ($operacion == 'add') {
+            $listadoMH->setAuditUserIns($user->getUsername());
+            $listadoMH->setAuditDateIns(new \DateTime());
+            $listadoMHDao->editRegMH($listadoMH);
+        }
+
+        return new Response('{"status":true,"msg":""}');
+    }
+    
 }
 ?>

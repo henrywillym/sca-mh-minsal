@@ -59,21 +59,21 @@ class ListadoMH{
    /**
      * @var string $mhNombres
      *
-     * @ORM\Column(name="mh_nombres", type="string", length=150)
+     * @ORM\Column(name="mh_nombres", type="string", length=100)
      */
     private $mhNombres;
   
    /**
      * @var string $mhApellidos
      *
-     * @ORM\Column(name="mh_apellidos", type="string", length=150)
+     * @ORM\Column(name="mh_apellidos", type="string", length=100)
      */
     private $mhApellidos;
   
    /**
      * @var string $mhRazon
      *
-     * @ORM\Column(name="mh_razon", type="string", length=150)
+     * @ORM\Column(name="mh_razon", type="string", length=100)
      */
     private $mhRazon;
     

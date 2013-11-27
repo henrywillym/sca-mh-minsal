@@ -201,3 +201,7 @@ MinSalSCAProcesosBundle_consultarListadoMHJSON:
 MinSalSCAProcesosBundle_mantListadoMHEdicion:
     pattern:  /ListadoMH/mantListadoMHEdicion
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHEdicion } 
+
+MinSalSCAProcesosBundle_mantListadoMHEdicionRow:
+    pattern:  /ListadoMH/mantListadoMHEdicionRow
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHEdicionRow } 

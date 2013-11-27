@@ -13,9 +13,37 @@
         var searchOptionDate = ['eq',
                                 'le','ge'];
         
+        function adecuarFormulario(addEvent){
+            $('#mhTipoPersona').trigger('change');
+        }
+        
+        function validarFormulario(){
+            var success = true;
+            var message = '';
+
+            if($('#mhTipoPersona').val() == 'N'){
+                if($('#mhNombres').val()==''){
+                    success = false;
+                    message = 'Debe ingresar el nombre';
+                }else if($('#mhApellidos').val()==''){
+                    success = false;
+                    message = 'Debe ingresar el apellido';
+                }
+            }else{
+                if($('#mhRazon').val()==''){
+                    success = false;
+                    message = 'Debe ingresar la razón social';
+                }
+            }
+
+            return[success,message]; 
+        }
         
         $(document).ready(function(){
             $('#agregarRegistro').button();
+            $('#agregarOpcionesButton').button();
+            $('#editarOpcionesButton').button();
+            $('#eliminarOpcionesButton').button();
             
             var myGrid = $('#theGrid');
             
@@ -41,68 +69,208 @@
                 pager: jQuery('#pager'),
                 viewrecords: true, 
                 caption: '',
+                editurl: '{{ url('MinSalSCAProcesosBundle_mantListadoMHEdicionRow')}}',
                 colModel:[{
                         key:true,
                         label:'ID',
                         name:'mhId', 
                         index: 'mhId', 
                         hidden: true,
+                        editable:false,
                         width:30,
                         searchoptions:{
                             sopt: searchOptionNumber
+                        },
+                        formoptions:{
+                            rowpos:10,
+                            label: ""
                         }
                     },{
                         label:'NIT',
                         name:'mhNIT', 
                         index: 'mhNIT',
                         width:140,
+                        editable:true,
                         searchoptions:{
                             sopt: searchOptionText
+                        },
+                        editoptions:{
+                            size:20,
+                            maxlength:17,
+                            dataInit:function(el){
+                                $(el).mask("9999-999999-999-9",{
+                                    placeholder:"_"
+                                });
+                            }
+                        },
+                        formoptions:{
+                            rowpos:1,
+                            label: "NIT",
+                            elmsuffix:" (*)"
+                        },
+                        editrules:{
+                            //email:true,
+                            required:true
                         }
                     },{
                         label:'NRC',
                         name:'mhNRC', 
                         index: 'mhNRC',
                         width:60,
+                        editable:true,
                         searchoptions:{
                             sopt: searchOptionText
+                        },
+                        editoptions:{
+                            size:10,
+                            maxlength:8,
+                            dataInit:function(el){
+                                $(el).mask("999999-9",{placeholder:"_"});
+                            }
+                        },
+                        formoptions:{
+                            rowpos:2,
+                            label: "NRC",
+                            elmsuffix:" (*)"
+                        },
+                        editrules:{
+                            //email:true,
+                            required:true
                         }
                     },{ 
                         label:'Tipo Persona',
                         name:'mhTipoPersonaText', 
                         index: 'mhTipoPersonaText', 
                         width:60,
+                        editable:false,
                         searchoptions:{
                             sopt: searchOptionText
+                        }
+                     },{
+                        label:'Año',
+                        name:'mhYear', 
+                        index: 'mhYear', 
+                        width:60,
+                        hidden: true,
+                        editable:true,
+                        editrules:{
+                            //email:true,
+                            required:false,
+                            edithidden: false
+                        } ,
+                        formoptions:{
+                            rowpos:13,
+                            label: "Año",
+                            elmsuffix:" (*)"
+                        },
+                     },{
+                        label:'Tipo Persona',
+                        name:'mhTipoPersona', 
+                        index: 'mhTipoPersona', 
+                        width:60,
+                        hidden: true,
+                        editable:true,
+                        edittype:"select",
+                        editoptions:{
+                            size:40,
+                            value:"N:Natural;J:Jurídica",
+                            dataEvents:[{
+                                    type:'change',
+                                    fn: function(e){
+                                        if($('#mhTipoPersona').val() == 'N'){
+                                            $('#mhRazon').parent().parent().hide();
+                                            $('#mhNombres').parent().parent().slideDown('slow');
+                                            $('#mhApellidos').parent().parent().slideDown('slow');
+                                            $('#mhRazon').val('');
+                                        }else{
+                                            $('#mhRazon').parent().parent().slideDown('slow');
+                                            $('#mhNombres').parent().parent().hide();
+                                            $('#mhApellidos').parent().parent().hide();
+                                            $('#mhNombres').val('');
+                                            $('#mhApellidos').val('');
+                                        }
+                                    }
+                                }
+                            ]
+                        } ,
+                        formoptions:{
+                            rowpos:3,
+                            label: "Tipo Persona",
+                            elmsuffix:" (*)"
+                        },
+                        editrules:{
+                            //email:true,
+                            required:true,
+                            edithidden: true
                         }
                     },{ 
                         label:'Nombres',
                         name:'mhNombres', 
                         index: 'mhNombres', 
                         width:120,
+                        editable:true,
                         searchoptions:{
                             sopt: searchOptionText
+                        },
+                        editoptions:{
+                            maxlength:100,
+                            size:40
+                        },
+                        formoptions:{
+                            rowpos:6, 
+                            elmprefix:"(*)", 
+                            label: "Nombres"
+                        },
+                        editrules:{
+                            required:false
                         }
                     },{ 
                         label:'Apellidos',
                         name:'mhApellidos', 
                         index: 'mhApellidos', 
                         width:120,
+                        editable:true,
                         searchoptions:{
                             sopt: searchOptionText
+                        },
+                        editoptions:{
+                            maxlength:100,
+                            size:40
+                        },
+                        formoptions:{
+                            rowpos:7, 
+                            elmprefix:"(*)", 
+                            label: "Apellidos"
+                        },
+                        editrules:{
+                            required:false
                         }
                     },{
                         label:'Razón',
                         name: 'mhRazon', 
                         index: 'mhRazon',
                         width:200,
+                        editable:true,
                         searchoptions:{
                             sopt: searchOptionText
+                        },
+                        editoptions:{
+                            maxlength:100,
+                            size:40
+                        },
+                        formoptions:{
+                            rowpos:8, 
+                            elmprefix:"(*)", 
+                            label: "Raz&oacute;n Social"
+                        },
+                        editrules:{
+                            required:false
                         }
                     }
                 ],
                 ignoreCase: true,
-                shrinkToFit: false
+                shrinkToFit: false,
+                ondblClickRow: function(){$("#editarOpcionesButton").click()}
             });
             
             myGrid.jqGrid('navGrid','#pager',{
@@ -113,16 +281,114 @@
                     $("#theGrid").jqGrid('setGridParam',{
                             datatype:'json',
                             loadonce:true
-                    }).trigger('reloadGrid');
+                    })//.trigger('reloadGrid');
                 }
             });
             
             $("#agregarRegistro").click(function(){
                 location.href = '{{ url('MinSalSCAProcesosBundle_mantListadoMHIngreso')}}';
             });
-      //fin
-       
+      
+            function despuesAgregarEditar(response, postdata) {
+                //alert("datos guardados con éxito!");
+
+                json   = response.responseText; // response text is returned from server.
+
+                try{
+                    var result = JSON.parse(json); // convert json object into javascript object
+                    if(result.status){
+                        alert("Datos guardados con éxito!");
+                        $('#loadingDiv').dialog( "close" );
+                        setTimeout(function(){
+                            try{
+                                $('#cData').click();
+                            }catch(ee){;}
+                        },1000);
+
+                        $("#theGrid").jqGrid('setGridParam',{
+                            datatype:'json',
+                            loadonce:true
+                        }).trigger('reloadGrid');
+                    }
+
+                    return [result.status, result.msg, 0];
+                }catch(e){
+                    return [false,'Ocurrio un error interno en el servidor',null];
+                }
+                //return[response.responseText,response.statusText]; //no error
+            }
+            
+            $("#agregarOpcionesButton").click(function(){
+                jQuery('#theGrid').jqGrid('editGridRow',"new",{
+                    width:550,
+                    height:220,
+                    bottominfo:"Campos marcados con (*) son obligatorios",
+                    beforeSubmit: function(postdata, formid) { 
+                        return validarFormulario();
+                    },
+                    afterSubmit:despuesAgregarEditar,
+                    afterShowForm: function(){
+                        adecuarFormulario(false);
+                    },
+                    closeAfterAdd:true,
+                    closeOnEscape: false,
+                    align:'center'
+                });
+
+            });
+
+
+             //editar
+            $("#editarOpcionesButton").click(function(){
+                var gr = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+
+                if( gr != null ){
+                    jQuery('#theGrid').jqGrid('editGridRow',gr,{ 
+                        width:550, 
+                        height:220,
+                        closeAfterEdit : true,
+                        editCaption: "Editar",
+                        bottominfo:"Campos marcados con (*) son obligatorios",
+                        beforeSubmit: function(postdata, formid) { 
+                            return validarFormulario();
+                        },
+                        afterSubmit:despuesAgregarEditar,
+                        afterShowForm: function(){
+                            adecuarFormulario(false);
+                        },
+                        reloadAfterSubmit:false,
+                        closeOnEscape: false,
+                        align:'center'
+                    });
+
+                }else{ 
+                    alert("Por favor seleccione una fila para editar!"); 
+                }
+            });
+
+            //eliminar
+            $("#eliminarOpcionesButton").click(function(){
+                var grs = jQuery('#theGrid').jqGrid('getGridParam','selrow');
+
+                if( grs != null ){
+                    jQuery('#theGrid').jqGrid('delGridRow',grs,{
+                        msg: "Desea eliminar este registro?",
+                        caption:"Eliminando Registro",
+                        width:550,
+                        height:100,
+                        reloadAfterSubmit:true,
+                        align:'center',
+                        onclickSubmit: function(rp_ge, postdata) {
+                            alert("Registro eliminado con éxito!");
+                        }
+                    });
+                }else{
+                    alert("Por favor seleccione una fila para borrar!");
+                }
+            });
       });
+      
+      
     </script>
     
     <style>
@@ -149,6 +415,13 @@
 
                     <div id="pager" class="scroll" style="text-align:center;">
                     </div> 
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <input type="button" id="agregarOpcionesButton" value="  Agregar  " />
+                    <input type="button" id="editarOpcionesButton" value="   Editar   " />
+                    <input type="button" id="eliminarOpcionesButton" value="  Eliminar  " />
                 </td>
             </tr>
             <tr>

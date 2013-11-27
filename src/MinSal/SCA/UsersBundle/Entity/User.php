@@ -25,7 +25,7 @@ class User extends BaseUser {
     public static $DGII_TEXT = 'Dirección General de Impuestos Internos';
     public static $DGA_TEXT= 'Dirección General de Aduanas';
     public static $MH_TEXT = 'Ministerio de Hacienda';
-    public static $DNM_TEXT = 'Dirección Nacional de Medicamentos';
+    public static $DNM_TEXT = 'Dirección General de Medicamentos';
     
     public static $COMPRADOR = 'COMPRADOR';
     public static $VENDEDOR = 'VENDEDOR';

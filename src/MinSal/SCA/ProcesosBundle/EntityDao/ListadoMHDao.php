@@ -39,6 +39,10 @@ class ListadoMHDao {
         return $registros->getArrayResult();
     }
     
+    public function getRegMH($id) {
+        return $this->repositorio->find($id);
+    }
+    
     public function commit(){
         $this->em->flush();
     }
@@ -70,7 +74,21 @@ class ListadoMHDao {
         
         return $i;
     }
+    
+    public function deleteRegMH(ListadoMH $reg) {
+        $this->em->remove($reg);
+        $this->em->flush();
+        
+        return ;
+    }
 
+    public function editRegMH(ListadoMH $reg) {
+        $this->em->persist($reg);
+        $this->em->flush();
+        
+        return ;
+    }
+    
     public function existenRegistros($mhYear) {
         $sql = "SELECT count(E) 
                 FROM MinSalSCAProcesosBundle:ListadoMH E
@@ -112,5 +130,28 @@ class ListadoMHDao {
         }else{
             return true;
         }
+    }
+    
+    public function existeReg($mhId, $mhYear, $mhNIT, $mhNRC) {
+        $sql = "SELECT count(e) 
+                FROM MinSalSCAProcesosBundle:ListadoMH e
+                WHERE e.mhYear= :mhYear
+                  AND (e.mhNIT= :mhNIT
+                  OR e.mhNRC= :mhNRC)";
+        
+        if($mhId){
+            $sql = $sql." AND e.mhId <> :mhId";
+        }
+        
+        $result = $this->em->createQuery($sql)
+                ->setParameter("mhYear",$mhYear)
+                ->setParameter("mhNIT",$mhNIT)
+                ->setParameter("mhNRC",$mhNRC);
+        
+        if($mhId){
+            $result->setParameter("mhId",$mhId);
+        }
+        
+        return $result->getSingleScalarResult();
     }
 }
