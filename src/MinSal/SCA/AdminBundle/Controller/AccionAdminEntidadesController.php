@@ -159,6 +159,8 @@ class AccionAdminEntidadesController extends Controller {
         $form = $this->createForm(new EntidadType(),$entidad);
         
         $form->bindRequest($request);
+        
+        $errores = $this->validarFormulario($entidad);
         if($form->isValid() && $errores == null){
             $entidad->setEntYear($entidad->getEntVenc()->format("Y"));
 
@@ -307,6 +309,42 @@ class AccionAdminEntidadesController extends Controller {
                     'autorizadoDNMText' => $autorizadoDNMText
                 )
         );
+    }
+    
+    private function validarFormulario(Entidad $entidad){
+        if($entidad->getEntRegDgii() == null || $entidad->getEntRegDgii()==''){
+            return 'ERROR: El Registro de Usuario (MINSAL) se encuentra vacío';
+            
+        }else if($entidad->getEntRegMinsal() == null || $entidad->getEntRegMinsal()==''){
+            return 'ERROR: El Número Resolución DGII se encuentra vacío';
+            
+        }else if($entidad->getEntTel() == null || $entidad->getEntTel()==''){
+            return 'ERROR: El Teléfono se encuentra vacío';
+            
+        }else if($entidad->getEntGiro() == null || $entidad->getEntGiro()==''){
+            return 'ERROR: El Giro o Actividad Económica se encuentra vacío';
+         
+        }else if($entidad->getEntEmail() == null || $entidad->getEntEmail()==''){
+            return 'ERROR: El E-mail se encuentra vacío';
+            
+        }else if(filter_var($entidad->getEntEmail(), FILTER_VALIDATE_EMAIL) != true) {
+            return 'ERROR: El E-mail ('.$entidad->getEntEmail().') es un correo invalido';
+            
+        }else if($entidad->getEntNombre() == null || $entidad->getEntNombre()==''){
+            return 'ERROR: El Nombre propietario, Denominación o Razón Social se encuentra vacío';
+        
+        }else if($entidad->getEntNombComercial() == null || $entidad->getEntNombComercial()==''){
+            return 'ERROR: El Nombre Comercial se encuentra vacío';
+        
+        }else if($entidad->getEntDireccionMatriz() == null || $entidad->getEntDireccionMatriz()==''){
+            return 'ERROR: La Dirección Casa Matriz se encuentra vacío';
+            
+        }else if($entidad->getEntUsosAlcohol() == null || $entidad->getEntUsosAlcohol()==''){
+            return 'ERROR: El Usos del Alcohol se encuentra vacío';
+            
+        }
+        
+        return "";
     }
 }
 ?>
