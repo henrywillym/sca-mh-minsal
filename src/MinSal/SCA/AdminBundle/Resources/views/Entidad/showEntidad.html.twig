@@ -246,8 +246,10 @@
         
         <center>
             <!--El boton tiene que ser submit, sino causa problemas con el envio-->
+            {% if autorizadoGuardar == true %}
             <input id="btnGuardar" type="submit" value="Guardar" onclick="return ValidarCuotas();"/> &nbsp;
             <input id="btnUsuarios" type="button" value="Ver Usuarios" onclick="location.href = '{{ url('MinSalSCAUsersBundle_mantMostrarUsuarios', {'userInterno': 'false', 'entId': entId})}}';"/>
+            {% endif %}
             <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAAdminBundle_mantEntidades')}}';"/>
             
             <span id="cuotaImport">

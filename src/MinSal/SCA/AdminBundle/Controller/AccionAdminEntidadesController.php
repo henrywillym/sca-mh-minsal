@@ -297,6 +297,12 @@ class AccionAdminEntidadesController extends Controller {
         $entidad = $entidadDao->getEntidad($entId);
         $autorizadoDNM = null;
         $autorizadoDNMText = null;
+        $autorizadoGuardar = false;
+        $user = $this->get('security.context')->getToken()->getUser();
+        
+        if($user->getUserInternoTipo()== User::$MINSAL || $user->getUserTipo() == null){
+            $autorizadoGuardar = true;
+        }
         
         if( !$entidad ){
             $entidad = new Entidad();
@@ -317,7 +323,8 @@ class AccionAdminEntidadesController extends Controller {
                     'entId' => $entId,
                     'entHabilitado' => $entidad->getEntHabilitado(),
                     'autorizadoDNM' => $autorizadoDNM,
-                    'autorizadoDNMText' => $autorizadoDNMText
+                    'autorizadoDNMText' => $autorizadoDNMText,
+                    'autorizadoGuardar' => $autorizadoGuardar
                 )
         );
     }
