@@ -163,7 +163,18 @@ class AccionAdminEntidadesController extends Controller {
         $errores = $this->validarFormulario($entidad);
         if($form->isValid() && $errores == null){
             $entidad->setEntYear($entidad->getEntVenc()->format("Y"));
-
+            
+            $entidad->setEntRegMinsal(strtoupper($entidad->getEntRegMinsal()));
+            $entidad->setEntRegDgii(strtoupper($entidad->getEntRegDgii()));
+            $entidad->setEntGiro(strtoupper($entidad->getEntGiro()));
+            $entidad->setEntEmail(strtoupper($entidad->getEntEmail()));
+            $entidad->setEntNombre(strtoupper($entidad->getEntNombre()));
+            $entidad->setEntNombComercial(strtoupper($entidad->getEntNombComercial()));
+            $entidad->setEntRepNombre(strtoupper($entidad->getEntRepNombre()));
+            $entidad->setEntDireccionMatriz(strtoupper($entidad->getEntDireccionMatriz()));
+            $entidad->setEntUsosAlcohol(strtoupper($entidad->getEntUsosAlcohol()));
+            $entidad->setEntComentario(strtoupper($entidad->getEntComentario()));
+            
             //Eliminar cuotas de importación y compras locales
             if(!$entidad->getEntImportador() || !$entidad->getEntComprador()){
 
@@ -312,11 +323,11 @@ class AccionAdminEntidadesController extends Controller {
     }
     
     private function validarFormulario(Entidad $entidad){
-        if($entidad->getEntRegDgii() == null || $entidad->getEntRegDgii()==''){
+        if($entidad->getEntRegMinsal() == null || $entidad->getEntRegMinsal()==''){
             return 'ERROR: El Registro de Usuario (MINSAL) se encuentra vacío';
             
-        }else if($entidad->getEntRegMinsal() == null || $entidad->getEntRegMinsal()==''){
-            return 'ERROR: El Número Resolución DGII se encuentra vacío';
+        /*}else if($entidad->getEntRegDgii() == null || $entidad->getEntRegDgii()==''){
+            return 'ERROR: El Número Resolución DGII se encuentra vacío';/**/
             
         }else if($entidad->getEntTel() == null || $entidad->getEntTel()==''){
             return 'ERROR: El Teléfono se encuentra vacío';

@@ -39,12 +39,12 @@ class EntidadType extends AbstractType {
             'input'=>'datetime',
             'format'=>'dd/MM/yyyy'
         ));/***/
-        $builder->add('entRegDgii', 'text', array('label' => 'Registro de Usuario (MINSAL)','required'=> true));
-        $builder->add('entRegMinsal',  'text', array('label' => 'Número Resolución DGII','required'=> true));
+        $builder->add('entRegMinsal', 'text', array('label' => 'Registro de Usuario (MINSAL)','required'=> false, 'attr'=> array('style'=>'text-transform:uppercase;')));
+        $builder->add('entRegDgii',  'text', array('label' => 'Número Resolución DGII','required'=> true, 'attr'=> array('style'=>'text-transform:uppercase;')));
         $builder->add('entNrc', 'text', array('label' => 'NRC','required'=>false));
         $builder->add('entTel',  null, array('label' => 'Teléfono', 'required'=> true));
-        $builder->add('entGiro', null, array('label' => 'Giro o Actividad Económica', 'required'=> true));
-        $builder->add('entEmail',  'email', array('label' => 'E-mail', 'max_length'=>'50','required'=> true));
+        $builder->add('entGiro', null, array('label' => 'Giro o Actividad Económica', 'required'=> true, 'attr'=> array('style'=>'text-transform:uppercase;')));
+        $builder->add('entEmail',  'email', array('label' => 'E-mail', 'max_length'=>'50','required'=> true, 'attr'=> array('style'=>'text-transform:uppercase;')));
         
         $builder->add('entTipoPersona',  'choice', array(
             'label'=>'Tipo Persona',
@@ -58,8 +58,8 @@ class EntidadType extends AbstractType {
         ));
         
         $builder->add('entNit', null, array('label' => 'NIT Empresa o de Persona Natural','required'=> true));
-        $builder->add('entNombre',  null, array('label' => 'Nombre propietario, Denominación o Razón Social','required'=> true));
-        $builder->add('entNombComercial',  null, array('label' => 'Nombre Comercial','required'=> true));
+        $builder->add('entNombre',  null, array('label' => 'Nombre propietario, Denominación o Razón Social','required'=> true, 'attr'=> array('style'=>'text-transform:uppercase;')));
+        $builder->add('entNombComercial',  null, array('label' => 'Nombre Comercial','required'=> true, 'attr'=> array('style'=>'text-transform:uppercase;')));
         $builder->add('entTipoDoc', 'choice', array(
             'label' => 'Tipo de documento',
             'expanded'=>true,
@@ -82,9 +82,9 @@ class EntidadType extends AbstractType {
         
         $builder->add('entRepNit',  null, array('label' => 'NIT Representante Legal o Apoderado'));
         $builder->add('entRepDoc',  null, array('label' => 'Pasaporte o DUI de Rep. Legal o Apoderado'));
-        $builder->add('entRepNombre',  null, array('label' => 'Nombre Completo de Representante Legal o Apoderado'));
-        $builder->add('entDireccionMatriz',  null, array('label' => 'Dirección Casa Matriz','required'=> true));
-        $builder->add('entUsosAlcohol',  null, array('label' => 'Usos del Alcohol','required'=> true));
+        $builder->add('entRepNombre',  null, array('label' => 'Nombre Completo de Representante Legal o Apoderado', 'attr'=> array('style'=>'text-transform:uppercase;')));
+        $builder->add('entDireccionMatriz',  null, array('label' => 'Dirección Casa Matriz','required'=> true, 'attr'=> array('style'=>'text-transform:uppercase;')));
+        $builder->add('entUsosAlcohol',  null, array('label' => 'Usos del Alcohol','required'=> true, 'attr'=> array('style'=>'text-transform:uppercase;')));
         
         $builder->add('entImportador',  'checkbox', array(
             'label'=>'Importador',

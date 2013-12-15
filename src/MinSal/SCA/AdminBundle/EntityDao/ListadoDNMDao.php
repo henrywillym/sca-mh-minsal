@@ -14,7 +14,7 @@ use MinSal\SCA\AdminBundle\Entity\ListadoDNM;
  *  Acceso a Datos 
  */
 class ListadoDNMDao {
-        public static $MSG_ERROR_DNM_NOAUTH = '**** ERROR **** La empresa no se encuentra registrada en el Listado de Personas Autorizadas por la Dirección General de Medicamentos';
+        public static $MSG_ERROR_DNM_NOAUTH = '**** ERROR **** La empresa no se encuentra registrada en el Listado de Personas Autorizadas por la Dirección Nacional de Medicamentos';
         
 	var $doctrine;
         var $repositorio;

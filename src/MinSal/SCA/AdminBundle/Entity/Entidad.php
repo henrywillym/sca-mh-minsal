@@ -20,11 +20,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity(fields="entNrc",message="Ya existe otra empresa con este número de NRC")
  */
 class Entidad {
-    public static $SI = 'Si';
-    public static $NO = 'No';
+    public static $SI = 'SI';
+    public static $NO = 'NO';
     
-    public static $NATURAL = 'Natural';
-    public static $JURIDICA = 'Jurídica';
+    public static $NATURAL = 'NATURAL';
+    public static $JURIDICA = 'JURIDICA';
     
     public function __construct() {
         $this->users = new ArrayCollection();

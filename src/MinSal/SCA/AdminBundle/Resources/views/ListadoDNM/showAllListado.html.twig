@@ -28,7 +28,7 @@
           sortorder: "asc",
           pager: jQuery('#pager'),
           viewrecords: true,          
-          caption: 'Listado de Entidades Autorizadas',
+          caption: 'Listado de Empresas Autorizadas',
           height: 200,
           editCaption: "Editar Listado",
           addCaption: "Agregar Al Listado",
@@ -206,13 +206,13 @@
          if( grs != null ) 
              jQuery('#theGrid').jqGrid('delGridRow',grs,
                  {
-                msg: "Desea Eliminar la entidad Autorizada?",
+                msg: "Desea Eliminar la empresa autorizada?",
                 caption:"Eliminando del Listado de Autorizado",
                 width:550,height:100,
                 reloadAfterSubmit:true,
                 align:'center',
                 onclickSubmit: function(rp_ge, postdata) {
-                           alert("Entidad Eliminada con Exito!");
+                           alert("Empresa Eliminada con Exito!");
                         }
                
              }); 
