@@ -77,9 +77,11 @@ class InventarioDetType extends AbstractType {
     }
     
     private function getAlcoholes(){
-        $alcoholDao = new AlcoholDao($this->doctrine);
-        $alcoholes = $alcoholDao->getAlcoholes();
-        
+        $registros= $this->em->createQuery("SELECT A
+                                                FROM MinSalSCAAdminBundle:Alcohol A
+                                                WHERE A.auditDeleted = false
+                                                order by A.alcNombre ASC");
+        $alcoholes = $registros->getArrayResult();
         $lista = array();
         
         foreach($alcoholes as $alc){
