@@ -19,9 +19,9 @@ class InventarioDetType extends AbstractType {
     
     public function __construct($doctrine){
         $this->doctrine = $doctrine;
+		$this->em = $this->doctrine->getEntityManager();
     }
-    
-    
+        
     /**
      * Utilizado en Symfony 2.1
      * 

@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * RepositoryClass de RegVenta
  *
- * @author Daniel E. Diaz
+ * @author Daniel E. Diaz (dansel7@gmail.com)
  */
 
 /**

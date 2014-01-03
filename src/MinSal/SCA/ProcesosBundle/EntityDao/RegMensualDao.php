@@ -7,7 +7,7 @@ use MinSal\SCA\ProcesosBundle\Entity\RegMensual;
 /**
  * RepositoryClass de RegMensual
  *
- * @author Daniel E. Diaz
+ * @author Daniel E. Diaz (dansel7@gmail.com)
  */
 class RegMensualDao {
     var $doctrine;
@@ -45,18 +45,20 @@ class RegMensualDao {
     public function getJasonRegMensual($id) {
      
  $registros = $this->em->createQuery("
-                        SELECT E.RegMenId, E.regmen_mes,E.regmen_year,E.regmen_excedente_ant,
+                        SELECT E.RegMenId, E.regmen_mes,E.regmen_year,E.regmen_excedente_ant,C.cuoNombreEsp,C.cuoGrado,
                         (E.regmen_prod + E.regmen_imp + E.regmen_compra_local) t_ent,
                  (E.regmen_venta_local + E.regmen_venta_inter + E.regmen_utilizacion + E.regmen_perdida) t_sal, 
  (E.regmen_excedente_ant + (E.regmen_prod + E.regmen_imp + E.regmen_compra_local) - (E.regmen_venta_local + E.regmen_venta_inter + E.regmen_utilizacion + E.regmen_perdida)) inv_fin
-                                      FROM MinSalSCAProcesosBundle:RegMensual E  
+                                      FROM MinSalSCAProcesosBundle:RegMensual E,
+                                      MinSalSCAAdminBundle:Cuota C
                                       WHERE E.entidad = :entid
+                                      AND  E.alcohol=C.cuoId
                                       AND E.auditDeleted = false")
                 ->setParameter('entid',$id);
         return $registros->getArrayResult();
     }
     
-   	public function addRegMensual($year,$idEnt,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user) {
+   	public function addRegMensual($year,$idEnt,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user,$regmen_alcohol) {
             
             $RegMensual=new RegMensual(); 
            
@@ -72,6 +74,7 @@ class RegMensualDao {
           $RegMensual->setRegmenutilizacion($regmen_util);
           $RegMensual->setRegmenventainter($regmen_v_i);
           $RegMensual->setRegmenperdida($regmen_perd);
+          $RegMensual->setAlcohol($regmen_alcohol);
                 $RegMensual->setAudituserins($user->getUsername());
                 $RegMensual->setAuditdateins(new \DateTime());
                 $RegMensual->setAuditDeleted("false");
@@ -89,7 +92,7 @@ class RegMensualDao {
         /*
          * Actualizar RegMensual
          */
-        public function editRegMensual($id,$idEnt,$year,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user){
+        public function editRegMensual($id,$idEnt,$year,$regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp,$regmen_c_l,$regmen_v_l,$regmen_v_i,$regmen_util,$regmen_perd,$user,$regmen_alcohol){
             
             //$RegMensual= new RegMensual();            
             $RegMensual=$this->repositorio->find($id);
@@ -109,6 +112,7 @@ class RegMensualDao {
           $RegMensual->setRegmenutilizacion($regmen_util);
           $RegMensual->setRegmenventainter($regmen_v_i);
           $RegMensual->setRegmenperdida($regmen_perd);
+          $RegMensual->setAlcohol($regmen_alcohol);
                 $RegMensual->setAudituserupd($user->getUsername());
                 $RegMensual->setAuditdateupd(new \DateTime());
                 $RegMensual->setAuditDeleted("false");
@@ -147,17 +151,19 @@ class RegMensualDao {
         }
     
     
-    public function existeRegMensual($idReg, $entId, $year, $mes) {
+    public function existeRegMensual($idReg, $entId, $year, $mes,$alcohol) {
         $result = $this->em->createQuery("SELECT count(E) 
                                           FROM MinSalSCAProcesosBundle:RegMensual E 
                                           WHERE E.entidad = :entId 
                                             AND E.RegMenId <> :RegMenId
                                             AND E.regmen_year = :year 
                                             AND E.regmen_mes = :mes 
+                                            AND E.alcohol = :alcohol 
                                             AND E.auditDeleted= false ")
                 ->setParameter('RegMenId', $idReg)
                 ->setParameter('year', $year)
                 ->setParameter('mes', $mes)
+                ->setParameter('alcohol', $alcohol)
                 ->setParameter('entId', $entId);
         
         return $result->getSingleScalarResult();

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @author Daniel E. Diaz
+ * @author Daniel E. Diaz (dansel7@gmail.com)
  */
 
 namespace MinSal\SCA\ProcesosBundle\Controller;
@@ -108,12 +108,11 @@ class AccionSCARegMensualController extends Controller {
     public function mantRegMensualEdicionAction(request $request) {
         $RegMensual = new RegMensual();
         $RegMensualDao = new RegMensualDao($this->getDoctrine());
-        $form = $this->createForm(new RegMensualType($this->getDoctrine()), $RegMensual);
-        $form->bindRequest($request);
-
         $user = $this->get('security.context')->getToken()->getUser();
         $idEnt = $user->getEntidad()->getEntId();
-
+        
+        $form = $this->createForm(new RegMensualType($this->getDoctrine(),$idEnt), $RegMensual);
+        $form->bindRequest($request);
 
         $id = $RegMensual->getRegMenId('RegMenId');
         $eliminar = $request->get('eliminar');
@@ -140,23 +139,24 @@ class AccionSCARegMensualController extends Controller {
             $regmen_v_i = $RegMensual->getRegmenventainter("venta_inter");
             $regmen_util = $RegMensual->getRegmenutilizacion("utilizacion");
             $regmen_perd = $RegMensual->getRegmenperdida("perdida");
+            $regmen_alcohol=$RegMensual->getAlcohol("alcohol");
             
-            $existe = $RegMensualDao->existeRegMensual($id, $idEnt, $year, $regmen_mes);
+            $existe = $RegMensualDao->existeRegMensual($id, $idEnt, $year, $regmen_mes,$regmen_alcohol);
             
             if($existe == false){
                 if ($operacion == 'Guardar') {
-                    $RegMensualDao->addRegMensual($year, $idEnt, $regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp, $regmen_c_l, $regmen_v_l, $regmen_v_i, $regmen_util, $regmen_perd, $user);
+                    $RegMensualDao->addRegMensual($year, $idEnt, $regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp, $regmen_c_l, $regmen_v_l, $regmen_v_i, $regmen_util, $regmen_perd, $user,$regmen_alcohol);
                     $this->get('session')->setFlash('notice', 'Los datos se han guardado exitosamente');
                 }
 
                 if ($operacion == 'Actualizar') {
-                    $RegMensualDao->editRegMensual($id, $idEnt, $year, $regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp, $regmen_c_l, $regmen_v_l, $regmen_v_i, $regmen_util, $regmen_perd, $user);
+                    $RegMensualDao->editRegMensual($id, $idEnt, $year, $regmen_mes, $regmen_exc, $regmen_prod, $regmen_imp, $regmen_c_l, $regmen_v_l, $regmen_v_i, $regmen_util, $regmen_perd, $user,$regmen_alcohol);
 
                     $this->get('session')->setFlash('notice', 'Los datos se han actualizado exitosamente');
                 }
             }else{
                 $opciones = $this->getRequest()->getSession()->get('opciones');
-                $this->get('session')->setFlash('notice', 'ERROR: No puede guardarse la información, debido a que existe un registro con el mismo Año/Mes, por favor revise');
+                $this->get('session')->setFlash('notice', 'ERROR: No puede guardarse la información, debido a que existe un registro con el mismo Año/Mes/Tipo Alcohol, por favor revise');
 
                 return $this->render('MinSalSCAProcesosBundle:RegMensual:showRegMensual.html.twig', array(
                             'form' => $form->createView(),
@@ -177,7 +177,7 @@ class AccionSCARegMensualController extends Controller {
     public function mantCargarRegMensualAction($RegMenId) {
         $opciones = $this->getRequest()->getSession()->get('opciones');
         $user = $this->get('security.context')->getToken()->getUser();
-
+        $idEnt = $user->getEntidad()->getEntId();
         $RegMensualDao = new RegMensualDao($this->getDoctrine());
         $RegMensual = $RegMensualDao->getRegMensual($RegMenId);
 
@@ -186,7 +186,7 @@ class AccionSCARegMensualController extends Controller {
             $RegMensual = new RegMensual();
         }
 
-        $form = $this->createForm(new RegMensualType($this->getDoctrine()), $RegMensual);
+        $form = $this->createForm(new RegMensualType($this->getDoctrine(), $idEnt), $RegMensual);
 
         return $this->render('MinSalSCAProcesosBundle:RegMensual:showRegMensual.html.twig', array(
                     'form' => $form->createView(),
