@@ -74,7 +74,9 @@ class AccionAdminAlcoholesController extends Controller {
 
     public function consultarAlcoholesJSONSelectAction() {
         $alcoholDao = new AlcoholDao($this->getDoctrine());
-        $alcoholes = $alcoholDao->getAlcoholes();
+        $user = $this->get('security.context')->getToken()->getUser();
+        
+        $alcoholes = $alcoholDao->getAlcoholes($user->getUserInternoTipo());
         
         $numfilas = count($alcoholes);
         

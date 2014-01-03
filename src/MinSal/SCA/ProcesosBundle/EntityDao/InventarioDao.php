@@ -1,6 +1,7 @@
 <?php
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
+use MinSal\SCA\ProcesosBundle\Entity\Inventario;
 use MinSal\SCA\ProcesosBundle\Entity\InventarioDet;
 
 /**
@@ -39,9 +40,16 @@ class InventarioDao {
                                           FROM MinSalSCAProcesosBundle:Inventario E
                                           WHERE E.invId = :invId
                                           order by E.auditDateUpd DESC, E.auditDateIns DESC")
-                //->setParameter('entId',$entId)
+                //->setParameter('entId',$entId) 
                 ->setParameter('invId',$id);
-        return $registros->getArrayResult();
+        
+         $result= $registros->getResult();
+        
+        if($result !=null && count($result)>0){
+            return $result[0];
+        }else{
+            return null;
+        }
     }
     
     public function findInventario($entId, $alcId, $invGrado, $invNombreEsp) {
@@ -67,7 +75,7 @@ class InventarioDao {
     public function addInventario(Inventario $inventario) {
         $this->em->persist($inventario);
         $this->em->flush();
-        $matrizMensajes = array('El proceso de almacenar el registro termino con éxito', 'Inventario ' . $inventario->getEntId());
+        $matrizMensajes = array('El proceso de almacenar el registro termino con éxito', 'Inventario ' . $inventario->getEntidad()->getEntId());
 
         return $matrizMensajes;
     }
@@ -82,11 +90,11 @@ class InventarioDao {
     
     public function delInventario(Inventario $inventario) {
         if (!$inventario) {
-            throw $this->createNotFoundException('No se encontro entidad con ese id ' . $inventario->getEntId());
+            throw $this->createNotFoundException('No se encontro entidad con ese id ' . $inventario->getEntidad()->getEntId());
         }
         //$this->em->remove($entidad);
         $this->em->flush();
-        $matrizMensajes = array('El proceso de eliminar termino con exito', 'Inventario ' . $inventario->getEntId());
+        $matrizMensajes = array('El proceso de eliminar termino con exito', 'Inventario ' . $inventario->getEntidad()->getEntId());
         
         return $matrizMensajes;
     }

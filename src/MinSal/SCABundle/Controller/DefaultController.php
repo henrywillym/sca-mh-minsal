@@ -3,12 +3,13 @@
 namespace MinSal\SCABundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use MinSal\SCA\UsersBundle\Entity\User;
-use MinSal\SCA\AdminBundle\Entity\RolSistema;
 use MinSal\SCA\AdminBundle\Entity\OpcionSistema;
+use MinSal\SCA\AdminBundle\Entity\RolSistema;
 use MinSal\SCA\AdminBundle\EntityDao\OpcionSistemaDao;
+use MinSal\SCA\UsersBundle\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
     *  Merge the arrays passed to the function and keep the keys intact.
@@ -21,7 +22,7 @@ use MinSal\SCA\AdminBundle\EntityDao\OpcionSistemaDao;
        $result = array();
        foreach ( $args as &$array ) {
            foreach ( $array as $key => &$value ) {
-               $result[$key] = $value;
+               $result[$value->getIdOpcionSistema()] = $value;
            }
        }
        return $result;
@@ -45,7 +46,6 @@ class DefaultController extends Controller {
                     //$opciones = $rol->getOpcionesSistema();
                      $opciones = new ArrayCollection(array_merge_maintain_keys($opciones->toArray(), $rol->getOpcionesSistema()->toArray())); 
                 }
-            
                 $peticion = $this->getRequest();
                 $sesion = $peticion->getSession();
                 $sesion->set('opciones', $opciones);
@@ -54,7 +54,10 @@ class DefaultController extends Controller {
             }
         }else{
             if ($user != 'anon.' && $user->getAuditDeleted() == true) {
-                $this->get('session')->setFlash('notice', 'El usuario "" se encuentra inactivo');
+                $this->get('session')->setFlash('notice', 'El usuario "'.$user->getUsername().'" se encuentra inactivo');
+                $this->getRequest()->getSession()->set('notice', 'El usuario "'.$user->getUsername().'" se encuentra inactivo');
+                return new RedirectResponse($this->generateUrl('fos_user_security_logout'));
+                //return $this->redirect($this->generateUrl('fos_user_security_logout'));
             }
             
             return $this->render('MinSalSCABundle:Default:index.html.twig');

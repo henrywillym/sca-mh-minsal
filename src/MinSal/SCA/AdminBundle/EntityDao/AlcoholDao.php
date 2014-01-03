@@ -2,14 +2,7 @@
 
 namespace MinSal\SCA\AdminBundle\EntityDao;
 
-use MinSal\SCA\AdminBundle\Entity\UnidadOrganizativa;
-use MinSal\SCA\AdminBundle\Entity\InformacionGeneral;
-use MinSal\SCA\AdminBundle\EntityDao\MunicipioDao;
-use MinSal\SCA\AdminBundle\EntityDao\InformacionGeneralDao;
-use MinSal\SCA\AdminBundle\EntityDao\EmpleadoDao;
-use MinSal\SCA\AdminBundle\Entity\Empleado;
-use Doctrine\ORM\Query\ResultSetMapping;
-
+use MinSal\SCA\UsersBundle\Entity\User;
 /**
  * @author Henry Willy Melara <henrywillym@gmail.com>
  */
@@ -28,12 +21,21 @@ class AlcoholDao {
     /*
      *  Obtiene todos los registros de alcoholes activos
      */
-    public function getAlcoholes() {
+    public function getAlcoholes($userInternoTipo) {
         //$alcoholes = $this->repositorio->findAll();
-        $alcoholes = $this->em->createQuery("SELECT A
+        if($userInternoTipo == User::$MH){
+            $alcoholes = $this->em->createQuery("SELECT A
                                                 FROM MinSalSCAAdminBundle:Alcohol A
                                                 WHERE A.auditDeleted = false
+                                                  AND A.alcId = 1
                                                 order by A.alcNombre ASC");
+        }else{
+            $alcoholes = $this->em->createQuery("SELECT A
+                                                FROM MinSalSCAAdminBundle:Alcohol A
+                                                WHERE A.auditDeleted = false
+                                                  AND A.alcId <> 1
+                                                order by A.alcNombre ASC");
+        }
         return $alcoholes->getArrayResult();
     }
     

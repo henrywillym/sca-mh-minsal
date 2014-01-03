@@ -4,7 +4,7 @@ namespace MinSal\SCA\AdminBundle\Form\Type;
 use MinSal\SCA\AdminBundle\Form\Type\EntidadType;
 use MinSal\SCA\AdminBundle\Form\Type\AlcoholType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -40,7 +40,7 @@ class CuotaType extends AbstractType {
         );
     }
     
-    public function buildForm(FormBuilder $builder, array $opciones){
+    public function buildForm(FormBuilderInterface $builder, array $opciones){
         $builder->add('cuoId', 'hidden');
         $builder->add('cuoYear', 'hidden');
         $builder->add('cuoTipo', 'hidden');

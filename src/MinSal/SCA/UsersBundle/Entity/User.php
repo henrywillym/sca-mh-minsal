@@ -29,13 +29,15 @@ class User extends BaseUser {
     
     public static $COMPRADOR = 'COMPRADOR';
     public static $VENDEDOR = 'VENDEDOR';
+    public static $COMPRADOR_VENDEDOR = 'COMPRADOR_VENDEDOR';
     public static $DIGITADOR= 'DIGITADOR';
     public static $APROBADOR = 'APROBADOR';
     
     public static $COMPRADOR_TEXT = 'Comprador';
     public static $VENDEDOR_TEXT = 'Vendedor';
-    public static $DIGITADOR_TEXT = 'Digitador de Empresas y Cuotas';
-    public static $APROBADOR_TEXT = 'Autorizador en Proceso Solicitud de Import.';
+    public static $COMPRADOR_VENDEDOR_TEXT = 'Comprador y Vendedor';
+    public static $DIGITADOR_TEXT = 'Digitador/Ingreso datos';
+    public static $APROBADOR_TEXT = 'Autorizador';
     
     public function __construct() {
         parent::__construct();
@@ -44,6 +46,8 @@ class User extends BaseUser {
         $this->rols = new ArrayCollection();
         $this->auditDeleted = false;
         $this->userInternoTipo = null;
+        $this->auditDateIns = new \DateTime();
+        $this->algorithm = 'sha512';
     }
     
     /**
@@ -51,7 +55,7 @@ class User extends BaseUser {
      * @ORM\Column(name="usuario_codigo", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $idUsuario;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Entidad", inversedBy="users", cascade={"persist"})
@@ -60,10 +64,13 @@ class User extends BaseUser {
     protected $entidad;
 
     /**
-     * @ORM\ManyToMany(targetEntity="MinSal\SCA\AdminBundle\Entity\RolSistema")
+     * Bidireccional - Ver comentario abajo para saber porque se dejo especificado joincolumns
+     * @ORM\ManyToMany(targetEntity="MinSal\SCA\AdminBundle\Entity\RolSistema", inversedBy="usuarios")
      * @ORM\JoinTable(name="sca_usuario_rol", 
      *              joinColumns={@ORM\JoinColumn(name="usuario_codigo", referencedColumnName="usuario_codigo")},
      *              inverseJoinColumns={@ORM\JoinColumn(name="rol_codigo", referencedColumnName="rol_codigo")})
+     * 
+     * A mapped superclass cannot be an entity, it is not query-able and persistent relationships defined by a mapped superclass must be unidirectional (with an owning side only). This means that One-To-Many assocations are not possible on a mapped superclass at all. Furthermore Many-To-Many associations are only possible if the mapped superclass is only used in exactly one entity at the moment. For further support of inheritance, the single or joined table inheritance features have to be used.
      */
     protected $rols;
         
@@ -244,25 +251,12 @@ class User extends BaseUser {
      */
     private $auditDeleted;
     
-   
-
     /**
-     * Get idUsuario
+     * @var string $algorithm
      *
-     * @return integer 
+     * @ORM\Column(name="algorithm", type="string", length=10, nullable=false)
      */
-    public function getIdUsuario() {
-        return $this->idUsuario;
-    }
-
-    /**
-     * Set idUsuario
-     *
-     * @param integer $idUsuario
-     */
-    public function setIdUsuario($idUsuario) {
-        $this->idUsuario= $idUsuario;
-    }
+    private $algorithm;
 
     /**
      * Get username
@@ -271,6 +265,10 @@ class User extends BaseUser {
      */
     public function getUsername() {
         return $this->username;
+    }
+    
+    public function setUsername($username) {
+        return $this->username = $username;
     }
 
     
@@ -415,6 +413,24 @@ class User extends BaseUser {
         $this->auditDeleted = $auditDeleted;
     }
     
+    public function getId() {
+        return parent::getId();
+    }
+
+    public function setId($id) {
+        $this->id = $id;
+    }
+    
+    
+    public function getAlgorithm() {
+        return $this->algorithm;
+    }
+
+    public function setAlgorithm($algorithm) {
+        $this->algorithm = $algorithm;
+    }
+
+            
     public function getUserInternoTipoText() {
     	//ACA SE FILTRA CUAL ES EL TIPO DE MINISTERIO AL QUE PERTENECE
         if($this->userInternoTipo == User::$MINSAL){
@@ -440,6 +456,13 @@ class User extends BaseUser {
             return User::$APROBADOR_TEXT;
         }else if($this->userTipo == User::$DIGITADOR){
             return User::$DIGITADOR_TEXT;
+        }else if($this->userTipo == User::$COMPRADOR_VENDEDOR){
+            return User::$COMPRADOR_VENDEDOR_TEXT;
         }
+    }
+    
+    public function addRol(\MinSal\SCA\AdminBundle\Entity\RolSistema $rol)
+    {
+        $this->rols[] = $rol;
     }
 }

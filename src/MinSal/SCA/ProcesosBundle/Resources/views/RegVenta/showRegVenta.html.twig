@@ -1,0 +1,179 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{% form_theme form 'MinSalSCAUsersBundle:ChangePassword/Form:fields.html.twig' %}
+{% block body %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#btnGuardar').button();
+            $('#btnActualizar').button();
+            $('#btnEliminar').button();
+            $('#btnRegresar').button();
+
+            //Hoja de estilo a tabla
+           $('td>label').parent().attr('align','right');
+           if($('#RegVenta_RegVentaId').val()=='' || $('#RegVenta_RegVentaId').val()==-1){
+               $('#btnEliminar').hide();
+               $('#btnActualizar').hide();
+           }else{
+               $('#btnGuardar').hide();
+           }
+           $('#RegVenta_regveFecha').datepicker();
+           
+            //VALIDACION DE CAMPOS
+            $("#RegVenta_regveMinsal").blur(function(){
+            this.value=(this.value.replace(/[^\d\-]/g, ''));    
+            });
+            $("#RegVenta_regvedgii").blur(function(){
+            this.value=(this.value.replace(/[^\d\-]/g, ''));    
+            });
+            $("#RegVenta_regveGrado").blur(function(){
+            this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+            $("#RegVenta_regveLitros").blur(function(){
+            this.value=(this.value.replace(/[^\d\.]/g, ''));    
+            });
+                        
+            {$('#RegVenta_regveNIT').mask("9999-999999-999-9",{placeholder:"_"});}
+            
+            //Se muestra el grado correspondiente
+          if( $('#RegVenta_regveGrado').val()=="") getGrado();
+          
+             $("#RegVenta_alcohol").change(function(){getGrado();})
+                   
+        });
+
+//FUNCION PARA OBTENER EL GRADO SEGUN EL TIPO DE ALCOHOL
+function getGrado(){
+$.post('{{ url('MinSalSCAProcesosBundle_getGradoRV',{'CuoId':'CuoId'})}}'.replace(/CuoId/g, $("#RegVenta_alcohol").val()), function(data) {
+  $('#RegVenta_regveGrado').val(data);
+});
+}
+
+        function enviarEliminar(){
+            if(confirm('!Desea eliminar el registro "'+$('#RegVenta_RegVentaId').val()+'"?')){
+                if(!confirm('!Desea abortar la eliminacion??')){
+                    $('#valido').val(true);
+                    $('#eliminar').val(true);
+                    $('#formulario').submit();
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        
+    </script>
+    
+    <form id="formulario" action="{{ path('MinSalSCAProcesosBundle_mantRegVentaEdicion') }}" {{ form_enctype(form) }} method="POST" class="RegVentaTypeForm">
+        <input type="hidden" id="valido" value=false/>
+        <input type="hidden" id="eliminar" name="eliminar" value=false/>
+            <table align='center' style="border: 1px solid;" >
+                <tr>
+                    <td align='center' colspan="2">
+                        <h1>
+                           Ingrese Registro de Ventas a clientes de "{{entNombComercial}}"
+                        </h1>
+                        {% if app.session.hasFlash('notice') %}
+                            <div class="flash-notice">
+                                {{ app.session.flash('notice') }}
+                            </div><br/>
+                        {% endif %}
+                    </td>
+                </tr>
+                  <tr>
+                    <td><label id="fecha" >Fecha:</label></td>
+                    <td>
+                       {{ form_widget(form.regveFecha) }}
+                        <div class="flash-notice">
+                            {{form_errors(form.regveFecha)}}
+                        </div>
+                    </td>
+                </tr>
+                    <tr><td>&nbsp;</td></tr>
+                <tr>
+                    <td><label id="nit" >NIT Cliente:</label></td>
+                    <td>
+                       {{ form_widget(form.regveNIT) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regveNIT) }}
+                        </div>
+                    </td>
+                </tr>
+             
+                <tr>
+                    <td><label id="nombcliente" >Nombre Cliente:</label></td>
+                    <td>
+                       {{ form_widget(form.regveNombre) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regveNombre) }}
+                        </div>
+                    </td>
+                </tr>
+              
+                  
+                <tr>
+                    <td><label id="reg_user" >Registro Usuario (MINSAL):</label></td>
+                    <td>
+                        {{ form_widget(form.regveMinsal) }}
+                        {{ form_errors(form.regveMinsal) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><label id="n_res" >Numero Resolución DGII:</label></td>
+                    <td>
+                        {{ form_widget(form.regvedgii) }}
+                        {{ form_errors(form.regvedgii) }}
+                    </td>
+                </tr>
+                  <tr><td>&nbsp;</td></tr>
+                
+                 <tr>
+                    <td><label id="AlcId" >Nombre Alcohol:</label></td>
+                    <td>
+                        {{ form_widget(form.alcohol) }}
+                        {{ form_errors(form.alcohol) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><label id="RegVentaLitros" >Cantidad (Ltr) :</label></td>
+                    <td>
+                        {{ form_widget(form.regveLitros) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regveLitros) }}
+                        </div>
+                    </td>
+                </tr>      
+                 <tr>
+                    <td><label id="RegVentaGrado" >Grado :</label></td>
+                    <td>
+                        {{ form_widget(form.regveGrado) }}
+                        <div class="flash-notice">
+                            {{ form_errors(form.regveGrado) }}
+                        </div>
+                    </td>
+                </tr>  
+               
+                
+                
+                <tr>
+                    <td colspan="2"><hr/></td>
+                </tr> 
+                
+                            
+                
+                <tr>
+                    <td align='center' colspan=2 >
+                        <div id="msgDialog">
+                        </div>
+                        <br>
+                        <input id="btnGuardar" name="btnGuardar" type="submit" value="Guardar" />
+                        <input id="btnActualizar" name="btnGuardar" type="submit" value="Actualizar" />
+                        <input id="btnEliminar" name="btnEliminar" type="button" value="Eliminar" onclick="return enviarEliminar();"/>
+
+                        <input id="btnRegresar"  type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantRegVenta')}}';"/>
+                    </td>
+                </tr>
+            </table>    
+
+    {{ form_rest(form) }}
+        </form>
+{% endblock%}

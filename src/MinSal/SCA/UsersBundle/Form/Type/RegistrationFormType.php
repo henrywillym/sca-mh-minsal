@@ -1,7 +1,7 @@
 <?php
 namespace  MinSal\SCA\UsersBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use FOS\UserBundle\Form\Type\RegistrationFormType as BaseType;
 use Doctrine\ORM\EntityRepository;
 use MinSal\SCA\UsersBundle\Entity\User;
@@ -32,18 +32,18 @@ class RegistrationFormType  extends BaseType{
      * @param array $options
      * @return type
      */
-    public function getDefaultOption1(array $options){
+    public function setDefaultOption1(array $options){
         return array(
             'data_class' => 'MinSal\SCA\UsersBundle\Entity\User',
             'csrf_protection' => false,
             'cascade_validation' => false,
         );
     }
-    public function buildForm(FormBuilder $builder, array $options){
+    public function buildForm(FormBuilderInterface $builder, array $options){
         
         parent::buildForm($builder, $options);
         
-        $builder->add('idUsuario',  'hidden');
+        $builder->add('id',  'hidden');
         $builder->add('userPrimerNombre',  null, array('label' => 'Primer Nombre'));
         $builder->add('userSegundoNombre',  null, array('label' => 'Segundo Nombre'));
         $builder->add('userApellidos',  null, array('label' => 'Apellidos'));
@@ -74,6 +74,7 @@ class RegistrationFormType  extends BaseType{
             'expanded'=>false,
             'multiple'=>false,
             'choices'=> array(
+                User::$COMPRADOR_VENDEDOR => User::$COMPRADOR_VENDEDOR_TEXT,
                 User::$VENDEDOR => User::$VENDEDOR_TEXT, 
                 User::$COMPRADOR => User::$COMPRADOR_TEXT,
                 User::$DIGITADOR => User::$DIGITADOR_TEXT, 
