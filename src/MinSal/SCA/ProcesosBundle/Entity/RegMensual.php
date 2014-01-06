@@ -18,8 +18,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 class RegMensual {
     
     public function __construct() {
-        $year = date("Y", strtotime("-1 month"));
-        $month = date("m", strtotime("-1 month"));
+        $year = date("Y");
+        $month = date("m");
         $this->regmen_year = $year;
         $this->regmen_mes = $month+0;
         $this->auditDeleted = false;

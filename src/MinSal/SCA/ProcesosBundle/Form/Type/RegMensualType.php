@@ -99,7 +99,7 @@ class RegMensualType extends AbstractType {
         $registros = $this->em->createQuery("SELECT E
                                           FROM MinSalSCAAdminBundle:Cuota E
                                           WHERE E.entidad = :entid 
-                                          AND E.auditDeleted = FALSE")
+                                          AND E.auditDeleted = FALSE AND E.cuoYear=".date("Y"))
                 ->setParameter('entid',$this->entid);
         $result= $registros->getArrayResult();
         
