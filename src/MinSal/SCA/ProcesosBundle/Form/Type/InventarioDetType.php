@@ -19,9 +19,9 @@ class InventarioDetType extends AbstractType {
     
     public function __construct($doctrine){
         $this->doctrine = $doctrine;
+		$this->em = $this->doctrine->getEntityManager();
     }
-    
-    
+        
     /**
      * Utilizado en Symfony 2.1
      * 
@@ -77,9 +77,11 @@ class InventarioDetType extends AbstractType {
     }
     
     private function getAlcoholes(){
-        $alcoholDao = new AlcoholDao($this->doctrine);
-        $alcoholes = $alcoholDao->getAlcoholes();
-        
+        $registros= $this->em->createQuery("SELECT A
+                                                FROM MinSalSCAAdminBundle:Alcohol A
+                                                WHERE A.auditDeleted = false
+                                                order by A.alcNombre ASC");
+        $alcoholes = $registros->getArrayResult();
         $lista = array();
         
         foreach($alcoholes as $alc){

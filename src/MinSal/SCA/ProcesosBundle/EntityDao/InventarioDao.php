@@ -1,6 +1,7 @@
 <?php
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
+use MinSal\SCA\ProcesosBundle\Entity\Inventario;
 use MinSal\SCA\ProcesosBundle\Entity\InventarioDet;
 
 /**
@@ -74,7 +75,7 @@ class InventarioDao {
     public function addInventario(Inventario $inventario) {
         $this->em->persist($inventario);
         $this->em->flush();
-        $matrizMensajes = array('El proceso de almacenar el registro termino con éxito', 'Inventario ' . $inventario->getEntId());
+        $matrizMensajes = array('El proceso de almacenar el registro termino con éxito', 'Inventario ' . $inventario->getEntidad()->getEntId());
 
         return $matrizMensajes;
     }
@@ -89,11 +90,11 @@ class InventarioDao {
     
     public function delInventario(Inventario $inventario) {
         if (!$inventario) {
-            throw $this->createNotFoundException('No se encontro entidad con ese id ' . $inventario->getEntId());
+            throw $this->createNotFoundException('No se encontro entidad con ese id ' . $inventario->getEntidad()->getEntId());
         }
         //$this->em->remove($entidad);
         $this->em->flush();
-        $matrizMensajes = array('El proceso de eliminar termino con exito', 'Inventario ' . $inventario->getEntId());
+        $matrizMensajes = array('El proceso de eliminar termino con exito', 'Inventario ' . $inventario->getEntidad()->getEntId());
         
         return $matrizMensajes;
     }

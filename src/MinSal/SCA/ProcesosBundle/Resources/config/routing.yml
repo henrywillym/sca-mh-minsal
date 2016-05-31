@@ -158,6 +158,10 @@ MinSalSCAProcesosBundle_mantSolLocalVerSolicitudes:
 MinSalSCAProcesosBundle_verSolLocalesJSON:
     pattern:  /Solicitud/Local/VerSolicitudes/Consultar
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:verSolLocalesJSON } 
+    
+MinSalSCAProcesosBundle_verVentasJSON:
+    pattern:  /Solicitud/Local/VerVentas/Consultar
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASolLocal:verVentasJSON } 
 
 MinSalSCAProcesosBundle_getSearchEstadosLocal:
     pattern:  /Solicitud/Local/getSearchEstados 
@@ -174,7 +178,30 @@ MinSalSCAProcesosBundle_getEtapasLocal:
 #*********************************************
 #***    Procesos Automatizados Publicos    ***
 #*********************************************
-MinSalSCAProcesosBundle_mantCargarInventarioDet:
+MinSalSCAProcesosBundle_ExpiracionSolicitudes:
     pattern:  /Scheduled/Anon/Process/ExpiracionSolicitudes
     defaults: { _controller: MinSalSCAProcesosBundle:AccionSCASchAnonProcess:expiracionSolicitudes } 
     
+    
+#*****************************
+#***  Carga de NIT/NRC MH  ***
+#*****************************
+MinSalSCAProcesosBundle_mantListadoMHVer:
+    pattern:  /ListadoMH/mantListadoMHVer
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHVer } 
+
+MinSalSCAProcesosBundle_mantListadoMHIngreso:
+    pattern:  /ListadoMH/mantListadoMHIngreso
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHIngreso } 
+
+MinSalSCAProcesosBundle_consultarListadoMHJSON:
+    pattern:  /ListadoMH/consultarListadoMHJSON
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:consultarListadoMHJSON } 
+
+MinSalSCAProcesosBundle_mantListadoMHEdicion:
+    pattern:  /ListadoMH/mantListadoMHEdicion
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHEdicion } 
+
+MinSalSCAProcesosBundle_mantListadoMHEdicionRow:
+    pattern:  /ListadoMH/mantListadoMHEdicionRow
+    defaults: { _controller: MinSalSCAProcesosBundle:AccionSCAListadoMH:mantListadoMHEdicionRow } 

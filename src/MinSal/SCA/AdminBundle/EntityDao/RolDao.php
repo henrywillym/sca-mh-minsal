@@ -32,6 +32,7 @@ namespace MinSal\SCA\AdminBundle\EntityDao;
 use Doctrine\ORM\Query\ResultSetMapping;
 use MinSal\SCA\AdminBundle\Entity\OpcionSistema;
 use MinSal\SCA\AdminBundle\Entity\RolSistema;
+use MinSal\SCA\UsersBundle\Entity\User;
 use Symfony\Bundle\DoctrineBundle\Registry;
 
 class RolDao {
@@ -198,13 +199,26 @@ class RolDao {
      */
     public function getRolesEspecificos($entImportador, $entProductor, $entComprador, $entVendedorLocal, $userTipo, $userInterno, $userInternoTipo) {
         $query = $this->repositorio->createQueryBuilder('R');
+        $where = '';
         
-        $where = '     R.rolTipo = :rolTipo
+        if($userTipo == User::$COMPRADOR_VENDEDOR){
+            $where = '     R.rolTipo in(:rolTipo1, :rolTipo2)
                          AND R.rolInterno = :rolInterno ';
-        $query = $query->setParameters(array(
-            'rolTipo' => $userTipo,
-            'rolInterno' => $userInterno === true?1:0
-        ));
+            $query = $query->setParameters(array(
+                'rolTipo1' => User::$COMPRADOR,
+                'rolTipo2' => User::$VENDEDOR,
+                'rolInterno' => $userInterno === true?1:0
+            ));
+            
+        }else{
+            $where = '     R.rolTipo = :rolTipo
+                         AND R.rolInterno = :rolInterno ';
+            $query = $query->setParameters(array(
+                'rolTipo' => $userTipo,
+                'rolInterno' => $userInterno === true?1:0
+            ));
+        }
+        
         
         if($entImportador || $entProductor || $entComprador){
             $where = $where.' AND (';

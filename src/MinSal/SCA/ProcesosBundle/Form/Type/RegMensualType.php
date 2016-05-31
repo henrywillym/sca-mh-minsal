@@ -12,13 +12,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Estructura para formulario de Ingreso a detalle mensual de litros de alcoholes
  *
- * @author Daniel E. Diaz
+ * @author Daniel E. Diaz (dansel7@gmail.com)
  */
 class RegMensualType extends AbstractType {
     private $doctrine;
     
-    public function __construct($doctrine){
+    public function __construct($doctrine,$eid){
         $this->doctrine = $doctrine;
+        $this->em = $this->doctrine->getEntityManager();
+        $this->entid=$eid;
     }
     
     
@@ -47,7 +49,13 @@ class RegMensualType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $opciones){
         $builder->add('RegMenId', 'hidden');
         
-        
+        $builder->add('alcohol', 'choice', array(
+            'choices' => $this->getAlcoholes(),
+            'required' => true,
+            'expanded' => false,
+            'multiple' => false,
+            'empty_value' => 'Debe Seleccionar un Alcohol'
+        ));
         $builder->add('regmen_mes', 'choice', array(
             'choices' => $this->getMeses(),
             'required' => true,
@@ -64,6 +72,7 @@ class RegMensualType extends AbstractType {
         $builder->add('regmen_venta_inter',  null, array('label' => 'Venta Internacional'));
         $builder->add('regmen_utilizacion',  null, array('label' => 'Utilizacion'));
         $builder->add('regmen_perdida',  null, array('label' => 'Perdida , Merma'));
+        
     }
 
     public function getName(){
@@ -80,6 +89,24 @@ class RegMensualType extends AbstractType {
         foreach($meses as $m){
             $lista[$i] = $m;
             $i++;
+        }
+        
+        return $lista;
+    }
+    
+    private function getAlcoholes(){
+        
+        $registros = $this->em->createQuery("SELECT E
+                                          FROM MinSalSCAAdminBundle:Cuota E
+                                          WHERE E.entidad = :entid 
+                                          AND E.auditDeleted = FALSE AND E.cuoYear=".date("Y"))
+                ->setParameter('entid',$this->entid);
+        $result= $registros->getArrayResult();
+        
+        $lista = array();
+        
+        foreach($result as $alc){
+            $lista[$alc['cuoId']] = $alc['cuoNombreEsp'];
         }
         
         return $lista;

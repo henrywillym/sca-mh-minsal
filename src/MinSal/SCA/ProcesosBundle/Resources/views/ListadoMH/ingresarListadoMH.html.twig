@@ -1,0 +1,94 @@
+{% extends 'MinSalSCABundle:Default:index.html.twig' %}
+{% form_theme form 'MinSalSCAUsersBundle:ChangePassword/Form:fields.html.twig' %}
+
+{% block body %}
+    <script type="text/javascript">
+        function validarFormulario(){
+            var msg ='';
+            
+            
+            return msg;
+        }
+        
+        function enviarFormulario(){
+            var msg = validarFormulario();
+            
+            if(msg != ''){
+                alert(msg);
+                return false;
+            }else{
+                if(confirm('Se eliminarán los datos previamente cargados para el año {{year}} (Si hubiesen). ¿Desea continuar?')){
+                    $('#btnGuardar').attr('disabled','disabled');
+                    return true;
+                }
+                
+                return false;
+            }
+        }
+        
+        var impDetId = '0';
+        
+        $(document).ready(function(){
+            $('#btnGuardar').button();
+            $('#btnRegresar').button();
+            
+            //Hoja de estilo a tabla
+           $('td>label').parent().attr('align','right');
+        });
+
+    </script>
+    
+    <form id="formulario" action="{{ path('MinSalSCAProcesosBundle_mantListadoMHEdicion') }}" {{ form_enctype(form) }} 
+           onsubmit="return enviarFormulario();" method="POST" class="ListadoMHTypeForm">
+        
+            <table align='center' style="border: 1px solid; ">
+                <tr>
+                    <td align='center' colspan="2">
+                        <h1>
+                            Carga de archivo CSV con datos de NIT/NRC del Ministerio de Hacienda para el año {{year}}
+                        </h1>
+                        {% if app.session.hasFlash('notice') %}
+                            <div class="flash-notice" style="max-width: 600px;">
+                                {{ app.session.flash('notice') }}
+                                    {{ form_errors(form)}}
+                            </div><br/>
+                        {% endif %}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>&nbsp;</td>
+                    <td></td>
+                </tr>
+                
+                <tr>
+                    <td>&nbsp;</td>
+                    <td></td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        
+                        <label>Archivo CSV:</label>
+                    </td>
+                    <td style="border: 1px solid;">
+                        {{ form_widget(form) }}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>&nbsp;</td>
+                    <td></td>
+                </tr>
+                
+                <tr>
+                    <td align='center' colspan=2 >
+                        <input id="btnGuardar" type="submit" value="Cargar Archivo" />
+                        <input id="btnRegresar" style="display:none" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAProcesosBundle_mantListadoMHVer')}}';"/>
+                    </td>
+                </tr>
+            </table>    
+
+            {{ form_rest(form) }}
+        </form>
+{% endblock%}

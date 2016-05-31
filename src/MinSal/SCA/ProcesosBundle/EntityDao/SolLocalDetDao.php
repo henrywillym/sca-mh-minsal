@@ -1,9 +1,10 @@
 <?php
 namespace MinSal\SCA\ProcesosBundle\EntityDao;
 
+use MinSal\SCA\AdminBundle\Entity\Cuota;
+use MinSal\SCA\ProcesosBundle\Entity\Etapa;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\SolLocalDet;
-use MinSal\SCA\AdminBundle\Entity\Cuota;
 
 /**
  * RepositoryClass de SolLocalDet
@@ -17,12 +18,12 @@ class SolLocalDetDao {
     
     var $fluId;
     
-    private $sqlSelect = " distinct E.localDetId, E.localDetLitros, E.localDetLitrosLib, F.auditUserIns, F.auditDateIns,
+    private $sqlSelect = " DISTINCT E.localDetId, E.localDetLitros, E.localDetLitrosLib, F.auditUserIns, F.auditDateIns,
                         C.estId, C.estNombre, 
                         D.etpId, D.etpNombre,
                         F.solLocalFecha,
                         H.cuoNombreEsp, H.cuoGrado,
-                        AA.entNombComercial,
+                        AA.entNombComercial,A.entNombComercial clienteEntNombComercial, 
                         A.entHabilitado, A.entComentario";
 
     function __construct($doctrine) {
@@ -69,7 +70,38 @@ class SolLocalDetDao {
                                             JOIN B.flujo G
                                           WHERE A.entId = :entId
                                             AND G.fluId = :fluId
-                                            ORDER BY F.solLocalId DESC")
+                                            AND BB.invDetAccion in ('-','R')
+                                            ORDER BY E.localDetId DESC")
+                ->setParameter('entId',$entId)
+                ->setParameter('fluId',$this->fluId);
+        return $registros->getArrayResult();
+    }
+    
+    public function getVentasLocalesDetByEntidad($entId) {
+        
+        $sql = "SELECT ".$this->sqlSelect.", 
+                            (SELECT count(K) 
+                               FROM MinSalSCAAdminBundle:ListadoDNM K 
+                              WHERE H.cuoYear = K.ldnm_year
+                                AND A.entNit = K.ldnm_nit
+                                AND A.entNrc = K.ldnm_nrc) AS HAB
+                  FROM MinSalSCAProcesosBundle:Inventario HH
+                    JOIN HH.entidad AA
+                    JOIN HH.inventariosDet BB
+                    JOIN BB.solLocalDet E 
+                    JOIN E.cuota H
+                    JOIN E.solLocal F
+                    JOIN F.entidad A
+                    JOIN F.transicion B
+                    JOIN B.estado C
+                    JOIN B.etpFin D
+                    JOIN B.flujo G
+                  WHERE AA.entId = :entId
+                    AND G.fluId = :fluId
+                    AND BB.invDetAccion in ('-','R')
+                    ORDER BY E.localDetId DESC";
+        
+        $registros = $this->em->createQuery($sql)
                 ->setParameter('entId',$entId)
                 ->setParameter('fluId',$this->fluId);
         return $registros->getArrayResult();
@@ -83,7 +115,7 @@ class SolLocalDetDao {
      * @param integer $fluId
      * @return Array
      */
-    public function getSolLocalesDetByEtapa($etpId, $entId = null) {
+    public function getSolLocalesDetByEtapa($etpId, $entId = null, $comprador=true, $vendedor=true) {
         $sql = "SELECT  ".$this->sqlSelect.", 
                     (SELECT count(K) 
                        FROM MinSalSCAAdminBundle:ListadoDNM K 
@@ -101,10 +133,21 @@ class SolLocalDetDao {
                     JOIN B.estado C
                     JOIN B.etpFin D
                     JOIN B.flujo G
-                WHERE D.etpId = :etpId ";
+                WHERE D.etpId = :etpId 
+                  AND BB.invDetAccion in ('R') ";
         
         if($entId != null){
-            $sql = $sql." AND (A.entId = :entId or AA.entId = :entId) ";
+            $sql = $sql." AND (false = true ";
+            
+            if($comprador){
+                $sql = $sql."      or A.entId = :entId";
+            }
+            
+            if($vendedor){
+                $sql = $sql."      or AA.entId = :entId";
+            }
+            
+            $sql = $sql." )";
         }
         
         $sql = $sql." AND G.fluId = :fluId
@@ -159,7 +202,7 @@ class SolLocalDetDao {
     }
     
     public function getProveedores($entId, $cuoId){
-        $cuotas = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado,
+        $query = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado, 
                                                 ProvEE.invId, ProvEE.invLitros - ProvEE.invReservado as invLitros, ProvEE.invGrado, ProvEE.invNombreEsp, 
                                                 (SELECT count(K) 
                                                    FROM MinSalSCAAdminBundle:ListadoDNM K 
@@ -175,20 +218,35 @@ class SolLocalDetDao {
                                           WHERE B.entId = :entId
                                             AND E.cuoId = :cuoId
                                             AND E.auditDeleted = false
+                                            AND ProvBB.entHabilitado = TRUE
                                             
                                             AND ProvBB.entId <> B.entId
                                             AND ProvAA.alcId = A.alcId
                                             AND (ProvBB.entImportador = TRUE 
-                                                OR ProvBB.entProductor = TRUE 
                                                 OR ProvBB.entCompVend = TRUE)
                                             AND ProvEE.invGrado >= E.cuoGrado
                                             
-                                            AND B.entComprador = TRUE
-                                          ORDER by ProvEE.invNombreEsp ASC")
+                                            AND B.entComprador = TRUE")
                 ->setParameter('entId',$entId)
                 ->setParameter('cuoId',$cuoId);
+        $result = $query->getArrayResult();
         
-        return $cuotas->getArrayResult();
+        //Query para agregar todos los Productores
+        $year = date("Y", strtotime("0 month"));
+        $productores = $this->em->createQuery("SELECT ProvBB.entId, ProvBB.entNombComercial,ProvBB.entDireccionMatriz,ProvBB.entHabilitado, 
+                            0 invId, 50000 as invLitros, 0 invGrado, '' invNombreEsp,
+                            (SELECT count(K) 
+                               FROM MinSalSCAAdminBundle:ListadoDNM K 
+                              WHERE ".$year." = K.ldnm_year
+                                AND ProvBB.entNit = K.ldnm_nit
+                                AND ProvBB.entNrc = K.ldnm_nrc) AS HAB
+                        FROM MinSalSCAAdminBundle:Entidad ProvBB
+                       WHERE ProvBB.entProductor = TRUE
+                         AND ProvBB.entHabilitado = TRUE");
+        
+        $result = array_merge($result, $productores->getArrayResult());
+        
+        return $result;
     }
     
     public function getProveedorSolicitud($localDetId, $entId, $cuoId){
@@ -249,6 +307,36 @@ class SolLocalDetDao {
                                             AND G.etpId not in (".Etapa::$FINALIZADA_OBS.",".Etapa::$RECEPCION_TOTAL_INV.")")
                 ->setParameter('entId', $entId)
                 ->setParameter('invId', $invId);
+        
+        $result= $registros->getSingleResult();
+        
+        if($result !=null && count($result)>0 && $result[1] != null){
+            return $result[1];
+        }else{
+            return 0;
+        }
+    }
+    
+    /**
+     * Devuelve la cantidad en litros de alcohol ingresados a inventario, a partir de una cuota dada.
+     * Esta funcion es utilizada para obtener los litros disponibles de una cuota
+     * 
+     * @param type $entId
+     * @param type $cuoId
+     * @return type
+     */
+    public function getLitrosInventarioXCuota($entId, $cuoId) {
+        $registros = $this->em->createQuery("SELECT sum(E.invDetLitros)
+                                          FROM MinSalSCAProcesosBundle:InventarioDet E 
+                                                JOIN E.solLocalDet B
+                                                JOIN B.cuota C
+                                                JOIN C.entidad D
+                                          WHERE D.entId = :entId
+                                            AND C.cuoId = :cuoId
+                                            AND E.invDetAccion = '+'
+                                            AND E.auditDeleted = false")
+                ->setParameter('entId', $entId)
+                ->setParameter('cuoId', $cuoId);
         
         $result= $registros->getSingleResult();
         

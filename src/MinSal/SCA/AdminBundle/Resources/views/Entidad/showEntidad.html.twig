@@ -52,6 +52,13 @@
             if($('#Entidad_entId').val() == '' || $('#Entidad_entId').val() == '-1'){
                 $('#btnUsuarios').hide();
             }
+            
+            $('#Entidad_entNombre').keypress(function(e){return validaCaracter(e);})
+                    .blur(function(){ compruebaCampo(this);});
+            $('#Entidad_entNombComercial').keypress(function(e){return validaCaracter(e);})
+                    .blur(function(){ compruebaCampo(this);});;
+            $('#Entidad_entRepNombre').keypress(function(e){return validaCaracter(e);})
+                    .blur(function(){ compruebaCampo(this);});;
         }
         
         /**
@@ -138,6 +145,23 @@
             }
         }
         
+        function validaCaracter(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            valor = String.fromCharCode(keycode);
+            var test = new RegExp("[a-zA-Z., 1-9]");
+            return !!valor.match(test);  
+        }
+        
+        function compruebaCampo(obj){
+            var test = new RegExp("^[a-zA-Z., 1-9]*$");
+            if(!$(obj).val().match(test)){
+                $(obj).val('');
+            }else{
+                $(obj).val($(obj).val().toUpperCase());
+            }
+        }
+        
+        
         function HabCuotaLocal(){
             if( $('#Entidad_entComprador').is(':checked') && 
                     $('#Entidad_entId').val()!= '-1' && 
@@ -222,8 +246,10 @@
         
         <center>
             <!--El boton tiene que ser submit, sino causa problemas con el envio-->
+            {% if autorizadoGuardar == true %}
             <input id="btnGuardar" type="submit" value="Guardar" onclick="return ValidarCuotas();"/> &nbsp;
             <input id="btnUsuarios" type="button" value="Ver Usuarios" onclick="location.href = '{{ url('MinSalSCAUsersBundle_mantMostrarUsuarios', {'userInterno': 'false', 'entId': entId})}}';"/>
+            {% endif %}
             <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAAdminBundle_mantEntidades')}}';"/>
             
             <span id="cuotaImport">

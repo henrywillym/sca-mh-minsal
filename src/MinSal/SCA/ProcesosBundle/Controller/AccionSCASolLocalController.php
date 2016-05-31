@@ -4,6 +4,7 @@
 namespace MinSal\SCA\ProcesosBundle\Controller;
 
 use MinSal\SCA\AdminBundle\Entity\Cuota;
+use MinSal\SCA\AdminBundle\Entity\Entidad;
 use MinSal\SCA\AdminBundle\EntityDao\AlcoholDao;
 use MinSal\SCA\AdminBundle\EntityDao\CuotaDao;
 use MinSal\SCA\AdminBundle\EntityDao\EntidadDao;
@@ -119,10 +120,27 @@ class AccionSCASolLocalController extends Controller {
         if($user->getEntidad()!=null){
             $paramArray['entNombComercial']= $user->getEntidad()->getEntNombComercial();
             $paramArray['urlJSONSolXEntidad'] = $this->generateUrl('MinSalSCAProcesosBundle_verSolLocalesJSON');
+            $paramArray['urlJSONVentasXEntidad'] = $this->generateUrl('MinSalSCAProcesosBundle_verVentasJSON');
         }else{
             $paramArray['entNombComercial']= null;
             $paramArray['urlJSONSolXEntidad'] = null;
         }
+        
+        if($user->getUserTipo()== User::$COMPRADOR_VENDEDOR){
+            $paramArray['mostrarVentas']= true;
+            $paramArray['mostrarCompras']= true;
+            
+        }else if($user->getUserTip()== User::$COMPRADOR ){
+            $paramArray['mostrarVentas']= false;
+            $paramArray['mostrarCompras']= true;
+        }else if($user->getUserTip()== User::$VENDEDOR ){
+            $paramArray['mostrarVentas']= true;
+            $paramArray['mostrarCompras']= false;
+        }else{
+            $paramArray['mostrarVentas']= false;
+            $paramArray['mostrarCompras']= false;
+        }
+        
 
         return $this->render('MinSalSCAProcesosBundle:SolLocalDet:verSolLocales.html.twig', $paramArray);
     }
@@ -138,7 +156,20 @@ class AccionSCASolLocalController extends Controller {
         $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
         
         if($user->getEntidad() != null){
-            $registros = $solLocalDetDao->getSolLocalesDetByEtapa($etpId, $user->getEntidad()->getEntId());
+            $comprador = false;
+            $vendedor = false;
+            foreach($user->getRols() as $rolTmp){
+                if($rolTmp->getRolTipo() == User::$COMPRADOR){
+                    $comprador = true;
+                }else if($rolTmp->getRolTipo() == User::$VENDEDOR){
+                    $vendedor = true;
+                }else if($rolTmp->getRolTipo() == User::$COMPRADOR_VENDEDOR){
+                    $vendedor = true;
+                    $comprador = true;
+                }
+            }
+            
+            $registros = $solLocalDetDao->getSolLocalesDetByEtapa($etpId, $user->getEntidad()->getEntId(), $comprador, $vendedor);
         }else{
             $registros = $solLocalDetDao->getSolLocalesDetByEtapa($etpId);
         }
@@ -227,6 +258,54 @@ class AccionSCASolLocalController extends Controller {
     }
     
     /**
+     * Devuelve el listado de solicitudes que han sido asignadas a la empresa como parte de las ventas (Proveedores)
+     * 
+     * @return Response
+     */
+    public function verVentasJSONAction() {
+        $user = $this->get('security.context')->getToken()->getUser();
+        
+        $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
+        $registros = array();
+        
+        if($user->getEntidad() != null){
+            $registros = $solLocalDetDao->getVentasLocalesDetByEntidad($user->getEntidad()->getEntId());
+        }
+        $numfilas = count($registros);
+        
+        if ($numfilas != 0) {
+            $solLocal = new SolLocal();
+            $i = 0;
+            
+            foreach ($registros as $ent) {
+                $solLocal->setSolLocalFecha($ent['solLocalFecha']);
+                $solLocal->setAuditDateIns($ent['auditDateIns']);
+                
+                if($ent['entHabilitado'] == false || $ent['HAB'] == 0){
+                    $registros[$i]['estNombre']= SolLocal::$BLOQUEADA;
+                }
+                
+                $registros[$i]['solLocalFechaText']= $solLocal->getSolLocalFechaText();
+                $registros[$i]['auditDateInsText']= $solLocal->getAuditDateInsText();
+                $i=$i+1;
+            }
+        }
+        
+        $datos = json_encode($registros);
+        $pages = floor($numfilas / 10) + 1;
+
+        $jsonresponse = '{
+               "page":"1",
+               "total":"' . $pages . '",
+               "records":"' . $numfilas . '", 
+               "rows":' . $datos . '}';
+
+        $response = new Response($jsonresponse);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
+    
+    /**
      * Devuelve el listado de cuotas asignadas a la entidad
      * @return Response
      */
@@ -237,8 +316,9 @@ class AccionSCASolLocalController extends Controller {
         $localDetId = $request->get('localDetId');
         
         $cuotaDao = new CuotaDao($this->getDoctrine());
-        $inventarioDetDao = new InventarioDetDao($this->getDoctrine());
+        //$inventarioDetDao = new InventarioDetDao($this->getDoctrine());
         $solLocalDao = new SolLocalDao($this->getDoctrine());
+        $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
         $solLocalDet = $solLocalDao->getSolLocalDet($localDetId);
         
         $verSolicitud =   $localDetId != '0';
@@ -259,7 +339,7 @@ class AccionSCASolLocalController extends Controller {
             $selected ='';
             
             foreach($registros as $reg){
-                $litrosInventario = $inventarioDetDao->getLitrosInventarioXCuota($entId, $reg['cuoId']);
+                $litrosInventario = $solLocalDetDao->getLitrosInventarioXCuota($entId, $reg['cuoId']);
                 $litrosSolicitudesPendientes = $solLocalDao->getLitrosSolicitudXCuota($entId, $reg['cuoId']);
                 
                 $disponible = $reg['cuoLitros'] - $litrosInventario - $litrosSolicitudesPendientes;
@@ -306,6 +386,9 @@ class AccionSCASolLocalController extends Controller {
         $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
         $solLocalDao = new SolLocalDao($this->getDoctrine());
         $solLocalDet = $solLocalDao->getSolLocalDet($localDetId);
+        $cuotaDao = new CuotaDao($this->getDoctrine());
+        $cuota = $cuotaDao->getCuota($cuoId);
+        $grados = $cuota->getCuoGrado();
         
         $verSolicitud =   $localDetId != '0';
         
@@ -337,9 +420,13 @@ class AccionSCASolLocalController extends Controller {
                 /*if(round($reg['invLitros']+0, 2) != round($litrosSolicitudesPendientes+0,2)){
                     throw new Exception("El detalle de inventario (".round($reg['invLitros']+0, 2).")no coincide con el total de inventario invId -> ".$reg['invId']." almacenado (".round($litrosSolicitudesPendientes, 2).")");
                 }*/
-                $disponible = $reg['invLitros'];// - $litrosSolicitudesPendientes;
+                if($reg['invId']==0){
+                    $disponible = round(($reg['invLitros']), 0, PHP_ROUND_HALF_DOWN);
+                }else{
+                    $disponible = round(($reg['invLitros'] * $reg['invGrado']/$grados), 0, PHP_ROUND_HALF_DOWN);// - $litrosSolicitudesPendientes;
+                }
                 $habilitadoDNM = $reg['HAB']>0 && $reg['entHabilitado'] ==true;
-                
+                                
                 //$debug[$i]['$litrosInventario']=$litrosInventario;
                 //$debug[$i]['$litrosSolicitudesPendientes']=$litrosSolicitudesPendientes;
                 $debug[$i]['invLitros']=$reg['invLitros'];
@@ -352,7 +439,11 @@ class AccionSCASolLocalController extends Controller {
                         $selected = '';
                     }
                     
-                    $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . round($disponible,2) . " provDireccion=\"". $reg['entDireccionMatriz'] ."\">" . $reg['invNombreEsp'] . ' ('. $reg['invGrado'] .'%) - ' . $reg['entNombComercial']. "</option>";
+                    if($reg['invId']==0){
+                        $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . $disponible . " provDireccion=\"". $reg['entDireccionMatriz'] ."\" entId= ". $reg['entId'] .">PRODUCTOR: ". $reg['entNombComercial']."</option>"; 
+                    }else{
+                        $htmlResponse = $htmlResponse. "<option value=" . $reg['invId'] . " grado=" . $reg['invGrado'] . " disponible=" . $disponible . " provDireccion=\"". $reg['entDireccionMatriz'] ."\">" . $reg['invNombreEsp'] . ' ('. $reg['invGrado'] .'%) - ' . $reg['entNombComercial']. "</option>";
+                    }
                     $i++;
                 }
             }
@@ -384,6 +475,19 @@ class AccionSCASolLocalController extends Controller {
             $entId = $user->getEntidad()->getEntId();
         }
         
+        $comprador = false;
+        $vendedor = false;
+        foreach($roles as $rolTmp){
+            if($rolTmp->getRolTipo() == User::$COMPRADOR){
+                $comprador = true;
+            }else if($rolTmp->getRolTipo() == User::$VENDEDOR){
+                $vendedor = true;
+            }else if($rolTmp->getRolTipo() == User::$COMPRADOR_VENDEDOR){
+                $vendedor = true;
+                $comprador = true;
+            }
+        }
+        
         foreach($roles as $rol){
             $transiciones = $rol->getTransiciones();
 
@@ -393,7 +497,7 @@ class AccionSCASolLocalController extends Controller {
                         $tmp['traId'] = $reg->getTraId();
                         $tmp['id'] = $reg->getEtpFin()->getEtpId();
                         $tmp['nombre'] = $reg->getEtpFin()->getEtpNombre();
-                        $tmp['cantidad'] = $solLocalDao->getCantidadSolicitudesXEtapa($entId, $reg->getEtpFin()->getEtpId());
+                        $tmp['cantidad'] = $solLocalDao->getCantidadSolicitudesXEtapa($entId, $reg->getEtpFin()->getEtpId(), $comprador, $vendedor);
                         //$tmpIndex[$reg->getEtpFin()->getEtpId()] = true;
 
                         $traIdSeries[$tmp['id']] = $tmp;
@@ -493,7 +597,6 @@ class AccionSCASolLocalController extends Controller {
     /*
      * Se encarga de ejecutar las acciones de ingresar las solicitudes de local
      * del mantenimiento
-     * pendiente TODA LA FUNCION
      */
     public function mantSolLocalEdicionAction(Request $request) {
         $solLocalDetTmp = new SolLocalDet();
@@ -510,10 +613,14 @@ class AccionSCASolLocalController extends Controller {
         $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
         $transicionDao = new TransicionDao($this->getDoctrine());
         $inventarioDao = new InventarioDao($this->getDoctrine());
+        $entidadDao = new EntidadDao($this->getDoctrine());
         
         $transicion = null;
+        $productor = $request->get('productor');
+        $productor = ($productor==='true'||$productor===true);
+        $invId = $request->get('invId');
         
-        $errores = $solLocalDetTmp->isValid($this->getDoctrine(), $user->getEntidad(), $request->get('invId'));
+        $errores = $solLocalDetTmp->isValid($this->getDoctrine(), $user->getEntidad(), $invId, $productor);
         
         
         //Validacion DNM y Habilitado de Empresa que ingresa solicitud
@@ -525,7 +632,12 @@ class AccionSCASolLocalController extends Controller {
         $autorizadoDNM = $listadoDNMDao->estaAutorizado($year->format('Y')+0, $entidad->getEntNrc(), $entidad->getEntNit());
 
         //###### Validacion de empresa seleccionada como proveedor
-        $provEntidad = $inventarioDao->getInventario($request->get('invId'))->getEntidad();
+        if($productor){
+            $provEntidad = $entidadDao->getEntidad($request->get('prodEntId'));
+        }else{
+            $provEntidad = $inventarioDao->getInventario($invId)->getEntidad();
+        }
+        
         $autorizadoDNMProv = true;
         $autorizadoDNMProvText = '';
 
@@ -558,24 +670,33 @@ class AccionSCASolLocalController extends Controller {
                 $solLocal->addSolLocalDet($solLocalDet);
                 $solLocalDet->setCuota($cuotaDao->getCuota($request->get('cuota')));
                 
-                $inventarioDet = $this->agregarInventarioProveedor(
+                if($productor =='true' || $productor == true){
+                    $inventario = new Inventario();
+                    $inventario->setAlcohol($solLocalDet->getCuota()->getAlcohol());
+                    $inventario->setInvGrado($solLocalDet->getCuota()->getAlcohol()->getAlcGrado());
+                    $inventario->setInvNombreEsp($solLocalDet->getCuota()->getCuoNombreEsp());
+
+                    $invId = $this->crearInvIdProductor($inventario, $provEntidad);
+                }
+                
+                $inventario = $this->agregarInventarioProveedor(
                     new SolLocalDet(),
-                    $request->get('invId'),
+                    $invId,
                     $solLocalDetTmp->getLocalDetLitros(),
                     $solLocalDetTmp->getCuota()->getCuoGrado(),
                     true,
                     false
                 );
                 
-                $inventarioDet->setSolLocalDet($solLocalDet);
-                $solLocalDet->addInventarioDet($inventarioDet);
+                $inventario->setSolLocalDet($solLocalDet);
+                $solLocalDet->addInventarioDet($inventario);
             }
             //##################################################################################################
             $form = $this->createForm(new SolLocalDetType($this->getDoctrine()), $solLocalDet);
             $form->bindRequest($request);
             
             $solLocalDetDao->addSolLocalDet($solLocalDet);
-            $this->generarEmailEtapaNotificacion($solLocalDet, $transicion, $inventarioDet->getInventario()->getEntidad()->getEntId());
+            $this->generarEmailEtapaNotificacion($solLocalDet, $transicion, $inventario->getInventario()->getEntidad()->getEntId());
             $this->get('session')->setFlash('notice', 'Los datos se han guardado con éxito!!!');
             
             return $this->redirect($this->generateUrl('MinSalSCAProcesosBundle_mantSolLocalIngreso'));
@@ -622,7 +743,7 @@ class AccionSCASolLocalController extends Controller {
                     'entNombComercial'=> $user->getEntidad()->getEntNombComercial(),
                     'comentario' => null,
                     'transiciones' => null,
-                    'invId' => $request->get('invId'),
+                    'invId' => $invId,
                     'autorizadoDNM' => $autorizadoDNM,
                     'autorizadoDNMText' => $autorizadoDNMText,
                     'entHabilitado' => $entidad->getEntHabilitado(),
@@ -655,7 +776,19 @@ class AccionSCASolLocalController extends Controller {
             $transicionDao = new TransicionDao($this->getDoctrine());
             $nextTransiciones = $transicionDao->getTransicionesSiguientes($solLocalDet->getSolLocal()->getTransicion()->getTraId());
             $roles = $user->getRols();
+            $inventarioProv = null;
             
+            $invsDetTemp = $solLocalDet->getInventariosDet();
+            foreach($invsDetTemp as $tmp){
+                if( $solLocalDet->getSolLocal()->getEntidad()->getEntId() != $tmp->getInventario()->getEntidad()->getEntId()){
+                    $inventarioProv = $tmp->getInventario();
+                }
+            }
+            /*var_dump('Comprador EntId= '.$solLocalDet->getSolLocal()->getEntidad()->getEntId());
+            var_dump('User EntId= '.$user->getEntidad()->getEntId());
+            
+            var_dump('Proveedor EntId= '.$solLocalDet->getCuota()->getEntidad()->getEntId());
+            */
             //Validacion para asegurarse que el usuario que esta visualizando la solicitud tiene autorizacion para evaluarla y pasarla a la siguiente etapa
             foreach($roles as $rol){
                 $transicionesRol = $rol->getTransiciones();
@@ -664,17 +797,21 @@ class AccionSCASolLocalController extends Controller {
                     foreach($nextTransiciones as $reg){
                         if($transicionRol->getTraId() == $reg->getTraId()){
                             if($reg->getFlujo()->getFluId() == Flujo::$LOCAL && !array_key_exists($reg->getTraId(), $tmpIndex)){
-                            //if(count($result)==0){
-                                $arrayTrans = array();
+                                if(($solLocalDet->getSolLocal()->getEntidad()->getEntId() == $user->getEntidad()->getEntId() && $rol->getRolTipo() == User::$COMPRADOR)
+                                    ||
+                                    ($inventarioProv->getEntidad()->getEntId() == $user->getEntidad()->getEntId() && $rol->getRolTipo() == User::$VENDEDOR)
+                                ){
+                                    $arrayTrans = array();
 
-                                $arrayTrans['id'] = $reg->getTraId();
-                                $arrayTrans['nombre'] = $reg->getEstado()->getEstNombreBoton();
-                                $arrayTrans['comentario'] = $reg->getTraComentario()?"true":"false";
-                                $arrayTrans['litrosLibera'] = $reg->getTraLitrosLibera()?"true":"false";
-                                
-                                $tmpIndex[$reg->getTraId()]=true;
+                                    $arrayTrans['id'] = $reg->getTraId();
+                                    $arrayTrans['nombre'] = $reg->getEstado()->getEstNombreBoton();
+                                    $arrayTrans['comentario'] = $reg->getTraComentario()?"true":"false";
+                                    $arrayTrans['litrosLibera'] = $reg->getTraLitrosLibera()?"true":"false";
 
-                                $result[] = $arrayTrans;
+                                    $tmpIndex[$reg->getTraId()]=true;
+
+                                    $result[] = $arrayTrans;
+                                }
                             }
                         }
                     }
@@ -763,6 +900,7 @@ class AccionSCASolLocalController extends Controller {
     public function cambiarEstadoAction(Request $request, $localDetId, $traId){
         $auditUser = $this->container->get('security.context')->getToken()->getUser();
         $errorList = '';
+        $proseguir = false;
         
         $solLocalDao = new SolLocalDao($this->getDoctrine());
         $solLocalDetDao = new SolLocalDetDao($this->getDoctrine());
@@ -790,6 +928,7 @@ class AccionSCASolLocalController extends Controller {
             foreach($transicionesRol as $transicionRol){
                 foreach($nextTransiciones as $reg){
                     if($reg->getFlujo()->getFluId() == Flujo::$LOCAL && $transicionRol->getTraId() == $reg->getTraId() && $traId == $reg->getTraId()){
+                        
                         //Validacion de empresa que ingresa la solicitud
                         $entidad = $solLocalDet->getSolLocal()->getEntidad();
                         $year = new \DateTime();
@@ -812,73 +951,84 @@ class AccionSCASolLocalController extends Controller {
                         }
                         
                         if( $autorizadoDNM == true && $entidad->getEntHabilitado() == true && $provEntidad == true){
-                        
-                            if($reg->getTraComentario()){
-                                $solLocalComentario = $request->get('solLocalComentario');
-                                if($solLocalComentario==null || $solLocalComentario==''){
-                                    $errorList = $errorList.'- Es necesario detallar un comentario para pasar a la siguiente etapa';
-                                }else{
-                                    $solLocalDet->getSolLocal()->setSolLocalComentario($solLocalComentario);
-                                }
+                            
+                            if(($solLocalDet->getSolLocal()->getEntidad()->getEntId() == $auditUser->getEntidad()->getEntId() && $rol->getRolTipo() == User::$COMPRADOR)
+                                ||
+                                ($inventarioProv->getEntidad()->getEntId() == $auditUser->getEntidad()->getEntId() && $rol->getRolTipo() == User::$VENDEDOR)
+                            ){
+                                $proseguir = true;
                             }
+                            
+                            if($proseguir == false){
+                                $errorList = $errorList.'#### AUDITORIA: Su usuario no tiene permisos para cambiar el estado de esta solicitud ####';
+                            }else{
+                                if($reg->getTraComentario()){
+                                    $solLocalComentario = $request->get('solLocalComentario');
+                                    if($solLocalComentario==null || $solLocalComentario==''){
+                                        $errorList = $errorList.'- Es necesario detallar un comentario para pasar a la siguiente etapa';
+                                    }else{
+                                        $solLocalDet->getSolLocal()->setSolLocalComentario($solLocalComentario);
+                                    }
+                                }
 
-                            if($reg->getTraLitrosLibera() || $reg->getTraLiberaTotal()){
-                                $localDetLitrosLib = $solLocalDet->getLocalDetLitrosLib();
-                                $localDetLitros = $solLocalDet->getLocalDetLitros();
-                                $litrosLib = $request->get('localDetLitrosLib');
+                                if($reg->getTraLitrosLibera() || $reg->getTraLiberaTotal()){
+                                    $localDetLitrosLib = $solLocalDet->getLocalDetLitrosLib();
+                                    $localDetLitros = $solLocalDet->getLocalDetLitros();
+                                    $litrosLib = $request->get('localDetLitrosLib');
 
-                                if($reg->getTraLiberaTotal()){
-                                    $solLocalDet->setLocalDetLitrosLib($localDetLitros);
-                                    $inventarioDet = $this->agregarInventario($solLocalDet->getCuota(), $localDetLitros - $localDetLitrosLib);
+                                    if($reg->getTraLiberaTotal()){
+                                        $solLocalDet->setLocalDetLitrosLib($localDetLitros);
+                                        $inventarioDet = $this->agregarInventario($solLocalDet->getCuota(), $localDetLitros - $localDetLitrosLib);
 
-                                    $inventarioDet->setSolLocalDet($solLocalDet);
-                                    $solLocalDet->addInventarioDet($inventarioDet);
+                                        $inventarioDet->setSolLocalDet($solLocalDet);
+                                        $solLocalDet->addInventarioDet($inventarioDet);
 
-                                    $inventarioDetProv = $this->agregarInventarioProveedor(
-                                        $solLocalDet,
-                                        $inventarioProv->getInvId(),
-                                        $localDetLitros - $localDetLitrosLib ,
-                                        $solLocalDet->getCuota()->getCuoGrado(),
-                                        false,
-                                        false
-                                    );
-                                    $inventarioDetProv->setSolLocalDet($solLocalDet);
-                                    $inventarioDetProv->getSolLocalDet()->addInventarioDet($inventarioDet);
+                                        $inventarioDetProv = $this->agregarInventarioProveedor(
+                                            $solLocalDet,
+                                            $inventarioProv->getInvId(),
+                                            $localDetLitros - $localDetLitrosLib ,
+                                            $solLocalDet->getCuota()->getCuoGrado(),
+                                            false,
+                                            false
+                                        );
+                                        $inventarioDetProv->setSolLocalDet($solLocalDet);
+                                        $inventarioDetProv->getSolLocalDet()->addInventarioDet($inventarioDet);
 
-                                }else if($reg->getTraLitrosLibera()){
+                                    }else if($reg->getTraLitrosLibera()){
 
-                                    try{
-                                        $litrosLib = (float) $litrosLib;
-                                        $localDetLitrosLib = (float) $localDetLitrosLib;
-                                        $localDetLitros = (float) $localDetLitros;
+                                        try{
+                                            $litrosLib = (float) $litrosLib;
+                                            $localDetLitrosLib = (float) $localDetLitrosLib;
+                                            $localDetLitros = (float) $localDetLitros;
 
-                                        if($litrosLib ==null || $litrosLib ==''){
-                                            $errorList = $errorList.'- Debe ingresar los litros a liberar';
-                                        }else if($localDetLitros - $localDetLitrosLib - $litrosLib <= 0){
-                                            $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($localDetLitros - $localDetLitrosLib);
-                                        }else if($litrosLib <=0){
-                                            $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
-                                        }else{
-                                            $solLocalDet->setLocalDetLitrosLib($localDetLitrosLib + $litrosLib);
+                                            if($litrosLib ==null || $litrosLib ==''){
+                                                $errorList = $errorList.'- Debe ingresar los litros a liberar';
+                                            }else if($localDetLitros - $localDetLitrosLib - $litrosLib <= 0){
+                                                $errorList = $errorList.'- La cantidad de litros liberados debe ser menor a la cantidad pendiente por liberar '.($localDetLitros - $localDetLitrosLib);
+                                            }else if($litrosLib <=0){
+                                                $errorList = $errorList.'- Debe ingresar una cantidad mayor a 0';
+                                            }else{
+                                                $solLocalDet->setLocalDetLitrosLib($localDetLitrosLib + $litrosLib);
 
-                                            $inventarioDet = $this->agregarInventario($solLocalDet->getCuota(), $litrosLib);
+                                                $inventarioDet = $this->agregarInventario($solLocalDet->getCuota(), $litrosLib);
 
-                                            $inventarioDet->setSolLocalDet($solLocalDet);
-                                            $solLocalDet->addInventarioDet($inventarioDet);
+                                                $inventarioDet->setSolLocalDet($solLocalDet);
+                                                $solLocalDet->addInventarioDet($inventarioDet);
 
-                                            $inventarioDetProv = $this->agregarInventarioProveedor(
-                                                $solLocalDet,
-                                                $inventarioProv->getInvId(),
-                                                $litrosLib,
-                                                $solLocalDet->getCuota()->getCuoGrado(),
-                                                false,
-                                                true
-                                            );
-                                            $inventarioDetProv->setSolLocalDet($solLocalDet);
-                                            $inventarioDetProv->getSolLocalDet()->addInventarioDet($inventarioDet);
+                                                $inventarioDetProv = $this->agregarInventarioProveedor(
+                                                    $solLocalDet,
+                                                    $inventarioProv->getInvId(),
+                                                    $litrosLib,
+                                                    $solLocalDet->getCuota()->getCuoGrado(),
+                                                    false,
+                                                    true
+                                                );
+                                                $inventarioDetProv->setSolLocalDet($solLocalDet);
+                                                $inventarioDetProv->getSolLocalDet()->addInventarioDet($inventarioDet);
+                                            }
+                                        }  catch (Exception $e){
+                                            $errorList = $errorList.'- Debe ingresar un número valido';
                                         }
-                                    }  catch (Exception $e){
-                                        $errorList = $errorList.'- Debe ingresar un número valido';
                                     }
                                 }
                             }
@@ -1142,6 +1292,35 @@ class AccionSCASolLocalController extends Controller {
         $inventarioDet->setInvDetComentario("Solicitud #".$inventarioDet->getSolLocalDet()->getLocalDetId()." Cancelada/Rechazada");
         
         return $inventarioDet;
+    }
+    
+    private function crearInvIdProductor(Inventario $inventarioDetalle, Entidad $provEntidad){
+        $user = $this->get('security.context')->getToken()->getUser();
+        
+        $inventarioDao = new InventarioDao($this->getDoctrine());
+        
+        //Buscamos si el encabezado en la tabla de "Inventario" existe
+        $inventario = $inventarioDao->findInventario(
+                            $provEntidad->getEntId(),
+                            $inventarioDetalle->getAlcohol()->getAlcId(),
+                            $inventarioDetalle->getInvGrado(),
+                            $inventarioDetalle->getInvNombreEsp()
+                        );
+
+        if($inventario == null){
+            //#### Encabezado de Inventario
+            $inventario = new Inventario();
+            $inventario->setEntidad($provEntidad);
+            $inventario->setAlcohol($inventarioDetalle->getAlcohol());
+            $inventario->setInvLitros(0);
+            $inventario->setInvGrado($inventarioDetalle->getInvGrado());
+            $inventario->setInvNombreEsp($inventarioDetalle->getInvNombreEsp());
+            $inventario->setAuditUserIns($user->getUsername());
+            $inventario->setAuditDateIns(new \DateTime());
+        }
+        
+        $inventarioDao->addInventario($inventario);
+        return $inventario->getInvId();
     }
 }
 ?>

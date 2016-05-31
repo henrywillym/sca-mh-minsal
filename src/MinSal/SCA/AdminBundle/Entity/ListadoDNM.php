@@ -165,7 +165,7 @@ class ListadoDNM
      */
     public function setLdnm_tipo_persona($ldnm_tipo_persona)
     {if($ldnm_tipo_persona=="Natural") $this->ldnm_tipo_persona = "N";
-     if($ldnm_tipo_persona=="Juridica")$this->ldnm_tipo_persona = "J";     
+     if($ldnm_tipo_persona=="Jurídica")$this->ldnm_tipo_persona = "J";     
     }
 
     /**
@@ -176,7 +176,7 @@ class ListadoDNM
     public function getLdnm_tipo_persona()
     {
     	if($this->ldnm_tipo_persona=="N") return "Natural";
-    	if($this->ldnm_tipo_persona=="J") return "Juridica";
+    	if($this->ldnm_tipo_persona=="J") return "Jurídica";
     }
     
      /**

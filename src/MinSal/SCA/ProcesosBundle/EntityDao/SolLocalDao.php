@@ -216,18 +216,30 @@ class SolLocalDao {
      * @param int $etpId
      * @return int
      */
-    public function getCantidadSolicitudesXEtapa($entId, $etpId){
-        $registros = $this->em->createQuery("SELECT count( distinct E.solLocalId)
-                                          FROM MinSalSCAProcesosBundle:SolLocalDet EE
-                                                JOIN EE.solLocal E 
-                                                JOIN E.entidad A
-                                                JOIN E.transicion F
-                                                JOIN F.etpFin G
-                                                JOIN EE.inventariosDet BB
-                                                JOIN BB.inventario DD
-                                                JOIN DD.entidad CC
-                                          WHERE G.etpId = :etpId
-                                            AND (A.entId = :entId or CC.entId = :entId or :entId =0)")
+    public function getCantidadSolicitudesXEtapa($entId, $etpId, $comprador, $vendedor){
+        $sql = "SELECT count(distinct E.solLocalId)
+                FROM MinSalSCAProcesosBundle:SolLocalDet EE
+                      JOIN EE.solLocal E 
+                      JOIN E.entidad A
+                      JOIN E.transicion F
+                      JOIN F.etpFin G
+                      JOIN EE.inventariosDet BB
+                      JOIN BB.inventario DD
+                      JOIN DD.entidad CC
+                WHERE G.etpId = :etpId
+                  AND (
+                      :entId = 0 ";
+        if($comprador){
+            $sql = $sql. " or A.entId = :entId ";
+        }
+        
+        if($vendedor){
+            $sql = $sql. " or CC.entId = :entId ";
+        }
+        
+        $sql = $sql." )";
+        
+        $registros = $this->em->createQuery($sql)
                 ->setParameter('etpId', $etpId)
                 ->setParameter('entId', $entId);
         

@@ -128,7 +128,7 @@ class ListadoDNMDao {
             $cant = $result->getSingleScalarResult();
             
             if($cant == 0){
-                return false;
+                return true;//Cambiar a False para implementar validacion de DNM
             }else{
                 return true;
             }

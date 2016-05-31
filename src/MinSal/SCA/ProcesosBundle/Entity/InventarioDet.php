@@ -331,4 +331,9 @@ class InventarioDet {
         
         $this->inventario->setInvGrado($invGrado);
     }
+    
+    
+    public function getInvDetFechaText() {
+        return $this->invDetFecha->format('Y-m-d');
+    }
 }

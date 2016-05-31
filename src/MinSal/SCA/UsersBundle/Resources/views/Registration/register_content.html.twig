@@ -77,7 +77,7 @@
             
             var opciones = $('#fos_user_registration_form_userTipo').children();
             opciones.filter(function(index){
-                if(this.value =='VENDEDOR' || this.value=='COMPRADOR'){
+                if(this.value =='VENDEDOR' || this.value=='COMPRADOR' || this.value =='COMPRADOR_VENDEDOR'){
                     return true;
                 }else{
                     return false;
@@ -99,7 +99,7 @@
             
             var opciones = $('#fos_user_registration_form_userTipo').children();
             opciones.filter(function(index){
-                if(this.value =='VENDEDOR' || this.value=='COMPRADOR'){
+                if(this.value =='VENDEDOR' || this.value=='COMPRADOR' || this.value =='COMPRADOR_VENDEDOR'){
                     return true;
                 }else{
                     return false;
@@ -135,9 +135,11 @@
 </script>
     
     {% for key, message in app.session.getFlashes() %}
-        <div class="{{ key }}">
-            {{ message|trans({}, 'FOSUserBundle') }}
-        </div>
+        <center>
+            <div class="flash-notice"> <!--{{ key }}-->
+                {{ message|trans({}, 'FOSUserBundle') }}
+            </div>
+        </center>
     {% endfor %}
 
     {# ************************************************** #}

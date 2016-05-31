@@ -206,6 +206,14 @@
                         $('#gradoProv').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('grado'));
                         $('#disponibleProv').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('disponible'));
                         $('[id="SolLocalDet_invId"]').val($('#invId').val());
+                        
+                        if($('#invId').val() == '0'){
+                            $('#productor').val(true);
+                            $('#prodEntId').val($('#invId').children("option").filter("[value='"+ $('#invId').val() +"']").attr('entId'));
+                        }else{
+                            $('#productor').val(false);
+                            $('#prodEntId').val(0);
+                        }
                     });
                     
                     $('#invId').change();
@@ -219,6 +227,8 @@
     <form id="formulario" action="{{ path('MinSalSCAProcesosBundle_mantSolLocalEdicion') }}" {{ form_enctype(form) }} 
            onsubmit="return enviarFormulario();" method="POST" class="SolLocalDetTypeForm">
         
+        <input type="hidden" id="prodEntId" name="prodEntId" value="" />
+        <input type="hidden" id="productor" name="productor" value=false />
         <input type="hidden" id="valido" value=false />
         <input type="hidden" id="eliminar" name="eliminar" value=false />
         <input type="hidden" id="solLocalComentario" name="solLocalComentario" />

@@ -5,6 +5,7 @@ use Doctrine\ORM\Query;
 use MinSal\SCA\ProcesosBundle\Entity\Flujo;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacion;
 use MinSal\SCA\ProcesosBundle\Entity\SolImportacionDet;
+use MinSal\SCA\UsersBundle\Entity\User;
 
 /**
  * RepositoryClass de Transicion
@@ -72,6 +73,7 @@ class TransicionDao {
                                             LEFT JOIN C.entidad D
                                           WHERE AA.traId = :traId
                                             AND ((D.entId = :entId and AA.traNotificaEmpresa = true) OR D.entId = ".$provEntId." OR C.userInterno = true)
+                                            AND B.rolTipo not in ('".User::$VENDEDOR."')
                                             AND C.auditDeleted = false")
                 ->setParameter('traId',$traId)
                 ->setParameter('entId',$entId);

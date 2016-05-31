@@ -33,7 +33,7 @@
                 <input type="button" value="Eliminar" id="eliminarCuota"/> &nbsp;
             {%else%}
                 <div class="flash-notice">
-                    No se pueden ingresar/modificar cuotas, debido a que la empresa no tiene vigente la autorización de la Dirección General de Medicamentos
+                    No se pueden ingresar/modificar cuotas, debido a que la empresa no tiene vigente la autorización de la Dirección Nacional de Medicamentos
                 </div>
             {%endif%}
             <input id="btnRegresar" type="button" value="Regresar" onclick="location.href = '{{ url('MinSalSCAAdminBundle_mantCargarEntidad',{'entId':entId})}}';"/>

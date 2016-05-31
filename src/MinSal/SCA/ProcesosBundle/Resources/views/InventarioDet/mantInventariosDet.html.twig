@@ -36,8 +36,19 @@
                         label:'ID',
                         name:'invDetId', 
                         index: 'invDetId', 
-                        hidden: true,
+                        //hidden: true,
                         width:20
+                    },{ 
+                        label:'Fecha',
+                        name:'invDetFechaText', 
+                        index: 'invDetFechaText', 
+                        width:90,
+                        searchoptions:{
+                            sopt: searchOptionDate,
+                            dataInit:  function (elem) {
+                                $(elem).datepicker();
+                            }
+                        }
                     },{
                         label:'Nombre Alcohol',
                         name:'inventario.alcohol.alcNombre', 
@@ -51,6 +62,10 @@
                         name:'inventario.invGrado', 
                         index: 'inventario.invGrado', 
                         width:90
+                    },{
+                        label:'Acción',
+                        name:'invDetAccion', 
+                        index: 'invDetAccion'
                     },{ 
                         label:'Cantidad (Ltr)',
                         name:'invDetLitros', 

@@ -10,7 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * RepositoryClass de RegMensual
- * @author Daniel E. Diaz
+ * @author Daniel E. Diaz (dansel7@gmail.com)
  * 
  * @ORM\Entity
  * @ORM\Table(name="sca_registro_mensual")
@@ -18,8 +18,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 class RegMensual {
     
     public function __construct() {
-        $year = date("Y", strtotime("-1 month"));
-        $month = date("m", strtotime("-1 month"));
+        $year = date("Y");
+        $month = date("m");
         $this->regmen_year = $year;
         $this->regmen_mes = $month+0;
         $this->auditDeleted = false;
@@ -60,7 +60,14 @@ class RegMensual {
      * @ORM\Column(name="ent_id", type="integer", nullable=false)
      */
     protected $entidad;
-
+    
+    /**
+     * @var integer $alcohol
+     * @ORM\ManyToOne(targetEntity="MinSal\SCA\AdminBundle\Entity\Cuota")
+     * @ORM\JoinColumn(name="cuo_id", referencedColumnName="cuo_id")
+     * * @ORM\Column(name="cuo_id", type="integer", nullable=false)
+     */
+    protected $alcohol;
        
     /**
      * @var numeric $regmen_year
@@ -205,6 +212,15 @@ class RegMensual {
         $this->entidad = $entidad;
     }
 
+    
+    public function getAlcohol() {
+        return $this->alcohol;
+    }
+
+    public function setAlcohol($alcohol) {
+        $this->alcohol = $alcohol;
+    }
+    
     public function getRegmenyear() {
         return $this->regmen_year;
     }

@@ -2,6 +2,7 @@
 namespace MinSal\SCA\AdminBundle\EntityDao;
 
 use MinSal\SCA\AdminBundle\Entity\Entidad;
+use MinSal\SCA\UsersBundle\Entity\User;
 
 /**
  * RepositoryClass de Entidad
@@ -117,7 +118,9 @@ class EntidadDao {
         $registros = $this->em->createQuery("SELECT distinct C.email
                                           FROM MinSalSCAAdminBundle:Entidad E 
                                             JOIN E.users C
+                                            JOIN C.rols D
                                           WHERE E.entId = :entId
+                                            AND D.rolTipo in ('".User::$COMPRADOR."', '".User::$COMPRADOR_VENDEDOR."')
                                             AND C.auditDeleted = false")
                 ->setParameter('entId',$entId);
         $result = array();

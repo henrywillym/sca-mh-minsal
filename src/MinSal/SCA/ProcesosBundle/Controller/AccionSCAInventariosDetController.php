@@ -60,7 +60,14 @@ class AccionSCAInventariosDetController extends Controller {
         //$emple = new InventarioDet();
 
         if ($numfilas != 0) {
-            //array_multisort($registros, SORT_ASC);
+            $inventarioDet = new InventarioDet();
+            $i = 0;
+            
+            foreach ($registros as $ent) {
+                $inventarioDet->setInvDetFecha($ent['invDetFecha']);
+                $registros[$i]['invDetFechaText']= $inventarioDet->getInvDetFechaText();
+                $i=$i+1;
+            }
             
         } else {
             //$rows[0]['id'] = 0;

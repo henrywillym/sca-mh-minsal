@@ -74,6 +74,7 @@ class RegistrationFormType  extends BaseType{
             'expanded'=>false,
             'multiple'=>false,
             'choices'=> array(
+                User::$COMPRADOR_VENDEDOR => User::$COMPRADOR_VENDEDOR_TEXT,
                 User::$VENDEDOR => User::$VENDEDOR_TEXT, 
                 User::$COMPRADOR => User::$COMPRADOR_TEXT,
                 User::$DIGITADOR => User::$DIGITADOR_TEXT, 

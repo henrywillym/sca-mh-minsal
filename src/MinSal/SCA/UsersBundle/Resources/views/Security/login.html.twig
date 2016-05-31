@@ -40,9 +40,9 @@
             <td colspan="2" style=" font-size: 12px; font-family: Verdana, Geneva, sans-serif; color: red " >
                 {% if error %}
                     {% if error=='Bad credentials' %}
-                       <div>NO EXISTE ESE USUARIO</div>
+                       <div>ERROR DE USUARIO/CONTRASEÑA</div>
                     {% elseif error=='The presented password is invalid.' %}
-                       <div>USUARIO/PASSWORD INCORRECTOS</div>
+                       <div>USUARIO/CONTRASEÑA INCORRECTOS</div>
                     {% elseif error=='User account is disabled.' %}
                        <div id="msgDialogComentario" title="Notificación" style="display:none">
                            LA CUENTA NO SE ENCUENTRA CONFIRMADA AUN. PARA ACTIVARLA ES NECESARIO SEGUIR LAS INSTRUCCIONES QUE SE PROPORCIONARON EN EL CORREO DE ACTIVACION
